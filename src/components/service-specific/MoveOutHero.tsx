@@ -8,7 +8,7 @@ export default function MoveOutHero({ location = "Brooklyn, NY" }: MoveOutHeroPr
   return (
     <BaseHero
       title="Book a Move In/Out Clean in Brooklyn"
-      description="Professional move in/out cleaning to ensure your property is spotless for the next occupants. Get your deposit back with our thorough, inspection-ready cleaning service."
+      description="Professional move in/out cleaning for spotless properties. Get your deposit back with our thorough, inspection-ready service."
       location={location}
       showWizard={true}
     />
