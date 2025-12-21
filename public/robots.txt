@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.brooklynmaids.com/sitemap.xml
+
+# Allow search engines to crawl important pages
+Allow: /locations/
+Allow: /services/
+Allow: /quote
+Allow: /booking
+Allow: /privacy
+Allow: /terms
+Allow: /refund
+
+# Block any private areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /provider/
+Disallow: /account/
+
+# Crawl delay
+Crawl-delay: 1

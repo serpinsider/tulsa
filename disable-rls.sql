@@ -1,0 +1,5 @@
+-- Disable RLS on NextAuth tables (they handle their own security)
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE accounts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE verification_token DISABLE ROW LEVEL SECURITY;
