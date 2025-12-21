@@ -12,7 +12,7 @@ import { COLORS } from '@/styles/colors';
 // Helper to get form background color
 const getFormBg = () => {
   const primary = COLORS.backgrounds.primary;
-  // If it's a CSS variable, fallback to Mesa brown
+  // If it's a CSS variable, fallback to Las Vegas brown
   if (primary.includes('var(')) {
     return 'rgba(45, 20, 16, 0.5)';
   }
@@ -293,7 +293,18 @@ export default function QuoteForm() {
         squareFootage: formData.squareFootage,
         addons: formData.addons,
         confirmationNumber: confirmationNumber,
-        _subject: `Brooklyn Maids - Quote Request from ${formData.firstName} ${formData.lastName}`,
+        // Display labels for Formspree dashboard
+        'First Name': formData.firstName,
+        'Last Name': formData.lastName,
+        'Email': formData.email,
+        'Phone': formData.phone,
+        'Bedrooms': formData.bedrooms,
+        'Bathrooms': formData.bathrooms,
+        'Zip Code': formData.zipCode,
+        'Service Type': serviceTypeNames[formData.serviceType] || formData.serviceType,
+        'Home Size': formData.squareFootage,
+        'Extra Add-ons': extraAddons.length > 0 ? extraAddons.join(', ') : 'None',
+        'Confirmation Number': confirmationNumber
       };
 
       const response = await fetch('https://formspree.io/f/mrbjzvde', {
@@ -301,7 +312,10 @@ export default function QuoteForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(cleanFormData),
+        body: JSON.stringify({
+          ...cleanFormData,
+          _subject: `Brooklyn Maids - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+        }),
       });
 
       const result = await response.json();
@@ -322,11 +336,11 @@ export default function QuoteForm() {
   };
 
   if (submitted) {
-    return <SuccessMessage type="quote" confirmationNumber={confirmationNumber} frequency={formData.frequency} />;
+    return <SuccessMessage type="quote" confirmationNumber={confirmationNumber} />;
   }
 
   return (
-    <div className="w-full max-w-full sm:container mx-auto px-4 pt-48 pb-12">
+    <div className="w-full max-w-full sm:container mx-auto px-4 py-20">
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
         <div className="lg:col-span-2 backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: getFormBg() }}>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Get a free quote instantly!</h1>
@@ -449,39 +463,6 @@ export default function QuoteForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  Home Size (Square Footage)*
-                </label>
-                <select
-                  value={formData.squareFootage}
-                  onChange={(e) => setFormData({ ...formData, squareFootage: e.target.value })}
-                  className="w-full p-3 border border-white/20 rounded-lg text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
-                  style={{ background: getFormBg() }}
-                >
-                  <option value="Under 1,000 sqft">Under 1,000 sqft</option>
-                  <option value="1,000-2,000 sqft">1,000-2,000 sqft</option>
-                  <option value="2,000+">2,000+ sqft</option>
-                  <option value="3,000+ sqft">3,000+ sqft</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  Zip Code*
-                </label>
-                <input
-                  type="text"
-                  value={formData.zipCode}
-                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '').slice(0, 5) })}
-                  placeholder="Enter zip code"
-                  maxLength={5}
-                  className="w-full p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
-                  style={{ background: getFormBg() }}
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-semibold mb-2 text-white">
                 Service Type
@@ -491,7 +472,7 @@ export default function QuoteForm() {
                   { id: 'standard', name: 'Standard Clean', description: 'Regular maintenance' },
                   { id: 'deep', name: 'Deep Clean', description: 'Thorough cleaning' },
                   { id: 'moveout', name: 'Move Out Clean', description: 'Complete move-out' },
-                  { id: 'post-construction', name: 'Post Construction', description: 'After building work' },
+                  { id: 'post-construction', name: 'Post Construction', description: 'Post-renovation' },
                   { id: 'carpet', name: 'Carpet Cleaning', description: 'Deep carpet clean' },
                   { id: 'handyman', name: 'Handyman', description: 'Assembly & repairs' }
                 ].map(({ id, name, description }) => (
@@ -602,7 +583,7 @@ export default function QuoteForm() {
             )}
 
             <p className="text-xs text-white/60 text-center mb-4 mt-8">
-              By submitting this form, you agree to receive communications from Bayside Maids regarding your quote request. We respect your privacy and will never share your information.
+              By submitting this form, you agree to receive communications from Brooklyn Maids regarding your quote request. We respect your privacy and will never share your information.
             </p>
 
             <button
@@ -622,10 +603,10 @@ export default function QuoteForm() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm text-white/80">4.9 (500+ Reviews)</span>
+                <span className="text-sm text-white/80">4.9 (141 Reviews)</span>
               </div>
               <div className="text-sm text-white/80">
-                <span className="font-semibold">5,000+</span> Homes Cleaned
+                <span className="font-semibold">141</span> Happy Customers
               </div>
             </div>
 
@@ -742,7 +723,7 @@ export default function QuoteForm() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-white/90">What areas do you serve?</p>
                       <p className="text-xs text-white/70 leading-relaxed">
-                        We serve Brooklyn, Manhattan, Queens, Bronx, Staten Island, Long Island, Westchester, and Northern New Jersey. Contact us to confirm service in your area.
+                        We serve Washington DC, Baltimore, Boston, Charlotte, Richmond, and surrounding areas across MD, DC, VA, NC, CT, and MA. Contact us to confirm service in your area.
                       </p>
                     </div>
 
