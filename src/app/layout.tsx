@@ -3,7 +3,6 @@ import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
-import SessionProvider from "@/components/SessionProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PostHogProvider from "@/components/PostHogProvider";
 
@@ -66,9 +65,6 @@ export const metadata: Metadata = {
     creator: "@brooklynmaids",
     images: ["/ogs-image.jpg"],
   },
-  alternates: {
-    canonical: "https://brooklynmaids.com",
-  },
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
@@ -107,14 +103,12 @@ export default function RootLayout({
         />
         <ErrorBoundary>
           <PostHogProvider>
-            <SessionProvider>
-              <StructuredData type="local-business" />
-              <StructuredData type="organization" />
-              <StructuredData type="website" />
-              <ConditionalLayout>
-                {children}
-              </ConditionalLayout>
-            </SessionProvider>
+            <StructuredData type="local-business" />
+            <StructuredData type="organization" />
+            <StructuredData type="website" />
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
           </PostHogProvider>
         </ErrorBoundary>
 

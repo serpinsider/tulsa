@@ -37,7 +37,8 @@ export const locations: Location[] = [
   { name: "Long Island", slug: "long-island", state: "NY" },
   { name: "Westchester", slug: "westchester", state: "NY" },
   
-  // New Jersey - Core Markets (2)
+  // New Jersey - Core Markets (3)
+  { name: "New Jersey", slug: "new-jersey", state: "NJ" },
   { name: "Jersey City", slug: "jersey-city", state: "NJ" },
   { name: "Hoboken", slug: "hoboken", state: "NJ" },
 ];
@@ -73,7 +74,7 @@ export function getLocationBySlug(slug: string): Location | undefined {
 
 // Get popular locations for featured display
 export const popularLocations = [
-  "brooklyn", "manhattan", "queens", "jersey-city", "hoboken",
+  "brooklyn", "manhattan", "queens", "new-jersey", "jersey-city", "hoboken",
   "long-island", "westchester"
 ];
 
