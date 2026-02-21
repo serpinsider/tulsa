@@ -1,4 +1,12 @@
-import { CONTACT_INFO } from '@/lib/contact';
+/**
+ * StructuredData Component
+ * 
+ * Automatically pulls service areas from locations.ts
+ * No manual updates needed when creating new sites.
+ */
+
+import { BRANDING } from '@/config/branding';
+import { locations } from '@/lib/locations';
 
 interface StructuredDataProps {
   type: 'local-business' | 'service' | 'location' | 'organization' | 'website' | 'faq';
@@ -16,19 +24,19 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         return {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          "name": "Brooklyn Maids",
-          "image": "https://brooklynmaids.com/ogs-image.jpg",
-          "description": "House cleaning services serving Brooklyn and surrounding NYC areas. Reliable, thorough, and trusted cleaning for your home.",
-          "url": "https://brooklynmaids.com",
-          "telephone": CONTACT_INFO.phone.raw,
-          "email": CONTACT_INFO.email.raw,
+          "name": BRANDING.businessName,
+          "image": `${BRANDING.url}${BRANDING.assets.ogImage}`,
+          "description": BRANDING.seo.metaDescription,
+          "url": BRANDING.url,
+          "telephone": BRANDING.phone.raw,
+          "email": BRANDING.email.display,
           "address": {
             "@type": "PostalAddress",
             "addressCountry": "US",
-            "addressRegion": CONTACT_INFO.address.state,
-            "addressLocality": CONTACT_INFO.address.city,
-            "postalCode": CONTACT_INFO.address.zip,
-            "streetAddress": CONTACT_INFO.address.street
+            "addressRegion": BRANDING.address.state,
+            "addressLocality": BRANDING.address.city,
+            "postalCode": BRANDING.address.zip,
+            "streetAddress": BRANDING.address.street
           },
           "geo": {
             "@type": "GeoCoordinates",
@@ -38,106 +46,12 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           "areaServed": [
             {
               "@type": "State",
-              "name": "New York"
+              "name": BRANDING.primaryState
             },
-            {
-              "@type": "State",
-              "name": "New Jersey"
-            },
-            // NYC Boroughs
-            { "@type": "City", "name": "Brooklyn" },
-            { "@type": "City", "name": "Manhattan" },
-            { "@type": "City", "name": "Queens" },
-            { "@type": "City", "name": "Bronx" },
-            { "@type": "City", "name": "Staten Island" },
-            // Brooklyn Neighborhoods
-            { "@type": "AdministrativeArea", "name": "Park Slope" },
-            { "@type": "AdministrativeArea", "name": "Williamsburg" },
-            { "@type": "AdministrativeArea", "name": "Brooklyn Heights" },
-            { "@type": "AdministrativeArea", "name": "DUMBO" },
-            { "@type": "AdministrativeArea", "name": "Downtown Brooklyn" },
-            { "@type": "AdministrativeArea", "name": "Fort Greene" },
-            { "@type": "AdministrativeArea", "name": "Prospect Heights" },
-            { "@type": "AdministrativeArea", "name": "Carroll Gardens" },
-            { "@type": "AdministrativeArea", "name": "Cobble Hill" },
-            { "@type": "AdministrativeArea", "name": "Boerum Hill" },
-            { "@type": "AdministrativeArea", "name": "Red Hook" },
-            { "@type": "AdministrativeArea", "name": "Gowanus" },
-            { "@type": "AdministrativeArea", "name": "Sunset Park" },
-            { "@type": "AdministrativeArea", "name": "Crown Heights" },
-            { "@type": "AdministrativeArea", "name": "Bedford-Stuyvesant" },
-            { "@type": "AdministrativeArea", "name": "Bushwick" },
-            { "@type": "AdministrativeArea", "name": "Greenpoint" },
-            { "@type": "AdministrativeArea", "name": "Clinton Hill" },
-            { "@type": "AdministrativeArea", "name": "Windsor Terrace" },
-            { "@type": "AdministrativeArea", "name": "Bay Ridge" },
-            { "@type": "AdministrativeArea", "name": "Albemarle" },
-            { "@type": "AdministrativeArea", "name": "Atlantic Terminal" },
-            { "@type": "AdministrativeArea", "name": "Bath Beach" },
-            { "@type": "AdministrativeArea", "name": "Bensonhurst" },
-            { "@type": "AdministrativeArea", "name": "Bergen Beach" },
-            { "@type": "AdministrativeArea", "name": "Borough Park" },
-            { "@type": "AdministrativeArea", "name": "Brighton Beach" },
-            { "@type": "AdministrativeArea", "name": "Broadway Junction" },
-            { "@type": "AdministrativeArea", "name": "Brooklyn Navy Yard" },
-            { "@type": "AdministrativeArea", "name": "Brownsville" },
-            { "@type": "AdministrativeArea", "name": "Canarsie" },
-            { "@type": "AdministrativeArea", "name": "City Line" },
-            { "@type": "AdministrativeArea", "name": "Columbia Street Waterfront" },
-            { "@type": "AdministrativeArea", "name": "Coney Island" },
-            { "@type": "AdministrativeArea", "name": "Cypress Hills" },
-            { "@type": "AdministrativeArea", "name": "Dahill" },
-            { "@type": "AdministrativeArea", "name": "Dyker Beach Park" },
-            { "@type": "AdministrativeArea", "name": "Dyker Heights" },
-            { "@type": "AdministrativeArea", "name": "East Flatbush" },
-            { "@type": "AdministrativeArea", "name": "East New York" },
-            { "@type": "AdministrativeArea", "name": "East Williamsburg" },
-            { "@type": "AdministrativeArea", "name": "Erasmus" },
-            { "@type": "AdministrativeArea", "name": "Farragut" },
-            { "@type": "AdministrativeArea", "name": "Flatbush" },
-            { "@type": "AdministrativeArea", "name": "Flatlands" },
-            { "@type": "AdministrativeArea", "name": "Floyd Bennett Field" },
-            { "@type": "AdministrativeArea", "name": "Fort Hamilton" },
-            { "@type": "AdministrativeArea", "name": "Georgetown" },
-            { "@type": "AdministrativeArea", "name": "Gerritsen Beach" },
-            { "@type": "AdministrativeArea", "name": "Gravesend" },
-            { "@type": "AdministrativeArea", "name": "Greenwood Cemetery" },
-            { "@type": "AdministrativeArea", "name": "Greenwood Heights" },
-            { "@type": "AdministrativeArea", "name": "Highland Park" },
-            { "@type": "AdministrativeArea", "name": "Homecrest" },
-            { "@type": "AdministrativeArea", "name": "Industry City" },
-            { "@type": "AdministrativeArea", "name": "Kensington" },
-            { "@type": "AdministrativeArea", "name": "Los Sures Southside" },
-            { "@type": "AdministrativeArea", "name": "Madison" },
-            { "@type": "AdministrativeArea", "name": "Manhattan Beach" },
-            { "@type": "AdministrativeArea", "name": "Mapleton" },
-            { "@type": "AdministrativeArea", "name": "Marine Park" },
-            { "@type": "AdministrativeArea", "name": "Midwood" },
-            { "@type": "AdministrativeArea", "name": "Midwood Park" },
-            { "@type": "AdministrativeArea", "name": "Mill Basin" },
-            { "@type": "AdministrativeArea", "name": "Navy Yard" },
-            { "@type": "AdministrativeArea", "name": "New Lots" },
-            { "@type": "AdministrativeArea", "name": "Northside" },
-            { "@type": "AdministrativeArea", "name": "Ocean Hill" },
-            { "@type": "AdministrativeArea", "name": "Paerdegat" },
-            { "@type": "AdministrativeArea", "name": "Parkville" },
-            { "@type": "AdministrativeArea", "name": "Prospect Lefferts Gardens" },
-            { "@type": "AdministrativeArea", "name": "Prospect Park South" },
-            { "@type": "AdministrativeArea", "name": "Remsen Village" },
-            { "@type": "AdministrativeArea", "name": "Seagate" },
-            { "@type": "AdministrativeArea", "name": "Sheepshead Bay" },
-            { "@type": "AdministrativeArea", "name": "South Slope" },
-            { "@type": "AdministrativeArea", "name": "South Williamsburg" },
-            { "@type": "AdministrativeArea", "name": "Starrett City" },
-            { "@type": "AdministrativeArea", "name": "Stuyvesant Heights" },
-            { "@type": "AdministrativeArea", "name": "Victorian Flatbush" },
-            { "@type": "AdministrativeArea", "name": "Vinegar Hill" },
-            // Long Island & Westchester
-            { "@type": "City", "name": "Long Island" },
-            { "@type": "City", "name": "Westchester" },
-            // New Jersey
-            { "@type": "City", "name": "Jersey City" },
-            { "@type": "City", "name": "Hoboken" }
+            ...locations.map(loc => ({
+              "@type": "City",
+              "name": loc.name
+            }))
           ],
           "serviceType": ["House Cleaning", "Maid Service", "Residential Cleaning"],
           "priceRange": "$80-$400",
@@ -152,49 +66,47 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             "worstRating": "1"
           },
           "sameAs": [
-            "https://www.facebook.com/brooklynmaids",
-            "https://www.instagram.com/brooklynmaids",
-            "https://www.linkedin.com/company/brooklynmaids",
-            "https://twitter.com/brooklynmaids"
-          ]
+            BRANDING.social.facebook,
+            BRANDING.social.instagram,
+            BRANDING.social.yelp
+          ].filter(Boolean)
         };
 
       case 'organization':
         return {
           "@context": "https://schema.org",
           "@type": "Organization",
-          "name": "Brooklyn Maids",
-          "url": "https://brooklynmaids.com",
-          "logo": "https://brooklynmaids.com/ogs-image.jpg",
-          "description": "House cleaning services across New York City and surrounding areas.",
+          "name": BRANDING.businessName,
+          "url": BRANDING.url,
+          "logo": `${BRANDING.url}${BRANDING.assets.logo}`,
+          "description": `Professional house cleaning services in ${BRANDING.serviceArea}.`,
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+13477504380",
+            "telephone": BRANDING.phone.raw,
             "contactType": "customer service",
             "areaServed": "US",
             "availableLanguage": "English"
           },
           "sameAs": [
-            "https://www.facebook.com/brooklynmaids",
-            "https://www.instagram.com/brooklynmaids",
-            "https://www.linkedin.com/company/brooklynmaids",
-            "https://twitter.com/brooklynmaids"
-          ]
+            BRANDING.social.facebook,
+            BRANDING.social.instagram,
+            BRANDING.social.yelp
+          ].filter(Boolean)
         };
 
       case 'website':
         return {
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "Brooklyn Maids",
-          "alternateName": ["Brooklyn Maids Cleaning", "brooklynmaids.com"],
-          "url": "https://brooklynmaids.com",
-          "description": "House cleaning services across Brooklyn, New York",
+          "name": BRANDING.businessName,
+          "alternateName": [`${BRANDING.businessName} Cleaning`, BRANDING.domain],
+          "url": BRANDING.url,
+          "description": BRANDING.seo.metaDescription,
           "potentialAction": {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://brooklynmaids.com/search?q={search_term_string}"
+              "urlTemplate": `${BRANDING.url}/search?q={search_term_string}`
             },
             "query-input": "required name=search_term_string"
           }
@@ -255,8 +167,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           "name": `House Cleaning Services${data?.location ? ` in ${data.location}` : ''}`,
           "provider": {
             "@type": "LocalBusiness",
-            "name": "Brooklyn Maids",
-            "url": "https://brooklynmaids.com"
+            "name": BRANDING.businessName,
+            "url": BRANDING.url
           },
           "serviceType": "House Cleaning",
           "description": `House cleaning and maid services${data?.location ? ` in ${data.location}` : ''}. Regular cleaning, deep cleaning, move-out cleaning, and specialty services.`,
@@ -301,7 +213,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           "name": `House Cleaning Services in ${data?.location}`,
           "provider": {
             "@type": "LocalBusiness",
-            "name": "Brooklyn Maids"
+            "name": BRANDING.businessName
           },
           "serviceArea": {
             "@type": "State",

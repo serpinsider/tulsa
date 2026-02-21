@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { SERVICE_AREA_FAQ_ANSWER } from '@/config/content';
+import { BRANDING } from '@/config/branding';
 
 export default function MoveOutFAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -46,7 +48,7 @@ export default function MoveOutFAQSection() {
     },
     {
       question: "What areas do you serve for move-out cleaning?",
-      answer: "We serve all of Brooklyn, Manhattan, Queens, Bronx, Staten Island, Long Island, Westchester, Jersey City, and Hoboken."
+      answer: SERVICE_AREA_FAQ_ANSWER
     }
   ];
 

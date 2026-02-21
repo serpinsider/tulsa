@@ -1,13 +1,17 @@
-import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+'use client';
 
-export const metadata: Metadata = {
-  title: "Get Car Cleaning Quote - Brooklyn Maids",
-  description: "Request a quote for car interior and exterior cleaning services in Brooklyn and NYC.",
-};
+import CarCleaningStepWizard from '@/components/specialty-wizards/CarCleaningStepWizard';
 
 export default function CarCleaningQuotePage() {
-  // Redirect to main quote page
-  redirect('/quote');
+  return (
+    <main className="min-h-screen pt-20" style={{ background: 'rgba(30, 35, 40, 0.98)' }}>
+      <div className="w-full max-w-full sm:container mx-auto px-4 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: 'var(--form-bg-color, rgba(45, 20, 16, 0.5))' }}>
+            <CarCleaningStepWizard />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
-

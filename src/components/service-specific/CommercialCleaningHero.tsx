@@ -1,16 +1,18 @@
 import BaseHero from '../shared/BaseHero';
+import CommercialStepWizard from '../specialty-wizards/CommercialStepWizard';
 
 interface CommercialCleaningHeroProps {
   location?: string;
 }
 
-export default function CommercialCleaningHero({ location = "Brooklyn, NY" }: CommercialCleaningHeroProps) {
+export default function CommercialCleaningHero({ location = "Las Vegas" }: CommercialCleaningHeroProps) {
   return (
     <BaseHero
-      title="Book Commercial Cleaning in NYC"
-      description="Office cleaning, janitorial services, and commercial maintenance for businesses of all sizes."
+      title="Commercial Cleaning Services in Las Vegas"
+      description="Professional cleaning for offices, retail stores, restaurants and more. Flexible scheduling, trained staff, reliable service."
       location={location}
       showWizard={true}
+      CustomWizard={CommercialStepWizard}
     />
   );
 }

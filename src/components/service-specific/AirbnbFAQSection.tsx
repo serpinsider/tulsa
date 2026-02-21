@@ -1,4 +1,5 @@
 import BaseFAQ from '../shared/BaseFAQ';
+import { BRANDING } from '@/config/branding';
 
 export default function AirbnbFAQSection() {
   const faqs = [

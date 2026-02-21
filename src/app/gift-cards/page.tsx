@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import { BRANDING, getBookingKoalaUrl } from '@/config/branding';
 
 export const metadata: Metadata = {
-  title: 'Gift Cards - Brooklyn Maids',
-  description: 'Send the gift of a clean home! Purchase Brooklyn Maids gift cards for friends, family, or clients. Perfect for housewarmings, holidays, or any special occasion.',
+  title: `Gift Cards - ${BRANDING.businessName}`,
+  description: `Send the gift of a clean home! Purchase ${BRANDING.businessName} gift cards for friends, family, or clients. Perfect for housewarmings, holidays, or any special occasion.`,
 };
 
 export default function GiftCardsPage() {
@@ -20,7 +21,7 @@ export default function GiftCardsPage() {
 
         <div className="bg-slate-800/50 backdrop-blur-md rounded-xl shadow-xl border border-white/10 overflow-hidden">
           <iframe 
-            src="https://brooklynmaids.bookingkoala.com/gift-cards/send?embed=true" 
+            src={getBookingKoalaUrl('gift-cards/send')}
             style={{ border: 'none', height: '1000px' }} 
             width="100%" 
             scrolling="no"
@@ -28,7 +29,7 @@ export default function GiftCardsPage() {
           />
         </div>
       </div>
-      <script src="https://brooklynmaids.bookingkoala.com/resources/embed.js" defer />
+      <script src={`https://${BRANDING.integrations.bookingKoalaSubdomain}.bookingkoala.com/resources/embed.js`} defer />
     </div>
   );
 }

@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { CONTACT_INFO } from '@/lib/contact';
+import { BRANDING } from '@/config/branding';
+import { locations } from '@/lib/locations';
+import { FOOTER_DESCRIPTION } from '@/config/content';
+import { COLORS } from '@/styles/colors';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -25,29 +28,38 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* NYC Boroughs */}
+          {/* Primary Locations */}
           <div>
-            <h3 className="text-xs font-semibold text-white/60 mb-3">NYC Boroughs</h3>
+            <h3 className="text-xs font-semibold text-white/60 mb-3">Service Areas</h3>
             <ul className="space-y-2.5">
-              <li><Link href="/locations/brooklyn" className="text-xs text-white/80 hover:text-white">Brooklyn</Link></li>
-              <li><Link href="/locations/manhattan" className="text-xs text-white/80 hover:text-white">Manhattan</Link></li>
-              <li><Link href="/locations/queens" className="text-xs text-white/80 hover:text-white">Queens</Link></li>
-              <li><Link href="/locations/bronx" className="text-xs text-white/80 hover:text-white">Bronx</Link></li>
-              <li><Link href="/locations/staten-island" className="text-xs text-white/80 hover:text-white">Staten Island</Link></li>
+              {locations.slice(0, 5).map((location) => (
+                <li key={location.slug}>
+                  <Link href={`/locations/${location.slug}`} className="text-xs text-white/80 hover:text-white">
+                    {location.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Extended Areas */}
-          <div>
-            <h3 className="text-xs font-semibold text-white/60 mb-3">Extended Areas</h3>
-            <ul className="space-y-2.5">
-              <li><Link href="/locations/long-island" className="text-xs text-white/80 hover:text-white">Long Island</Link></li>
-              <li><Link href="/locations/westchester" className="text-xs text-white/80 hover:text-white">Westchester</Link></li>
-              <li><Link href="/locations/jersey-city" className="text-xs text-white/80 hover:text-white">Jersey City</Link></li>
-              <li><Link href="/locations/hoboken" className="text-xs text-white/80 hover:text-white">Hoboken</Link></li>
-              <li><Link href="/new-jersey" className="text-xs text-white/80 hover:text-white">Northern NJ</Link></li>
-            </ul>
-          </div>
+          {/* Additional Locations */}
+          {locations.length > 5 && (
+            <div>
+              <h3 className="text-xs font-semibold text-white/60 mb-3">More Areas</h3>
+              <ul className="space-y-2.5">
+                {locations.slice(5, 10).map((location) => (
+                  <li key={location.slug}>
+                    <Link href={`/locations/${location.slug}`} className="text-xs text-white/80 hover:text-white">
+                      {location.name}
+                    </Link>
+                  </li>
+                ))}
+                {locations.length > 10 && (
+                  <li><Link href="/locations" className="text-xs text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold">View All Areas →</Link></li>
+                )}
+              </ul>
+            </div>
+          )}
 
           {/* Company */}
           <div>
@@ -80,17 +92,20 @@ export default function Footer() {
             <div className="flex items-center gap-8">
               <Logo size="sm" className="opacity-80" />
               <p className="text-xs text-white/40">
-                Professional cleaning services across NYC, Long Island, Westchester, and Northern New Jersey.
+                Professional cleaning services across {BRANDING.serviceAreaLong}.
               </p>
             </div>
             <div className="flex items-center gap-6">
-              <a href={CONTACT_INFO.phone.href} className="text-xs text-white/60 hover:text-white">{CONTACT_INFO.phone.display}</a>
+              <a href={BRANDING.phone.href} className="text-xs text-white/60 hover:text-white">{BRANDING.phone.display}</a>
               <Link href="/refund" className="text-xs text-white/40 hover:text-white">Refund Policy</Link>
             </div>
           </div>
           <div className="mt-4 pt-4 border-t border-white/5">
             <p className="text-xs text-white/40">
-              Copyright &copy; {currentYear} Brooklyn Maids. All rights reserved.
+              Copyright &copy; {currentYear} {BRANDING.businessName}. All rights reserved.
+            </p>
+            <p className="text-xs text-white/30 mt-2">
+              {FOOTER_DESCRIPTION}
             </p>
           </div>
         </div>

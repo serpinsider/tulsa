@@ -9,7 +9,7 @@ interface CleaningTypesSectionProps {
   location?: string;
 }
 
-export default function CleaningTypesSection({ location = "Brooklyn, NY" }: CleaningTypesSectionProps) {
+export default function CleaningTypesSection({ location = "Tulsa, OK" }: CleaningTypesSectionProps) {
   const [activeTab, setActiveTab] = useState<CleaningType>('standard');
 
   const cleaningTypes = {

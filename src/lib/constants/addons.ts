@@ -121,6 +121,13 @@ export const ADDONS: AddOn[] = [
     description: 'Clean workspace', 
     icon: 'office-cleaning.png',
     tooltip: "We clean your home office space."
+  },
+  { 
+    key: 'superDeepClean', 
+    label: 'Super Deep Clean', 
+    description: 'Heavily soiled homes', 
+    icon: 'super-cleaning.png',
+    tooltip: "Intensive cleaning for heavily soiled homes, extreme messes, odors, or neglect. Adds $300 to your cleaning."
   }
 ];
 

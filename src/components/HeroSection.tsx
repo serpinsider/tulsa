@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { COLORS, INLINE_STYLES } from '@/styles/colors';
 import { LAYOUTS } from '@/styles/layouts';
+import { BRANDING } from '@/config/branding';
 
 const avatars = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face&auto=format&q=80",
@@ -20,7 +21,7 @@ interface HeroSectionProps {
   location?: string;
 }
 
-export default function HeroSection({ location = "Brooklyn, NY" }: HeroSectionProps) {
+export default function HeroSection({ location }: HeroSectionProps) {
   const [isFormExpanded, setIsFormExpanded] = useState(false);
   const [immediateTransition, setImmediateTransition] = useState(false);
   
@@ -82,13 +83,13 @@ export default function HeroSection({ location = "Brooklyn, NY" }: HeroSectionPr
           isFormExpanded ? 'flex justify-center items-start' : 'grid grid-cols-1 lg:grid-cols-2 items-center'
         }`}>
           {/* Hero Content - Hide when form is expanded */}
-          <div className={`text-center lg:text-left transition-all duration-500 ease-out ${
+          <div className={`text-center lg:text-left transition-all duration-500 ease-out max-w-xl ${
             isFormExpanded 
               ? 'opacity-0 pointer-events-none scale-95 absolute' 
               : 'opacity-100 pointer-events-auto scale-100 relative'
           }`}>
             <h1 className={TYPOGRAPHY.heroTitle}>
-              {location && location !== "Brooklyn, NY" 
+              {location 
                 ? `Book a Housekeeper in ${location} in 60 Seconds.`
                 : "Book a Housekeeper in 60 Seconds."
               }
@@ -105,13 +106,13 @@ export default function HeroSection({ location = "Brooklyn, NY" }: HeroSectionPr
                 Services
               </Link>
               <a 
-                href="tel:+13477504380" 
+                href={BRANDING.phone.href} 
                 className="flex items-center justify-center h-12 px-8 text-sm text-white/80 hover:text-white transition-all duration-300 min-w-[160px] hover:-translate-y-[1px]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2 transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                call or text <span className="text-[#dfbd69] font-semibold ml-1 transition-all duration-300 hover:text-[#dfbd69]/80">(347) 750-4380</span>
+                call or text <span className="text-[#dfbd69] font-semibold ml-1 transition-all duration-300 hover:text-[#dfbd69]/80">{BRANDING.phone.display}</span>
               </a>
             </div>
 
@@ -136,7 +137,7 @@ export default function HeroSection({ location = "Brooklyn, NY" }: HeroSectionPr
                 {/* Stars */}
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-[#926f34]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className={`w-4 h-4 text-[#926f34]`} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}

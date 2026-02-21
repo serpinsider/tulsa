@@ -1,14 +1,14 @@
 /**
- * Button Standards - Brooklyn Maids V4
+ * Button Standards - Base Theme
  * 
  * Centralized button styling to ensure consistency.
- * Based on the homepage button designs.
+ * Uses button classes defined in globals.css and hardcoded colors.
  */
 
 export const BUTTONS = {
   // ===== PRIMARY BUTTONS =====
   
-  // Main CTA button (gold gradient background) - uses button-quaternary for gradient
+  // Main CTA button (gold gradient background) - uses button-quaternary from globals.css
   primary: "button-quaternary",
   
   // Primary button (smaller variant)
@@ -37,18 +37,30 @@ export const BUTTONS = {
   // Hero "Get A Quote" style button with glow (uses button-tertiary as base)
   heroQuote: "button-tertiary animate-glow flex items-center justify-center h-12 px-8 font-semibold min-w-[160px] gap-2",
   
+  // Gold button (solid background)
+  goldSolid: "bg-[#dfbd69] text-[#283845] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69]/90 transition-all",
+  
+  // Navy button (solid background)
+  navySolid: "bg-[#283845] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#283845]/90 transition-all",
+  
+  // Outlined buttons
+  outlined: "bg-transparent border-2 border-[#dfbd69] text-[#dfbd69] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69] hover:text-[#283845] transition-all",
+  outlinedWhite: "bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all",
+  
+  // ===== FORM BUTTONS =====
+  
   // Service type selection button (for forms)
   serviceType: {
     base: "relative cursor-pointer rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all backdrop-blur-sm",
-    selected: "ring-2 ring-[rgba(15,23,42,1)] bg-white/40 animate-glow border-[0.5px] border-white animate-selected-pulse",
-    unselected: "ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-white/40",
+    selected: "ring-2 ring-[#dfbd69] bg-white/40 animate-glow border-[0.5px] border-white animate-selected-pulse",
+    unselected: "ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-[#dfbd69]/50",
   },
   
   // Addon selection button (for forms)
   addon: {
     base: "w-full p-3 rounded-lg text-center transition-all backdrop-blur-sm",
-    selected: "ring-2 ring-[rgba(15,23,42,1)] bg-white/40 animate-glow border-[0.5px] border-white animate-selected-pulse",
-    unselected: "ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-white/40",
+    selected: "ring-2 ring-[#dfbd69] bg-white/40 animate-glow border-[0.5px] border-white animate-selected-pulse",
+    unselected: "ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-[#dfbd69]/50",
   },
   
   // ===== DISABLED STATES =====
@@ -69,12 +81,16 @@ export const BUTTONS = {
  */
 export const BUTTON_INLINE_STYLES = {
   // Gold glow shadow for hero quote button
-  goldGlow: { boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)' },
+  goldGlow: { boxShadow: '0 0 20px rgba(223, 189, 105, 0.3)' },
   
   // Dark shadow for selected service types
-  darkShadow: { boxShadow: '0 0 20px rgba(15, 23, 42, 0.3)' },
+  darkShadow: { boxShadow: '0 0 20px rgba(40, 56, 69, 0.3)' },
   
   // Hover shadow for unselected items
   hoverShadow: { boxShadow: '0 0 15px rgba(255, 255, 255, 0.2)' },
+  
+  // Gold gradient
+  goldGradient: {
+    background: 'linear-gradient(135deg, #dfbd69 0%, #926f34 100%)',
+  },
 };
-

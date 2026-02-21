@@ -5,7 +5,7 @@ import HowItWorksSection from './HowItWorksSection';
 import ContactSection from './ContactSection';
 import StructuredData from './StructuredData';
 import CommercialFAQSection from './service-specific/CommercialFAQSection';
-import ReviewsSection from './ReviewsSection';
+import CommercialReviewsSection from './service-specific/CommercialReviewsSection';
 import AreasWeServeSection from './AreasWeServeSection';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
@@ -49,7 +49,7 @@ export default function CommercialCleaningService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Commercial Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Office and commercial cleaning services"
       }} />
       
@@ -105,7 +105,7 @@ export default function CommercialCleaningService() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <CommercialReviewsSection />
       <CallOrTextBar />
       <CommercialFAQSection />
       <QuoteBar />

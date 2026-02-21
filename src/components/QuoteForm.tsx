@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { CONTACT_INFO } from '@/lib/contact';
+import { BRANDING } from '@/config/branding';
+import { QUOTE_FORM_SERVICE_AREA_TEXT } from '@/config/content';
 import { ADDONS } from '@/lib/constants/addons';
 import SuccessMessage from '@/components/shared/SuccessMessage';
 import { getSalesTaxRate } from '@/config/service-config';
@@ -224,7 +225,7 @@ export default function QuoteForm() {
         return;
       }
 
-      const confirmationNumber = 'BK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const confirmationNumber = 'TM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
       // Define what's included in each service type
       const includedInDeep = ['wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
@@ -280,8 +281,8 @@ export default function QuoteForm() {
 
       // Create structured data for Formspree
       const cleanFormData = {
-        business: 'Brooklyn Maids',
-        businessId: 'brooklyn',
+        business: BRANDING.businessName,
+        businessId: BRANDING.businessId,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -314,7 +315,7 @@ export default function QuoteForm() {
         },
         body: JSON.stringify({
           ...cleanFormData,
-          _subject: `Brooklyn Maids - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+          _subject: `${BRANDING.businessName} - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
         }),
       });
 
@@ -340,7 +341,7 @@ export default function QuoteForm() {
   }
 
   return (
-    <div className="w-full max-w-full sm:container mx-auto px-4 py-20">
+    <div className="w-full max-w-full sm:container mx-auto px-4 pt-48 pb-20">
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
         <div className="lg:col-span-2 backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: getFormBg() }}>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Get a free quote instantly!</h1>
@@ -399,7 +400,9 @@ export default function QuoteForm() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                <div className="h-5 mt-1">
+                  {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">
@@ -407,7 +410,7 @@ export default function QuoteForm() {
                 </label>
                 <input
                   type="tel"
-                  placeholder={CONTACT_INFO.phone.display}
+                  placeholder={BRANDING.phone.display}
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.phone ? 'border-red-500' : 'border-white/20'
                   }`}
@@ -419,7 +422,9 @@ export default function QuoteForm() {
                   }}
                   maxLength={14}
                 />
-                {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
+                <div className="h-5 mt-1">
+                  {errors.phone && <p className="text-red-400 text-sm">{errors.phone}</p>}
+                </div>
               </div>
             </div>
 
@@ -583,7 +588,7 @@ export default function QuoteForm() {
             )}
 
             <p className="text-xs text-white/60 text-center mb-4 mt-8">
-              By submitting this form, you agree to receive communications from Brooklyn Maids regarding your quote request. We respect your privacy and will never share your information.
+              By submitting this form, you agree to receive communications from {BRANDING.businessName} regarding your quote request. We respect your privacy and will never share your information.
             </p>
 
             <button
@@ -687,10 +692,10 @@ export default function QuoteForm() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    <span>{CONTACT_INFO.phone.display}</span>
+                    <span>{BRANDING.phone.display}</span>
                   </a>
                   <a 
-                    href={`sms:${CONTACT_INFO.phone.raw}`} 
+                    href={BRANDING.phone.smsHref} 
                     className="flex items-center space-x-3 text-base text-white/80 hover:text-white transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -699,13 +704,13 @@ export default function QuoteForm() {
                     <span>Text us</span>
                   </a>
                   <a 
-                    href={CONTACT_INFO.email.href} 
+                    href={BRANDING.email.href} 
                     className="flex items-center space-x-3 text-base text-white/80 hover:text-white transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span>{CONTACT_INFO.email.display}</span>
+                    <span>{BRANDING.email.display}</span>
                   </a>
                 </div>
 
@@ -723,7 +728,7 @@ export default function QuoteForm() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-white/90">What areas do you serve?</p>
                       <p className="text-xs text-white/70 leading-relaxed">
-                        We serve Washington DC, Baltimore, Boston, Charlotte, Richmond, and surrounding areas across MD, DC, VA, NC, CT, and MA. Contact us to confirm service in your area.
+                        {QUOTE_FORM_SERVICE_AREA_TEXT} Contact us to confirm service in your area.
                       </p>
                     </div>
 

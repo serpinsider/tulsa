@@ -52,7 +52,7 @@ export default function EventCleaningService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Event Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Pre-event, during-event, and post-event cleaning services"
       }} />
       
@@ -108,7 +108,7 @@ export default function EventCleaningService() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <ReviewsSection location="Tulsa" />
       <CallOrTextBar />
       <EventFAQSection />
       <QuoteBar />

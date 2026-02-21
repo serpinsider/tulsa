@@ -88,7 +88,7 @@ export default function DeepCleanService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Deep Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Professional deep cleaning services for homes and apartments"
       }} />
       

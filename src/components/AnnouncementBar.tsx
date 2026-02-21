@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ANNOUNCEMENT_BAR_TEXT } from '@/config/content';
+import { COLORS } from '@/styles/colors';
 
 export default function AnnouncementBar() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -8,7 +10,7 @@ export default function AnnouncementBar() {
 
   const messages = [
     'Save 10% on your first 3 bookings!',
-    "Serving all of Brooklyn & NYC!",
+    ANNOUNCEMENT_BAR_TEXT,
     "Ask about recurring plans!"
   ];
 

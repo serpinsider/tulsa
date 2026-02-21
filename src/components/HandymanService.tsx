@@ -48,7 +48,7 @@ export default function HandymanService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Handyman Services",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Handyman and home repair services"
       }} />
       

@@ -1,4 +1,5 @@
-import { CONTACT_INFO } from '@/lib/contact';
+import { BRANDING } from '@/config/branding';
+import { COVERAGE_ZONE } from '@/config/content';
 
 export default function ContactInfoSection() {
   return (
@@ -12,8 +13,8 @@ export default function ContactInfoSection() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Phone Support</h3>
-            <a href={CONTACT_INFO.phone.href} className="text-white font-semibold hover:text-[#dfbd69] transition-colors">
-              {CONTACT_INFO.phone.display}
+            <a href={BRANDING.phone.href} className="text-white font-semibold hover:text-[#dfbd69] transition-colors">
+              {BRANDING.phone.display}
             </a>
             <p className="text-sm text-white">7 days weekly availability</p>
           </div>
@@ -25,8 +26,8 @@ export default function ContactInfoSection() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Digital Contact</h3>
-            <a href={CONTACT_INFO.email.href} className="text-white font-semibold hover:text-[#dfbd69] transition-colors">
-              {CONTACT_INFO.email.display}
+            <a href={BRANDING.email.href} className="text-white font-semibold hover:text-[#dfbd69] transition-colors">
+              {BRANDING.email.display}
             </a>
             <p className="text-sm text-white">Same-day email replies</p>
           </div>
@@ -39,8 +40,8 @@ export default function ContactInfoSection() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Coverage Zone</h3>
-            <p className="text-white font-semibold">Brooklyn & NYC</p>
-            <p className="text-sm text-white">Brooklyn, Manhattan, Queens, Bronx</p>
+            <p className="text-white font-semibold">{COVERAGE_ZONE.title}</p>
+            <p className="text-sm text-white">{COVERAGE_ZONE.subtitle}</p>
           </div>
         </div>
       </div>

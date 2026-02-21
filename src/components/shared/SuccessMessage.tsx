@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { BRANDING } from '@/config/branding';
 
 interface SuccessMessageProps {
   type: 'quote' | 'booking';
@@ -107,10 +108,10 @@ export default function SuccessMessage({ type, confirmationNumber, frequency, in
               Questions? Call or text us!
             </p>
             <a 
-              href="tel:+13477504380" 
+              href={BRANDING.phone.href} 
               className="text-[#dfbd69] hover:text-[#dfbd69]/80 transition-colors text-lg font-semibold"
             >
-              (347) 750-4380
+              {BRANDING.phone.display}
             </a>
           </div>
         </div>

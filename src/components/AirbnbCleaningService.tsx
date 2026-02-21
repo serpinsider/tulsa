@@ -2,7 +2,7 @@ import AirbnbCleaningHero from './service-specific/AirbnbCleaningHero';
 import QuoteBar from './QuoteBar';
 import CallOrTextBar from './CallOrTextBar';
 import HowItWorksSection from './HowItWorksSection';
-import ReviewsSection from './ReviewsSection';
+import AirbnbReviewsSection from './service-specific/AirbnbReviewsSection';
 import ContactSection from './ContactSection';
 import StructuredData from './StructuredData';
 import AirbnbFAQSection from './service-specific/AirbnbFAQSection';
@@ -47,7 +47,7 @@ export default function AirbnbCleaningService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Airbnb Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Airbnb and vacation rental cleaning services"
       }} />
       
@@ -103,7 +103,7 @@ export default function AirbnbCleaningService() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <AirbnbReviewsSection />
       <CallOrTextBar />
       <AirbnbFAQSection />
       <QuoteBar />

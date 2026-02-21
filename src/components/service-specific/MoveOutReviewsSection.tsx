@@ -4,38 +4,40 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { REVIEW_LOCATIONS } from '@/config/content';
+import { BRANDING } from '@/config/branding';
 
 export default function MoveOutReviewsSection() {
   const reviews = [
     {
       name: "Amanda K.",
-      location: "Bedford-Stuyvesant",
+      location: REVIEW_LOCATIONS[0],
       rating: 5,
-      text: "Used Brooklyn Maids for my move-out clean and got my full security deposit back! They cleaned inside every cabinet, the oven, fridge, everything. My landlord was impressed. Highly recommend!",
+      text: `Used ${BRANDING.businessName} for my move-out clean and got my full security deposit back! They cleaned inside every cabinet, the oven, fridge, everything. My landlord was impressed. Highly recommend!`,
       date: "1 week ago",
       avatar: "https://i.imgur.com/ukM3Rqz.png"
     },
     {
       name: "Robert P.",
-      location: "Manhattan",
+      location: REVIEW_LOCATIONS[1],
       rating: 5,
-      text: "Moving is stressful enough - Brooklyn Maids made the cleaning part easy. They were thorough, professional, and left my old apartment spotless. Worth every dollar.",
+      text: `Moving is stressful enough - ${BRANDING.businessName} made the cleaning part easy. They were thorough, professional, and left my old apartment spotless. Worth every dollar.`,
       date: "2 weeks ago",
       avatar: "https://i.imgur.com/exzvuey.png"
     },
     {
       name: "Lisa M.",
-      location: "Carroll Gardens",
+      location: REVIEW_LOCATIONS[2],
       rating: 5,
-      text: "Booked a move-in clean for my new apartment. The previous tenants left it dirty, but Brooklyn Maids made it feel brand new. They cleaned inside all the cabinets and even the inside of the dishwasher!",
+      text: `Booked a move-in clean for my new apartment. The previous tenants left it dirty, but ${BRANDING.businessName} made it feel brand new. They cleaned inside all the cabinets and even the inside of the dishwasher!`,
       date: "3 weeks ago",
       avatar: "https://i.imgur.com/Yxgv0pk.png"
     },
     {
       name: "James T.",
-      location: "Downtown Brooklyn",
+      location: REVIEW_LOCATIONS[3],
       rating: 5,
-      text: "Best move-out cleaning service in NYC. They arrived on time, worked efficiently, and the apartment looked better than when I moved in. My landlord had zero complaints.",
+      text: `Best move-out cleaning service in ${BRANDING.serviceArea}. They arrived on time, worked efficiently, and the apartment looked better than when I moved in. My landlord had zero complaints.`,
       date: "1 month ago",
       avatar: "https://i.imgur.com/cdhxfCD.png"
     }

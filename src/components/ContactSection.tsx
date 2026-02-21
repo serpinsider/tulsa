@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CONTACT_INFO } from '@/lib/contact';
-import { INLINE_STYLES } from '@/styles/colors';
+import { BRANDING } from '@/config/branding';
+import { COLORS, INLINE_STYLES } from '@/styles/colors';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ export default function ContactSection() {
         return;
       }
 
-      const confirmationNumber = 'BK-CONTACT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const confirmationNumber = 'TM-CONTACT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
       const structuredData = {
         firstName: formData.firstName,
@@ -106,17 +106,17 @@ export default function ContactSection() {
               
               <div className="space-y-4">
                 <a 
-                  href={CONTACT_INFO.phone.href} 
+                  href={BRANDING.phone.href} 
                   className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5 text-[#dfbd69]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span>{CONTACT_INFO.phone.display}</span>
+                  <span>{BRANDING.phone.display}</span>
                 </a>
 
                 <a 
-                  href="sms:+13477504380" 
+                  href={BRANDING.phone.smsHref} 
                   className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5 text-[#dfbd69]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,13 +126,13 @@ export default function ContactSection() {
                 </a>
 
                 <a 
-                  href={CONTACT_INFO.email.href} 
+                  href={BRANDING.email.href} 
                   className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5 text-[#dfbd69]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>{CONTACT_INFO.email.display}</span>
+                  <span>{BRANDING.email.display}</span>
                 </a>
               </div>
             </div>

@@ -4,12 +4,14 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { REVIEW_LOCATIONS } from '@/config/content';
+import { BRANDING } from '@/config/branding';
 
 export default function DeepCleanReviewsSection() {
   const reviews = [
     {
       name: "Sarah M.",
-      location: "Park Slope",
+      location: REVIEW_LOCATIONS[0],
       rating: 5,
       text: "The deep clean was incredible! They got into every corner and crevice. My apartment hasn't looked this good since I moved in. The team was professional, thorough, and respectful of my space.",
       date: "2 weeks ago",
@@ -17,15 +19,15 @@ export default function DeepCleanReviewsSection() {
     },
     {
       name: "Michael T.",
-      location: "Williamsburg",
+      location: REVIEW_LOCATIONS[1],
       rating: 5,
-      text: "Booked a deep clean before hosting family for the holidays. Brooklyn Maids exceeded expectations - baseboards, window sills, everything was spotless. Worth every penny!",
+      text: `Booked a deep clean before hosting family for the holidays. ${BRANDING.businessName} exceeded expectations - baseboards, window sills, everything was spotless. Worth every penny!`,
       date: "1 month ago",
       avatar: "https://i.imgur.com/exzvuey.png"
     },
     {
       name: "Jennifer L.",
-      location: "Brooklyn Heights",
+      location: REVIEW_LOCATIONS[2],
       rating: 5,
       text: "After a renovation, my place was covered in dust. The deep clean service was exactly what I needed. They cleaned inside cabinets, wiped down all surfaces, and made my home livable again.",
       date: "3 weeks ago",
@@ -33,9 +35,9 @@ export default function DeepCleanReviewsSection() {
     },
     {
       name: "David R.",
-      location: "Carroll Gardens",
+      location: REVIEW_LOCATIONS[3],
       rating: 5,
-      text: "I get a deep clean every season and Brooklyn Maids never disappoints. They're consistent, reliable, and always do an amazing job. Highly recommend!",
+      text: `I get a deep clean every season and ${BRANDING.businessName} never disappoints. They're consistent, reliable, and always do an amazing job. Highly recommend!`,
       date: "1 week ago",
       avatar: "https://i.imgur.com/cdhxfCD.png"
     }

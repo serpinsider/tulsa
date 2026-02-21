@@ -1,9 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/create-recurring-bookings",
-      "schedule": "0 2 * * *"
-    }
-  ]
-}
-

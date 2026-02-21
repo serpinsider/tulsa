@@ -14,8 +14,8 @@ export const initPostHog = () => {
       // Set site property on all events
       loaded: (posthog) => {
         posthog.register({
-          site_business: 'Brooklyn Maids',
-          site_location: 'Brooklyn',
+          site_business: 'Tulsa Maids',
+          site_location: 'Tulsa',
           environment: process.env.NODE_ENV,
         });
       },
@@ -29,8 +29,8 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
   if (typeof window !== 'undefined') {
     posthog.capture(eventName, {
       ...properties,
-      site_business: 'Brooklyn Maids',
-      site_location: 'Brooklyn',
+      site_business: 'Tulsa Maids',
+      site_location: 'Tulsa',
     });
   }
 };
@@ -40,8 +40,8 @@ export const identifyUser = (userId: string, traits?: Record<string, any>) => {
   if (typeof window !== 'undefined') {
     posthog.identify(userId, {
       ...traits,
-      site_business: 'Brooklyn Maids',
-      site_location: 'Brooklyn',
+      site_business: 'Tulsa Maids',
+      site_location: 'Tulsa',
     });
   }
 };
@@ -51,8 +51,8 @@ export const trackPageView = (pagePath?: string) => {
   if (typeof window !== 'undefined') {
     posthog.capture('$pageview', {
       $current_url: pagePath || window.location.href,
-      site_business: 'Brooklyn Maids',
-      site_location: 'Brooklyn',
+      site_business: 'Tulsa Maids',
+      site_location: 'Tulsa',
     });
   }
 };

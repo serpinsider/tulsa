@@ -1,14 +1,16 @@
 import { Metadata } from 'next';
-import QuoteForm from '@/components/QuoteForm';
+import { BRANDING } from '@/config/branding';
+import StepWizard from '@/components/StepWizard';
+import { INLINE_STYLES } from '@/styles/colors';
 
 export const metadata: Metadata = {
-  title: 'Get Your Quote - Brooklyn Maids',
-  description: 'Get an instant, accurate quote for house cleaning services. Fast, easy, and no obligations. Serving Brooklyn, New York.',
+  title: `Get Your Quote - ${BRANDING.businessName}`,
+  description: `Get an instant, accurate quote for house cleaning services. Fast, easy, and no obligations. Serving ${BRANDING.serviceArea}.`,
   openGraph: {
-    title: 'Get Your Quote - Brooklyn Maids',
-    description: 'Get an instant quote for your home cleaning service. Choose your cleaning type, customize your needs, and let Brooklyn Maids take care of the rest.',
-    url: 'https://brooklynmaids.com/quote',
-    siteName: 'Brooklyn Maids',
+    title: `Get Your Quote - ${BRANDING.businessName}`,
+    description: `Get an instant quote for your home cleaning service. Choose your cleaning type, customize your needs, and let ${BRANDING.businessName} take care of the rest.`,
+    url: `${BRANDING.url}/quote`,
+    siteName: BRANDING.businessName,
     images: [
       {
         url: '/og-image.jpg',
@@ -29,15 +31,22 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  alternates: {
-    canonical: 'https://brooklynmaids.com/quote',
-  },
 };
 
 export default function QuotePage() {
   return (
-    <main className="min-h-screen bg-[#0f172a]">
-      <QuoteForm />
+    <main className="min-h-screen pt-32" style={INLINE_STYLES.primary}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+            Get Your Free Quote
+          </h1>
+          <p className="text-xl text-white/80">
+            Fill out the form below and we'll send you a detailed quote instantly!
+          </p>
+        </div>
+        <StepWizard />
+      </div>
     </main>
   );
 }

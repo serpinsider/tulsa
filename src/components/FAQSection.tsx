@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { TYPOGRAPHY } from '@/styles/typography';
-import { INLINE_STYLES } from '@/styles/colors';
+import { COLORS, INLINE_STYLES } from '@/styles/colors';
+import { BRANDING } from '@/config/branding';
+import { SERVICE_AREA_FAQ_ANSWER } from '@/config/content';
 
 
 interface FAQSectionProps {
   location?: string;
 }
 
-export default function FAQSection({ location = "Brooklyn" }: FAQSectionProps) {
+export default function FAQSection({ location }: FAQSectionProps) {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const faqs = [
@@ -27,15 +29,15 @@ export default function FAQSection({ location = "Brooklyn" }: FAQSectionProps) {
     },
     {
       question: "Are you insured and bonded?",
-      answer: "Yes, Brooklyn Maids is fully insured and bonded for your peace of mind.\n\nAll our housekeepers are background-checked and trained. We carry comprehensive liability insurance to protect your home and belongings."
+      answer: `Yes, ${BRANDING.businessName} is fully insured and bonded for your peace of mind.\n\nAll our housekeepers are background-checked and trained. We carry comprehensive liability insurance to protect your home and belongings.`
     },
     {
       question: "What areas do you service?",
-      answer: "**New York:**\n• Brooklyn: Park Slope, Williamsburg, Brooklyn Heights, DUMBO, Prospect Heights, Crown Heights, Bay Ridge, Sunset Park, Red Hook, Gowanus, Bushwick, Greenpoint\n• Manhattan\n• Queens\n• Bronx\n• Staten Island\n\n**New Jersey:**\n• Jersey City, Hoboken, Weehawken, Union City, North Bergen, West New York, Secaucus, Bayonne\n\n**Zip Codes Served:**\n• Brooklyn: 11201, 11206, 11209, 11211, 11213, 11215, 11216, 11217, 11220, 11221, 11222, 11231, 11238\n• Manhattan: 10001-10282\n• Queens: 11101-11697\n• Bronx: 10451-10475\n• Staten Island: 10301-10314\n• New Jersey: 07002, 07030, 07047, 07086, 07087, 07093, 07094, 07302, 07306, 07310\n\nContact us to confirm service in your area."
+      answer: SERVICE_AREA_FAQ_ANSWER
     },
     {
       question: "How do I schedule a cleaning?",
-      answer: "Get a quote or book online, or contact us directly:\n\n• Call: <a href='tel:+13477504380' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>(347) 750-4380</a>\n• Text: <a href='sms:+13477504380' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>(347) 750-4380</a>\n\nWe offer same-day and next-day service when available.\n\nContact us if you have questions about cleaning or handyman services.\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get A Quote</a><a href='/booking' class='bg-white/20 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-white/30 transition-colors border border-white/30'>Book Now</a></div>"
+      answer: `Get a quote or book online, or contact us directly:\n\n• Call: <a href='${BRANDING.phone.href}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.phone.display}</a>\n• Text: <a href='${BRANDING.phone.smsHref}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.phone.display}</a>\n\nWe offer same-day and next-day service when available.\n\nContact us if you have questions about cleaning or handyman services.\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get A Quote</a><a href='/booking' class='bg-white/20 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-white/30 transition-colors border border-white/30'>Book Now</a></div>`
     },
     {
       question: "Do you offer recurring cleaning services?",

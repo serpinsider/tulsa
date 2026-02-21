@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://www.brooklynmaids.com/sitemap.xml
+Sitemap: https://www.YOURDOMAIN.com/sitemap.xml
 
 # Allow search engines to crawl important pages
 Allow: /locations/
@@ -19,6 +19,9 @@ Disallow: /admin/
 Disallow: /dashboard/
 Disallow: /provider/
 Disallow: /account/
+Disallow: /setup-guide/
+Disallow: /quote-new/
+Disallow: /unauthorized/
 
 # Crawl delay
 Crawl-delay: 1

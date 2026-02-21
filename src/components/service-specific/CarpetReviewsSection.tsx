@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { REVIEW_LOCATIONS } from '@/config/content';
+import { BRANDING } from '@/config/branding';
 
 const carpetReviews = [
   {
     id: 1,
     name: "Jennifer S.",
-    location: "Park Slope, Brooklyn",
+    location: REVIEW_LOCATIONS[0],
     rating: 5,
     text: "Amazing carpet cleaning! Removed wine stains I thought were permanent. My carpets look brand new again.",
     date: "3 days ago",
@@ -17,7 +19,7 @@ const carpetReviews = [
   {
     id: 2,
     name: "Robert M.",
-    location: "Williamsburg, Brooklyn",
+    location: REVIEW_LOCATIONS[1],
     rating: 5,
     text: "Professional carpet cleaning service. They removed pet odors completely and the carpets dried quickly. Highly recommend!",
     date: "1 week ago",
@@ -26,7 +28,7 @@ const carpetReviews = [
   {
     id: 3,
     name: "Lisa K.",
-    location: "Brooklyn Heights, Brooklyn",
+    location: REVIEW_LOCATIONS[2],
     rating: 5,
     text: "Excellent upholstery cleaning! My sofa looks like new. They were careful with the fabric and very professional.",
     date: "5 days ago",
@@ -35,7 +37,7 @@ const carpetReviews = [
   {
     id: 4,
     name: "Michael T.",
-    location: "DUMBO, Brooklyn",
+    location: REVIEW_LOCATIONS[3],
     rating: 5,
     text: "Great area rug cleaning service. They picked up my Persian rug and returned it looking perfect. Very trustworthy.",
     date: "2 weeks ago",
@@ -44,16 +46,16 @@ const carpetReviews = [
   {
     id: 5,
     name: "Sarah D.",
-    location: "Crown Heights, Brooklyn",
+    location: REVIEW_LOCATIONS[4],
     rating: 5,
-    text: "Best carpet cleaning in Brooklyn! They removed years of stains and traffic patterns. Carpets look amazing!",
+    text: `Best carpet cleaning in ${BRANDING.serviceArea}! They removed years of stains and traffic patterns. Carpets look amazing!`,
     date: "1 week ago",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 6,
     name: "David L.",
-    location: "Gowanus, Brooklyn",
+    location: REVIEW_LOCATIONS[5],
     rating: 5,
     text: "Professional service from start to finish. Steam cleaning was thorough and my carpets dried fast. Will use again!",
     date: "4 days ago",
@@ -83,7 +85,7 @@ export default function CarpetReviewsSection() {
             Carpet Cleaning Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            See what Brooklyn residents say about our carpet cleaning services.
+            See what our customers say about our carpet cleaning services.
           </p>
         </div>
 

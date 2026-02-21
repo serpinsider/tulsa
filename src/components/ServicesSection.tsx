@@ -10,7 +10,7 @@ interface ServicesSectionProps {
   location?: string;
 }
 
-export default function ServicesSection({ location = "Brooklyn, NY" }: ServicesSectionProps) {
+export default function ServicesSection({ location = "Tulsa, OK" }: ServicesSectionProps) {
   const [showAllServices, setShowAllServices] = useState(false);
 
   const serviceCategories = {
@@ -305,7 +305,7 @@ export default function ServicesSection({ location = "Brooklyn, NY" }: ServicesS
                             href={service.href}
                             className="block text-sm text-white/80 hover:text-white transition-colors py-1 rounded hover:bg-white/5"
                           >
-                            {service.name} in Brooklyn
+                            {service.name} in Tulsa
                           </Link>
                         ))}
                       </div>

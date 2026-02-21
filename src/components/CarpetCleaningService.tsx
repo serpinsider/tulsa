@@ -48,7 +48,7 @@ export default function CarpetCleaningService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Carpet Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Carpet and upholstery cleaning services"
       }} />
       

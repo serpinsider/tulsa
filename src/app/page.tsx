@@ -11,17 +11,14 @@ import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://brooklynmaids.com",
-  },
 };
 
 export default function Home() {
   return (
     <main>
-      <HeroSection location="Brooklyn, NY" />
+      <HeroSection location="Tulsa, OK" />
       <QuoteBar />
-      <ServicesSection location="Brooklyn, NY" />
+      <ServicesSection location="Tulsa, OK" />
       <CallOrTextBar />
       <WhatWeCleanSection />
       <QuoteBar />
@@ -29,9 +26,9 @@ export default function Home() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <ReviewsSection location="Tulsa" />
       <CallOrTextBar />
-      <FAQSection location="Brooklyn" />
+      <FAQSection location="Tulsa" />
       <QuoteBar />
       <ContactSection />
     </main>

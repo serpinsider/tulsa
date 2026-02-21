@@ -1,5 +1,5 @@
 /**
- * Layout Standards - Brooklyn Maids V4
+ * Layout Standards - Tulsa Maids
  * 
  * Centralized layout classes for sections, containers, and spacing.
  */

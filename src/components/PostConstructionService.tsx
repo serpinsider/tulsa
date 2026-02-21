@@ -2,7 +2,7 @@ import PostConstructionHero from './service-specific/PostConstructionHero';
 import QuoteBar from './QuoteBar';
 import CallOrTextBar from './CallOrTextBar';
 import HowItWorksSection from './HowItWorksSection';
-import ReviewsSection from './ReviewsSection';
+import PostConstructionReviewsSection from './service-specific/PostConstructionReviewsSection';
 import ContactSection from './ContactSection';
 import StructuredData from './StructuredData';
 import PostConstructionFAQSection from './service-specific/PostConstructionFAQSection';
@@ -47,7 +47,7 @@ export default function PostConstructionService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Post-Construction Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Post-construction cleanup and debris removal services"
       }} />
       
@@ -103,7 +103,7 @@ export default function PostConstructionService() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <PostConstructionReviewsSection />
       <CallOrTextBar />
       <PostConstructionFAQSection />
       <QuoteBar />

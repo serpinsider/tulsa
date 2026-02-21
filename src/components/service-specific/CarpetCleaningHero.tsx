@@ -1,16 +1,18 @@
 import BaseHero from '../shared/BaseHero';
+import CarpetStepWizard from '../specialty-wizards/CarpetStepWizard';
 
 interface CarpetCleaningHeroProps {
   location?: string;
 }
 
-export default function CarpetCleaningHero({ location = "Brooklyn, NY" }: CarpetCleaningHeroProps) {
+export default function CarpetCleaningHero({ location = "Las Vegas" }: CarpetCleaningHeroProps) {
   return (
     <BaseHero
-      title="Book Carpet Cleaning in NYC"
-      description="Deep carpet cleaning, stain removal, and upholstery cleaning for homes and businesses."
+      title="Professional Carpet Cleaning in Las Vegas"
+      description="Deep steam cleaning that removes dirt, stains, and allergens. Same-day service available. Satisfaction guaranteed."
       location={location}
       showWizard={true}
+      CustomWizard={CarpetStepWizard}
     />
   );
 }

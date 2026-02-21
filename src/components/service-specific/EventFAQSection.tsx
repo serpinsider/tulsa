@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { BRANDING } from '@/config/branding';
 
 export default function EventFAQSection() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -12,7 +13,7 @@ export default function EventFAQSection() {
     },
     {
       question: "Do you offer same-day or emergency event cleaning?",
-      answer: "Yes! We understand events can be time-sensitive.\n\nWe offer same-day and emergency cleaning services for last-minute events, spills, or unexpected situations. Call us at (347) 750-4380 for urgent needs."
+      answer: `Yes! We understand events can be time-sensitive.\n\nWe offer same-day and emergency cleaning services for last-minute events, spills, or unexpected situations. Call us at ${BRANDING.phone.display} for urgent needs.`
     },
     {
       question: "Can you clean during the event?",
@@ -32,7 +33,7 @@ export default function EventFAQSection() {
     },
     {
       question: "How do I get an event cleaning quote?",
-      answer: "Get a custom quote for your event:\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/services/event-cleaning/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get Event Quote</a></div>Or contact us directly:\n• Call: <a href='tel:+13477504380' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>(347) 750-4380</a>\n• Email: <a href='mailto:hello@brooklynmaids.com' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>hello@brooklynmaids.com</a>"
+      answer: `Get a custom quote for your event:\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/services/event-cleaning/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get Event Quote</a></div>Or contact us directly:\n• Call: <a href='${BRANDING.phone.href}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.phone.display}</a>\n• Email: <a href='${BRANDING.email.href}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.email.display}</a>`
     }
   ];
 

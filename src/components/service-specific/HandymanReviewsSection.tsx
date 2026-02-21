@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { REVIEW_LOCATIONS } from '@/config/content';
+import { BRANDING } from '@/config/branding';
 
 const handymanReviews = [
   {
     id: 1,
     name: "Alex P.",
-    location: "Park Slope, Brooklyn",
+    location: REVIEW_LOCATIONS[0],
     rating: 5,
     text: "Perfect furniture assembly! They assembled my entire IKEA bedroom set quickly and professionally. Everything is sturdy and level.",
     date: "2 days ago",
@@ -17,7 +19,7 @@ const handymanReviews = [
   {
     id: 2,
     name: "Maria L.",
-    location: "Williamsburg, Brooklyn",
+    location: REVIEW_LOCATIONS[1],
     rating: 5,
     text: "Excellent TV mounting service! They concealed all the cables perfectly and the installation is rock solid. Very professional work.",
     date: "1 week ago",
@@ -26,7 +28,7 @@ const handymanReviews = [
   {
     id: 3,
     name: "James K.",
-    location: "Brooklyn Heights, Brooklyn",
+    location: REVIEW_LOCATIONS[2],
     rating: 5,
     text: "Great handyman service! Fixed my leaky faucet and patched drywall holes. Quick, reliable, and reasonably priced.",
     date: "4 days ago",
@@ -35,7 +37,7 @@ const handymanReviews = [
   {
     id: 4,
     name: "Rachel M.",
-    location: "DUMBO, Brooklyn",
+    location: REVIEW_LOCATIONS[3],
     rating: 5,
     text: "Amazing picture hanging service! They hung 15 pieces of art perfectly level and secure. Saved me hours of frustration.",
     date: "3 days ago",
@@ -44,7 +46,7 @@ const handymanReviews = [
   {
     id: 5,
     name: "Tom S.",
-    location: "Crown Heights, Brooklyn",
+    location: REVIEW_LOCATIONS[4],
     rating: 5,
     text: "Professional furniture assembly and installation. They built my office desk and mounted shelves. Quality work and fair pricing.",
     date: "1 week ago",
@@ -53,7 +55,7 @@ const handymanReviews = [
   {
     id: 6,
     name: "Emily R.",
-    location: "Gowanus, Brooklyn",
+    location: REVIEW_LOCATIONS[5],
     rating: 5,
     text: "Excellent handyman work! They fixed my door alignment and installed curtain rods. Very skilled and reliable team.",
     date: "5 days ago",
@@ -83,7 +85,7 @@ export default function HandymanReviewsSection() {
             Handyman Service Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            See what Brooklyn residents say about our handyman services.
+            See what our customers say about our handyman services.
           </p>
         </div>
 

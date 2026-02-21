@@ -1,11 +1,9 @@
-@import 'react-big-calendar/lib/css/react-big-calendar.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Brooklyn Maids color palette based on #283845 */
+  /* Tulsa Maids color palette - Dark slate with gold accents */
   --background: #FCFAED;
   --foreground: #283845;
   --slate-50: #FCFAED;
@@ -39,13 +37,13 @@
   --quaternary-button-hover-bg: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
 
   /* Accent colors */
-  --brooklyn-orange: #ED8936;
-  --brooklyn-teal: #38B2AC;
-  --brooklyn-cream: #FCFAED;
+  --accent-orange: #ED8936;
+  --accent-teal: #38B2AC;
+  --accent-cream: #FCFAED;
   
   /* Accessible text colors */
-  --text-on-dark: #FCFAED;      /* Brooklyn cream on dark backgrounds */
-  --text-on-light: #283845;     /* Brooklyn dark on light backgrounds */
+  --text-on-dark: #FCFAED;      /* Cream on dark backgrounds */
+  --text-on-light: #283845;     /* Dark on light backgrounds */
   --text-muted-dark: #e8e6d5;   /* Light muted text on dark */
   --text-muted-light: #5a554a;  /* Dark muted text on light */
 }
@@ -70,8 +68,8 @@
   --color-text-on-light: var(--text-on-light);
   --color-text-muted-dark: var(--text-muted-dark);
   --color-text-muted-light: var(--text-muted-light);
-  --color-button-light: var(--brooklyn-button-light);
-  --color-button-light-hover: var(--brooklyn-button-light-hover);
+  --color-button-light: var(--secondary-button-bg);
+  --color-button-light-hover: var(--secondary-button-hover-bg);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
   --font-logo: var(--font-playfair);
@@ -153,7 +151,6 @@ html {
 }
 
 .button-tertiary:hover {
-  background-color: var(--tertiary-button-hover-bg);
   transform: translateY(-1px);
 }
 
@@ -174,11 +171,6 @@ html {
 }
 
 .button-quaternary:hover {
-  transform: translateY(-1px);
-}
-
-.button-quaternary:hover {
-  filter: brightness(1.1);
   transform: translateY(-1px);
 }
 
@@ -305,6 +297,23 @@ html {
 
 .animate-fade-in {
   animation: fade-in 0.6s ease-out forwards;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Hero title specific styling */

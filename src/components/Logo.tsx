@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { BRANDING } from '@/config/branding';
+import { COLORS } from '@/styles/colors';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -18,13 +20,13 @@ export default function Logo({ size = 'md', linkToHome = true, className = '' }:
     <span 
       className={`font-[family-name:var(--font-playfair)] font-bold ${sizeClasses[size]} ${className}`}
       style={{
-        background: 'linear-gradient(135deg, #dfbd69 0%, #926f34 100%)',
+        background: `linear-gradient(135deg, #dfbd69 0%, #926f34 100%)`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
       }}
     >
-      Brooklyn Maids
+      {BRANDING.businessName}
     </span>
   );
 
@@ -32,7 +34,7 @@ export default function Logo({ size = 'md', linkToHome = true, className = '' }:
     return (
       <Link href="/" className="flex items-center">
         {logoText}
-        <span className="sr-only">Brooklyn Maids - Home</span>
+        <span className="sr-only">{BRANDING.businessName} - Home</span>
       </Link>
     );
   }

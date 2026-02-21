@@ -116,7 +116,7 @@ export default function MoveOutService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Move In/Out Cleaning",
-        location: "Brooklyn, NY",
+        location: "Tulsa, OK",
         description: "Professional move in and move out cleaning services"
       }} />
       

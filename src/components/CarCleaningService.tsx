@@ -4,11 +4,12 @@ import CallOrTextBar from './CallOrTextBar';
 import HowItWorksSection from './HowItWorksSection';
 import ContactSection from './ContactSection';
 import StructuredData from './StructuredData';
-import ReviewsSection from './ReviewsSection';
+import CarCleaningReviewsSection from './service-specific/CarCleaningReviewsSection';
 import BaseFAQ from './shared/BaseFAQ';
 import AreasWeServeSection from './AreasWeServeSection';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { BRANDING } from '@/config/branding';
 
 export default function CarCleaningService() {
   const carServices = [
@@ -55,7 +56,7 @@ export default function CarCleaningService() {
     },
     {
       question: "Do you come to my location?",
-      answer: "Yes! We offer mobile car cleaning services. We'll come to your home, office, or any convenient location in Brooklyn and surrounding areas with all our equipment and supplies."
+      answer: "Yes! We offer mobile car cleaning services. We'll come to your home, office, or any convenient location in Tulsa and surrounding areas with all our equipment and supplies."
     },
     {
       question: "What if my car needs stain removal or odor treatment?",
@@ -75,15 +76,16 @@ export default function CarCleaningService() {
     <>
       <StructuredData type="service" data={{ 
         service: "Car Cleaning",
-        location: "Brooklyn, NY",
+        location: `${BRANDING.primaryCity}, ${BRANDING.primaryState}`,
         description: "Car detailing and cleaning services"
       }} />
       
       <BaseHero 
-        title="Car Cleaning in New York"
+        title={`Professional Car Detailing Services in ${BRANDING.serviceArea}`}
         description="Interior and exterior car detailing with mobile service available. From deep cleaning to full detailing, we bring showroom quality to your vehicle."
-        location="New York, NY"
-        showWizard={true}
+        location={`${BRANDING.primaryCity}, ${BRANDING.primaryState}`}
+        showWizard={false}
+        quoteUrl="/services/car-cleaning/quote"
       />
       <QuoteBar />
       
@@ -136,7 +138,7 @@ export default function CarCleaningService() {
       <CallOrTextBar />
       <AreasWeServeSection />
       <QuoteBar />
-      <ReviewsSection location="Brooklyn" />
+      <CarCleaningReviewsSection />
       <CallOrTextBar />
       <BaseFAQ 
         title="Car Cleaning FAQ"

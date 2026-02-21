@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CONTACT_INFO } from '@/lib/contact';
+import { BRANDING } from '@/config/branding';
+import { COLORS } from '@/styles/colors';
 
 interface CallOrTextBarProps {
   quoteLink?: string;
@@ -26,10 +27,10 @@ const CallOrTextBar: React.FC<CallOrTextBarProps> = ({
         </svg>
         <span className="text-white/90 mx-1 text-[10px] sm:text-sm">CALL/TEXT</span>
         <a 
-          href={CONTACT_INFO.phone.href} 
+          href={BRANDING.phone.href} 
           className="font-bold text-white hover:text-white/80 transition-colors text-[10px] sm:text-sm"
         >
-          {CONTACT_INFO.phone.display}
+          {BRANDING.phone.display}
         </a>
         <span className="text-white/50 mx-1 text-[10px] sm:text-sm">OR</span>
         <Link 

@@ -11,6 +11,7 @@ import ReviewsSection from '@/components/ReviewsSection';
 import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
 import { locations, getLocationWithState } from '@/lib/locations';
+import { BRANDING } from '@/config/branding';
 
 interface LocationPageProps {
   params: Promise<{
@@ -32,33 +33,30 @@ export async function generateMetadata({ params }: LocationPageProps): Promise<M
   
   if (!location) {
     return {
-      title: 'Location Not Found | Brooklyn Maids',
+      title: `Location Not Found - ${BRANDING.businessName}`,
     };
   }
 
   const locationWithState = getLocationWithState(location.name, location.slug);
 
   return {
-    title: `House Cleaning Services in ${locationWithState} | Brooklyn Maids`,
+    title: `House Cleaning in ${locationWithState} - ${BRANDING.businessName}`,
     description: `House cleaning services in ${locationWithState}. Licensed & insured maids, 100% satisfaction guarantee. Book your trusted cleaning service today!`,
     openGraph: {
-      title: `House Cleaning Services in ${locationWithState} | Brooklyn Maids`,
+      title: `House Cleaning in ${locationWithState} - ${BRANDING.businessName}`,
       description: `House cleaning services in ${locationWithState}. Licensed & insured maids, 100% satisfaction guarantee. Book your trusted cleaning service today!`,
-      url: `https://brooklynmaids.com/locations/${location.slug}`,
-      siteName: 'Brooklyn Maids',
+      url: `${BRANDING.url}/locations/${location.slug}`,
+      siteName: BRANDING.businessName,
       images: [
         {
           url: '/ogs-image.jpg',
           width: 1200,
           height: 630,
-          alt: `Brooklyn Maids - House Cleaning Services in ${locationWithState}`,
+          alt: `${BRANDING.businessName} - House Cleaning Services in ${locationWithState}`,
         },
       ],
       locale: 'en_US',
       type: 'website',
-    },
-    alternates: {
-      canonical: `https://brooklynmaids.com/locations/${location.slug}`,
     },
   };
 }

@@ -1,8 +1,10 @@
 /**
- * Color Standards - Brooklyn Maids V4
+ * Color System - Tailwind Class Strings
  * 
- * Centralized color definitions and background styles.
- * Ensures brand consistency across the entire site.
+ * Each site defines its colors in globals.css as CSS variables.
+ * This file maps those variables to Tailwind utility classes for easy use in components.
+ * 
+ * To change site colors: Edit globals.css :root variables
  */
 
 export const COLORS = {
@@ -12,14 +14,14 @@ export const COLORS = {
     // Primary section background
     primary: "rgba(15, 23, 42, 0.95)",
     
-    // Secondary section background (same as primary for consistency)
+    // Secondary section background
     secondary: "rgba(15, 23, 42, 0.95)",
     
     // Hero gradient background
     hero: "bg-gradient-to-br from-slate-900 to-slate-800",
     
-    // Card background (for service cards, etc)
-    card: "bg-[rgba(15,23,42,0.95)]",
+    // Card background
+    card: "bg-[rgba(30,41,59,0.95)]",
     
     // Input field background
     input: "bg-slate-900/50",
@@ -31,19 +33,19 @@ export const COLORS = {
   // ===== BRAND COLORS =====
   
   brand: {
-    // Primary gold gradient
+    // Gold gradient colors
     goldGradientFrom: "#dfbd69",
     goldGradientTo: "#926f34",
     
-    // Legacy single gold (fallback)
+    // Single gold (for simple uses)
     gold: "#dfbd69",
     goldRGB: "223, 189, 105",
     
-    // Dark slate
+    // Navy/dark
     dark: "#283845",
     darkRGB: "40, 56, 69",
     
-    // Muted gold (for hover states)
+    // Muted gold
     goldMuted: "#926f34",
   },
   
@@ -62,7 +64,7 @@ export const COLORS = {
     // Very muted (60% opacity)
     veryMuted: "text-white/60",
     
-    // Brand gold accent (uses gradient via bg-clip)
+    // Brand gold accent
     accent: "text-[#dfbd69]",
     accentGradient: "bg-gradient-to-r from-[#dfbd69] to-[#926f34] bg-clip-text text-transparent",
     
@@ -80,7 +82,7 @@ export const COLORS = {
   },
   
   overlays: {
-    // Video/image overlay
+    // Dark overlay for video/images
     dark: "bg-black/60",
     
     // Light overlay for hover states
@@ -88,33 +90,67 @@ export const COLORS = {
     lightHover: "bg-white/15",
     
     // Card hover overlay
-    cardHover: "bg-[rgba(15,23,42,0.98)]",
+    cardHover: "bg-[rgba(30,41,59,0.98)]",
   },
   
   // ===== RING COLORS (for focus states) =====
   
   rings: {
     gold: "ring-[#dfbd69]",
-    goldDark: "ring-[rgba(15,23,42,1)]",
+    goldDark: "ring-[#926f34]",
     white: "ring-white/20",
   },
 };
 
 /**
- * Inline style helpers for cases where Tailwind can't be used
- * NOTE: All sections should use the same background for consistency
+ * INLINE_STYLES - For use in style={{}} props
+ * Use these when you need inline styles instead of className
  */
 export const INLINE_STYLES = {
-  // Standard section background (same for all sections)
-  primary: { background: 'rgba(15, 23, 42, 0.95)' },
+  // Primary section background
+  primary: {
+    background: 'rgba(15, 23, 42, 0.95)',
+  },
   
-  // Legacy secondary (kept for compatibility but should use primary)
-  secondary: { background: 'rgba(15, 23, 42, 0.95)' },
+  // Secondary section background
+  secondary: {
+    background: 'rgba(15, 23, 42, 0.95)',
+  },
   
-  // Gold glow shadow
-  goldGlow: { boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)' },
+  // Gold gradient for text/backgrounds
+  goldGradient: {
+    background: 'linear-gradient(135deg, #dfbd69 0%, #926f34 100%)',
+  },
   
-  // Dark shadow
-  darkShadow: { boxShadow: '0 0 20px rgba(15, 23, 42, 0.3)' },
+  // Text with gold gradient
+  goldGradientText: {
+    background: 'linear-gradient(135deg, #dfbd69 0%, #926f34 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  },
 };
 
+/**
+ * CSS_VARIABLES - For use in globals.css
+ * Define these in your site's globals.css :root {}
+ */
+export const CSS_VARIABLES = {
+  '--primary-gold': '#dfbd69',
+  '--secondary-gold': '#926f34',
+  '--primary-dark': '#283845',
+  '--slate-dark': '#0f172a',
+  '--slate-card': '#1e293b',
+};
+
+/**
+ * TAILWIND_COLORS - For use in tailwind.config.ts
+ * Extend Tailwind's color palette with site-specific colors
+ */
+export const TAILWIND_COLORS = {
+  'brand-gold': '#dfbd69',
+  'brand-gold-muted': '#926f34',
+  'brand-dark': '#283845',
+  'slate-primary': '#0f172a',
+  'slate-card': '#1e293b',
+};

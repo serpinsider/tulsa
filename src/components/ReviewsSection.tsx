@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { INLINE_STYLES } from '@/styles/colors';
+import { BRANDING } from '@/config/branding';
+import { REVIEW_LOCATIONS } from '@/config/content';
 
 const reviews = [
   {
     id: 1,
     name: "Sophie Eisenstat",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[0],
     rating: 5,
     text: "Absolutely excellent! They made communication quick and easy! The cleaning was fantastic! Deep cleaning was worth every penny and I love that they brought their own supplies!",
     date: "2 hours ago",
@@ -17,7 +19,7 @@ const reviews = [
   {
     id: 2,
     name: "Josh Gallant",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[1],
     rating: 5,
     text: "Great experience! They started and finished exactly on time and were very thorough. I will be booking them every month.",
     date: "3 weeks ago",
@@ -26,25 +28,25 @@ const reviews = [
   {
     id: 3,
     name: "Regina Ellison",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[2],
     rating: 5,
-    text: "Highly recommend this company! My maid showed up on time, was friendly, and she did a fantastic job of deep cleaning my apartment! Definitely keeping my bi-weekly bookings.",
+    text: `Highly recommend this company! My maid showed up on time, was friendly, and she did a fantastic job of deep cleaning my apartment! Definitely keeping my bi-weekly bookings.`,
     date: "3 weeks ago",
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 4,
     name: "Elizabeth McLees",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[3],
     rating: 5,
-    text: "I had never had an apartment cleaning before, using Brooklyn Maids was great. Easy to book online and my apartment is so clean!",
+    text: `I had never had an apartment cleaning before, using ${BRANDING.businessName} was great. Easy to book online and my apartment is so clean!`,
     date: "3 weeks ago",
     image: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 5,
     name: "Bijan Firouzan",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[4],
     rating: 5,
     text: "Booking was straightforward, trustworthy, and easy. They over-communicated by sending reminders and confirmations. The housekeeper was on time, friendly, and did a great job.",
     date: "23 weeks ago",
@@ -53,7 +55,7 @@ const reviews = [
   {
     id: 6,
     name: "Dana E.",
-    location: "Brooklyn, NY",
+    location: REVIEW_LOCATIONS[5],
     rating: 5,
     text: "Really thorough and quick at the same time. Schedule process is really easy. Cost is better than other ones I've seen. Definitely recommend!",
     date: "6 weeks ago",
@@ -65,7 +67,7 @@ interface ReviewsSectionProps {
   location?: string;
 }
 
-export default function ReviewsSection({ location = "Brooklyn" }: ReviewsSectionProps) {
+export default function ReviewsSection({ location }: ReviewsSectionProps) {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (

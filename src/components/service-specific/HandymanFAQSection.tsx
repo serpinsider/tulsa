@@ -1,4 +1,5 @@
 import BaseFAQ from '../shared/BaseFAQ';
+import { BRANDING } from '@/config/branding';
 
 export default function HandymanFAQSection() {
   const faqs = [
@@ -24,7 +25,7 @@ export default function HandymanFAQSection() {
     },
     {
       question: "How do I get a handyman quote?",
-      answer: "Get a quote for your handyman project:\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/services/handyman/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get Handyman Quote</a></div>Or contact us directly:\n• Call: <a href='tel:+13477504380' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>(347) 750-4380</a>\n• Text: <a href='sms:+13477504380' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>(347) 750-4380</a>"
+      answer: `Get a quote for your handyman project:\n\n<div class='flex flex-col sm:flex-row gap-3 mt-4'><a href='/services/handyman/quote' class='bg-[#dfbd69] text-slate-900 px-6 py-3 rounded-lg font-semibold text-center hover:bg-[#dfbd69]/90 transition-colors'>Get Handyman Quote</a></div>Or contact us directly:\n• Call: <a href='${BRANDING.phone.href}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.phone.display}</a>\n• Text: <a href='${BRANDING.phone.smsHref}' class='text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold'>${BRANDING.phone.display}</a>`
     }
   ];
 
