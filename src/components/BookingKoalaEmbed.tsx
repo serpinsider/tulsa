@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { getBookingKoalaUrl } from '@/config/branding'
 
 export default function BookingKoalaEmbed() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [iframeHeight, setIframeHeight] = useState('5800px')
+  const embedUrl = getBookingKoalaUrl()
 
   useEffect(() => {
     const updateHeight = () => {
@@ -23,9 +25,8 @@ export default function BookingKoalaEmbed() {
     updateHeight()
     window.addEventListener('resize', updateHeight)
 
-    // TODO: Replace with your BookingKoala subdomain
     const script = document.createElement('script')
-    script.src = 'https://[BOOKINGKOALA_SUBDOMAIN].bookingkoala.com/resources/embed.js'
+    script.src = 'https://brooklynmaids.bookingkoala.com/resources/embed.js'
     script.defer = true
     document.body.appendChild(script)
 
@@ -52,10 +53,9 @@ export default function BookingKoalaEmbed() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 pt-32 pb-12">
-      {/* TODO: Replace with your BookingKoala subdomain */}
       <iframe 
         ref={iframeRef}
-        src="https://[BOOKINGKOALA_SUBDOMAIN].bookingkoala.com/booknow?embed=true" 
+        src={embedUrl}
         className="w-full border-none"
         style={{ height: iframeHeight, minHeight: '100vh' }}
         scrolling="no"
