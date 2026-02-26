@@ -3,10 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ADDONS } from '@/lib/constants/addons';
-import { BRANDING, getFormspreeEndpoint } from '@/config/branding';
-import { COLORS } from '@/styles/colors';
+import { CONTACT_INFO } from '@/lib/contact';
 import SuccessMessage from '@/components/shared/SuccessMessage';
-import { trackEvent } from '@/lib/posthog/client';
 
 interface FormData {
   // Step 1 - Contact
@@ -51,7 +49,9 @@ interface FormData {
     officeCleaning: boolean;
     townhouse: boolean;
     extraHour: boolean;
-      washerDryer: boolean; // Using for stair cleaning
+    washerDryer: boolean;
+    stairwayCleaning: boolean;
+    dishwasher: boolean;
     movingServices: boolean;
     superDeepClean: boolean;
   };
@@ -69,6 +69,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   const [submitError, setSubmitError] = useState<string>('');
   const [showAddonsTray, setShowAddonsTray] = useState(false);
   const prevExpandedStateRef = useRef<boolean | undefined>(undefined);
+  const wizardRef = useRef<HTMLDivElement>(null);
+  const stepContentRef = useRef<HTMLDivElement>(null);
   
   const [formData, setFormData] = useState<FormData>({
     phone: '',
@@ -106,6 +108,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       townhouse: false,
       extraHour: false,
       washerDryer: false,
+      stairwayCleaning: false,
+      dishwasher: false,
       movingServices: false,
       superDeepClean: false,
     }
@@ -114,8 +118,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   // Initialize mounted state
   useEffect(() => {
     setIsMounted(true);
-    // Track wizard start
-    trackEvent('quote_wizard_started');
   }, []);
 
   // Phone number formatting
@@ -190,26 +192,20 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   // Notify parent when form expands beyond step 1
   useEffect(() => {
     if (onFormExpand && isMounted) {
-      const isCurrentlyExpanded = currentStep === 2 || currentStep === 3 || currentStep === 4 || currentStep === 5;
-      // Always notify on step 5 to ensure success message stays in expanded container
-      if (currentStep === 5 || typeof prevExpandedStateRef.current === 'undefined' || prevExpandedStateRef.current !== isCurrentlyExpanded) {
+      const isCurrentlyExpanded = currentStep >= 2;
+      if (typeof prevExpandedStateRef.current === 'undefined' || prevExpandedStateRef.current !== isCurrentlyExpanded) {
         prevExpandedStateRef.current = isCurrentlyExpanded;
         onFormExpand(isCurrentlyExpanded, true); // immediate=true for step changes
       }
     }
   }, [currentStep, onFormExpand, isMounted]);
 
-  // Scroll to top when reaching success step
+  // Scroll to top of page when reaching review step
   useEffect(() => {
-    if (currentStep === 4 && isMounted) {
-      // Immediate scroll
+    if (currentStep === 3) {
       window.scrollTo(0, 0);
-      // Also scroll after lock releases for reliability
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 650);
     }
-  }, [currentStep, isMounted]);
+  }, [currentStep]);
 
   const updateFormData = (field: string, value: string) => {
     // If changing service type to deep or moveout, reset and auto-enable required addons
@@ -239,6 +235,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         townhouse: false,
         extraHour: false,
         washerDryer: false,
+        stairwayCleaning: false,
+        dishwasher: false,
         movingServices: false,
         superDeepClean: false,
       };
@@ -265,12 +263,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         }
       }));
 
-      // Show addons tray after service type is selected (except for services without addons)
-      if (value !== 'post-construction' && value !== 'carpet' && value !== 'handyman') {
-        setShowAddonsTray(true);
-      } else {
-        setShowAddonsTray(false);
-      }
+      setShowAddonsTray(true);
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
@@ -329,36 +322,25 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
 
 
 
-  const scrollToForm = () => {
-    // First scroll to top of form container
-    const formElement = document.getElementById('quote-form-container');
-    if (formElement) {
-      const formRect = formElement.getBoundingClientRect();
-      const absoluteFormTop = window.pageYOffset + formRect.top - 20; // 20px padding
-      window.scrollTo({
-        top: absoluteFormTop,
-        behavior: 'smooth'
-      });
-    }
-  };
-
   const nextStep = async () => {
     const stepErrors = validateStep(currentStep);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
+      // Scroll to first error so user sees what to fix
+      const order = ['serviceType', 'zipCode', 'firstName', 'lastName', 'email'];
+      const firstKey = order.find((k) => stepErrors[k]);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const el = firstKey && document.getElementById(`field-${firstKey}`);
+          if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 80);
+      });
       return;
     }
-    
-    // Track step completion
-    trackEvent('quote_wizard_step_completed', {
-      step: currentStep,
-      step_name: currentStep === 1 ? 'phone' : 'property_and_contact',
-    });
     
     if (currentStep < 3) {
       setErrors({});
       setCurrentStep(currentStep + 1);
-      // Don't scroll - keep user where they are
     }
   };
 
@@ -418,6 +400,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         townhouse: false,
         extraHour: false,
         washerDryer: false,
+        stairwayCleaning: false,
+        dishwasher: false,
         movingServices: false,
         superDeepClean: false,
       }
@@ -436,16 +420,21 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
     try {
       const confirmationNumber = 'TM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-      // Prepare selected addons
+      // Prepare selected addons (exclude auto-included ones from display)
+      const includedInService = formData.serviceType === 'deep'
+        ? ['wallStainRemoval', 'tileAndGrout', 'baseboardCleaning']
+        : formData.serviceType === 'moveout'
+        ? ['bedroomBathroomCabinets', 'wallStainRemoval', 'tileAndGrout', 'baseboardCleaning']
+        : [];
       const selectedAddons = Object.entries(formData.addons)
-        .filter(([_, value]) => value)
+        .filter(([key, value]) => value && !includedInService.includes(key))
         .map(([key]) => key)
         .join(', ');
 
       // Prepare data for Formspree - NO price calculation, bot handles pricing
       const formspreeData = {
-        business: BRANDING.businessName,
-        businessId: BRANDING.businessId,
+        business: 'Tulsa Maids',
+        businessId: 'tulsa',
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -459,15 +448,14 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         addons: formData.addons,
         confirmationNumber,
         'Selected Add-ons': selectedAddons || 'None',
-        _subject: `${BRANDING.businessName} - Quote Request from ${formData.firstName} ${formData.lastName}`,
+        _subject: `Tulsa Maids - Quote Request from ${formData.firstName} ${formData.lastName}`,
+        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '',
       };
 
       // Submit to Formspree
-      console.log('Submitting to Formspree:', formspreeData);
-      
       let response;
       try {
-        response = await fetch(getFormspreeEndpoint(), {
+        response = await fetch('https://formspree.io/f/mrbjzvde', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -475,31 +463,12 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
           body: JSON.stringify(formspreeData)
         });
       } catch (error) {
-        console.error('Fetch error:', error);
-        alert('Network error submitting form. Please check:\n1. Your internet connection\n2. Any ad blockers or extensions\n3. Form is activated in Formspree');
-        setSubmitError('Network error. Please try again or contact us directly.');
+        setSubmitError('Network error. Please check your connection and try again.');
         setIsSubmitting(false);
         return;
       }
 
-      console.log('Response status:', response.status);
-      const result = await response.json();
-      console.log('Formspree response:', result);
-
       if (response.ok) {
-        // Track successful quote submission
-        trackEvent('quote_submitted', {
-          service_type: formData.serviceType,
-          bedrooms: formData.bedrooms,
-          bathrooms: formData.bathrooms,
-          confirmation_number: confirmationNumber,
-        });
-        
-        // Scroll to top IMMEDIATELY
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        
         setFormData(prev => ({ ...prev, confirmationNumber }));
         setCurrentStep(4);
       } else {
@@ -507,18 +476,16 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         throw new Error(errorData.message || `Server error: ${response.status}`);
       }
     } catch (error) {
-      console.error('Form submission error:', error);
+      const message = error instanceof Error ? error.message : 'Unknown error';
       
-      // Retry logic for network errors
-      if (retryCount < 2 && (error instanceof TypeError || error.message.includes('fetch'))) {
+      if (retryCount < 2 && (error instanceof TypeError || message.includes('fetch'))) {
         setTimeout(() => handleSubmit(retryCount + 1), 1000);
         return;
       }
       
-      // Show user-friendly error message
-      if (error.message.includes('fetch') || error instanceof TypeError) {
+      if (message.includes('fetch') || error instanceof TypeError) {
         setSubmitError('Network error. Please check your connection and try again.');
-      } else if (error.message.includes('400')) {
+      } else if (message.includes('400')) {
         setSubmitError('Please check your information and try again.');
       } else {
         setSubmitError('Something went wrong. Please try again or contact us directly.');
@@ -550,9 +517,9 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   const formatted = formatPhoneNumber(e.target.value);
                   updateFormData('phone', formatted);
                 }}
-                placeholder="(918) 900-8470"
+                placeholder="(918) 818-2460"
                 maxLength={14}
-                className={`w-full px-3 py-3 border rounded-lg bg-white/10 text-white placeholder-white/70 focus:ring-2 focus:ring-[#dfbd69] focus:border-white backdrop-blur-sm ${
+                className={`w-full px-3 py-3 border rounded-lg bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-[#dfbd69] focus:border-white backdrop-blur-sm ${
                   errors.phone ? 'border-red-400 ring-1 ring-red-400' : 'border-white/30'
                 }`}
                 required
@@ -650,7 +617,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   </div>
                 </div>
               </div>
-              <div>
+              <div id="field-zipCode">
                 <label className="block text-sm font-semibold mb-2 text-white">
                   Zip Code*
                 </label>
@@ -658,7 +625,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   type="text"
                   value={formData.zipCode}
                   onChange={(e) => updateFormData('zipCode', e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  placeholder="12345"
+                  placeholder="11201"
                   className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/40 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm ${
                     errors.zipCode ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'
                   }`}
@@ -670,7 +637,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
             </div>
 
             {/* Service Type - REQUIRED FIRST */}
-            <div>
+            <div id="field-serviceType">
               <label className="block text-sm font-semibold mb-3 text-white">
                 Select Your Cleaning Type* 
                 <span className="text-[#dfbd69] ml-2 text-xs">(Choose one to continue)</span>
@@ -707,7 +674,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                 <label className="block text-sm font-semibold mb-3 text-white">
                   How often do you need cleaning?*
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
                     { id: 'One Time', name: 'One Time', popular: false },
                     { id: 'Weekly', name: 'Weekly', popular: false },
@@ -756,7 +723,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {ADDONS.filter((addon) => {
-                    // Hide dishes from all service types
+                    // Hide dishes from all service types and hide included addons from the list
                     if (addon.key === 'dishes') return false;
                     
                     // Super Deep Clean only available for Standard and Deep cleans
@@ -810,8 +777,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                 {/* Contact Information - Shows after addons */}
                 <div className="pt-8 mt-8 border-t border-white/20">
                   <h4 className="text-base font-semibold text-white mb-6">Your Contact Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="relative">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div id="field-firstName" className="relative">
                       <label className="block text-sm font-semibold mb-2 text-white">
                         First Name*
                       </label>
@@ -847,7 +814,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                         <p className="absolute left-0 -bottom-5 text-xs text-red-300">{errors.lastName}</p>
                       )}
                     </div>
-                    <div className="relative">
+                    <div id="field-email" className="relative">
                       <label className="block text-sm font-semibold mb-2 text-white">
                         Email*
                       </label>
@@ -873,18 +840,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         );
         
       case 3:
-        // Calculate estimated price for display
-        const bedrooms = parseInt(formData.bedrooms) || 1;
-        const bathrooms = parseFloat(formData.bathrooms) || 1;
-        let estimatedPrice = 100 + (bedrooms - 1) * 20 + (bathrooms - 1) * 15;
-        
-        const serviceMultipliers: Record<string, number> = {
-          'standard': 1.0,
-          'deep': 1.6,
-          'moveout': 1.8,
-        };
-        estimatedPrice *= serviceMultipliers[formData.serviceType] || 1.0;
-
         const selectedAddons = Object.entries(formData.addons)
           .filter(([_, value]) => value)
           .map(([key]) => ADDONS.find(addon => addon.key === key))
@@ -953,7 +908,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
             )}
 
             <p className="text-[10px] sm:text-xs text-white/60 text-center leading-relaxed">
-              By submitting, you agree to receive communications from {BRANDING.businessName} regarding your quote request.
+              By submitting, you agree to receive communications from Tulsa Maids regarding your quote request.
             </p>
           </div>
         );
@@ -980,23 +935,34 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   };
 
   if (currentStep === 4) {
-    return <SuccessMessage type="quote" confirmationNumber={formData.confirmationNumber}  inline={true} onClose={handleCloseSuccess} />;
+    return (
+      <div ref={wizardRef}>
+        <SuccessMessage type="quote" confirmationNumber={formData.confirmationNumber} inline={true} onClose={handleCloseSuccess} />
+      </div>
+    );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" ref={wizardRef}>
       {/* Header */}
       <div className="text-center mb-6">
-        <h2 className="text-xl sm:text-2xl font-serif font-bold text-white mb-4 drop-shadow-lg">
+        <h2 className="text-xl sm:text-2xl font-serif font-bold text-white mb-3 drop-shadow-lg">
           Get a free quote instantly!
         </h2>
-        
+        {/* Progress indicator */}
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <div className={`h-1 w-12 rounded-full transition-all duration-300 ${currentStep >= 1 ? 'bg-[#dfbd69]' : 'bg-white/20'}`} />
+            <div className={`h-1 w-12 rounded-full transition-all duration-300 ${currentStep >= 2 ? 'bg-[#dfbd69]' : 'bg-white/20'}`} />
+          </div>
+          <span className="text-white/40 text-xs">Step {Math.min(currentStep, 2)} of 2</span>
+        </div>
       </div>
       
 
 
       {/* Step Content */}
-      <div className="max-w-2xl mx-auto">
+      <div ref={stepContentRef} className="max-w-2xl mx-auto">
         {renderStep()}
 
         {/* Navigation Buttons */}
@@ -1053,10 +1019,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
           <p className="text-sm text-white/70">
             Need help?{' '}
             <a 
-              href={BRANDING.phone.smsHref}
+              href={`sms:${CONTACT_INFO.phone.raw}`}
               className="text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold transition-colors duration-200"
             >
-              Text {BRANDING.phone.display}
+              Text {CONTACT_INFO.phone.display}
             </a>
           </p>
         </div>
@@ -1073,10 +1039,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                 </svg>
               ))}
             </div>
-            <span className="text-sm text-white/80">4.9 (141 Reviews)</span>
+            <span className="text-sm text-white/80">4.9 (171 Reviews)</span>
           </div>
           <div className="text-sm text-white/80">
-            <span className="font-semibold">141</span> Happy Customers
+            <span className="font-semibold">171</span> Happy Customers
           </div>
         </div>
       )}

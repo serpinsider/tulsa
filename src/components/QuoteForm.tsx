@@ -1,19 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { BRANDING } from '@/config/branding';
-import { QUOTE_FORM_SERVICE_AREA_TEXT } from '@/config/content';
+import { CONTACT_INFO } from '@/lib/contact';
 import { ADDONS } from '@/lib/constants/addons';
 import SuccessMessage from '@/components/shared/SuccessMessage';
-import { getSalesTaxRate } from '@/config/service-config';
 import { COLORS } from '@/styles/colors';
 
 // Helper to get form background color
 const getFormBg = () => {
   const primary = COLORS.backgrounds.primary;
-  // If it's a CSS variable, fallback to Las Vegas brown
+  // If it's a CSS variable, fallback to dark background
   if (primary.includes('var(')) {
     return 'rgba(45, 20, 16, 0.5)';
   }
@@ -24,7 +21,7 @@ const getFormBg = () => {
 type AddonsType = {
   insideFridge: boolean;
   insideOven: boolean;
-  carpet: boolean;
+  carpetCleaning: boolean;
   microwave: boolean;
   organization: boolean;
   handymanServices: boolean;
@@ -42,49 +39,26 @@ type AddonsType = {
   baseboardCleaning: boolean;
   tileAndGrout: boolean;
   officeCleaning: boolean;
+  superDeepClean: boolean;
+  dishwasher: boolean;
   townhouse: boolean;
   extraHour: boolean;
   washerDryer: boolean;
+  stairwayCleaning: boolean;
   movingServices: boolean;
 };
 
 const cleaningTypes = [
-  {
-    id: 'standard',
-    name: 'Standard Clean',
-    description: 'Regular maintenance'
-  },
-  {
-    id: 'deep',
-    name: 'Deep Clean',
-    description: 'Thorough cleaning'
-  },
-  {
-    id: 'super',
-    name: 'Super Clean',
-    description: 'Ultimate deep clean'
-  },
-  {
-    id: 'moveout',
-    name: 'Move Out Clean',
-    description: 'Complete move-out'
-  },
-  {
-    id: 'carpet',
-    name: 'Carpet Cleaning',
-    description: 'Deep carpet clean'
-  },
-  {
-    id: 'handyman',
-    name: 'Handyman',
-    description: 'Assembly & repairs'
-  }
+  { id: 'standard', name: 'Standard Clean', description: 'Regular maintenance' },
+  { id: 'deep', name: 'Deep Clean', description: 'Thorough cleaning' },
+  { id: 'moveout', name: 'Move Out Clean', description: 'Complete move-out' },
 ];
 
 export default function QuoteForm() {
-  const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
   const [confirmationNumber, setConfirmationNumber] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     firstName: '',
@@ -95,13 +69,12 @@ export default function QuoteForm() {
     bathrooms: '1',
     squareFootage: 'Under 1,000 sqft',
     zipCode: '',
-    serviceType: 'standard',
-    interestedInCarpet: false,
-    interestedInHandyman: false,
+    frequency: 'One Time',
+    serviceType: '',
     addons: {
       insideFridge: false,
       insideOven: false,
-      carpet: false,
+      carpetCleaning: false,
       microwave: false,
       organization: false,
       handymanServices: false,
@@ -119,18 +92,23 @@ export default function QuoteForm() {
       baseboardCleaning: false,
       tileAndGrout: false,
       officeCleaning: false,
+      superDeepClean: false,
+      dishwasher: false,
       townhouse: false,
       extraHour: false,
       washerDryer: false,
+      stairwayCleaning: false,
       movingServices: false,
     } as AddonsType
   });
+
+  const [showAddonsTray, setShowAddonsTray] = useState(false);
 
   const handleServiceTypeChange = (type: string) => {
     const resetAddons = {
       insideFridge: false,
       insideOven: false,
-      carpet: false,
+      carpetCleaning: false,
       microwave: false,
       organization: false,
       handymanServices: false,
@@ -148,9 +126,12 @@ export default function QuoteForm() {
       baseboardCleaning: false,
       tileAndGrout: false,
       officeCleaning: false,
+      superDeepClean: false,
+      dishwasher: false,
       townhouse: false,
       extraHour: false,
       washerDryer: false,
+      stairwayCleaning: false,
       movingServices: false,
     };
 
@@ -168,11 +149,14 @@ export default function QuoteForm() {
     setFormData(prev => ({
       ...prev,
       serviceType: type,
+      frequency: type === 'moveout' ? 'One Time' : prev.frequency,
       addons: {
         ...resetAddons,
         ...serviceTypeAddons
       }
     }));
+
+    setShowAddonsTray(true);
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -194,15 +178,18 @@ export default function QuoteForm() {
 
   const handleSubmit = async () => {
     try {
-      // Clear previous errors
+      setIsSubmitting(true);
+      setSubmitError('');
       setErrors({});
       const newErrors: Record<string, string> = {};
 
       // Validate required fields
+      if (!formData.serviceType) newErrors.serviceType = 'Please select a service type';
       if (!formData.firstName || formData.firstName.trim() === '') newErrors.firstName = 'First name is required';
       if (!formData.lastName || formData.lastName.trim() === '') newErrors.lastName = 'Last name is required';
       if (!formData.email || formData.email.trim() === '') newErrors.email = 'Email is required';
       if (!formData.phone || formData.phone.trim() === '') newErrors.phone = 'Phone is required';
+      if (!formData.zipCode || !/^\d{5}$/.test(formData.zipCode)) newErrors.zipCode = 'Please enter a valid 5-digit zip code';
 
       // Validate email format
       if (formData.email && !isValidEmail(formData.email)) {
@@ -217,7 +204,7 @@ export default function QuoteForm() {
       // If there are errors, set them and scroll to first error
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
-        // Scroll to first error field
+        setIsSubmitting(false);
         const firstErrorField = document.querySelector('.border-red-500');
         if (firstErrorField) {
           firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -243,7 +230,7 @@ export default function QuoteForm() {
           const readableNames: Record<string, string> = {
             insideFridge: 'Inside Fridge',
             insideOven: 'Inside Oven',
-            carpet: 'Carpet Cleaning',
+            carpetCleaning: 'Carpet Cleaning',
             microwave: 'Microwave',
             organization: 'Organization',
             handymanServices: 'Handyman Services',
@@ -261,9 +248,12 @@ export default function QuoteForm() {
             baseboardCleaning: 'Baseboard Cleaning',
             tileAndGrout: 'Tile & Grout',
             officeCleaning: 'Office Cleaning',
-            townhouse: 'Townhouse',
+            superDeepClean: 'Super Deep Clean',
+            dishwasher: 'Dishwasher Cleaning',
+            townhouse: 'Townhouse Clean',
             extraHour: 'Extra Hour',
-            washerDryer: 'Washer/Dryer',
+            washerDryer: 'Washer & Dryer',
+            stairwayCleaning: 'Stairway Cleaning',
             movingServices: 'Moving Services'
           };
           return readableNames[key] || key;
@@ -273,16 +263,13 @@ export default function QuoteForm() {
       const serviceTypeNames: Record<string, string> = {
         standard: 'Standard Clean',
         deep: 'Deep Clean',
-        super: 'Super Clean',
         moveout: 'Move Out Clean',
-        carpet: 'Carpet Cleaning',
-        handyman: 'Handyman'
       };
 
       // Create structured data for Formspree
       const cleanFormData = {
-        business: BRANDING.businessName,
-        businessId: BRANDING.businessId,
+        business: 'Tulsa Maids',
+        businessId: 'tulsa',
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -290,6 +277,7 @@ export default function QuoteForm() {
         bedrooms: formData.bedrooms,
         bathrooms: formData.bathrooms,
         zipCode: formData.zipCode,
+        frequency: formData.frequency,
         serviceType: formData.serviceType,
         squareFootage: formData.squareFootage,
         addons: formData.addons,
@@ -302,6 +290,7 @@ export default function QuoteForm() {
         'Bedrooms': formData.bedrooms,
         'Bathrooms': formData.bathrooms,
         'Zip Code': formData.zipCode,
+        'Frequency': formData.frequency,
         'Service Type': serviceTypeNames[formData.serviceType] || formData.serviceType,
         'Home Size': formData.squareFootage,
         'Extra Add-ons': extraAddons.length > 0 ? extraAddons.join(', ') : 'None',
@@ -315,24 +304,23 @@ export default function QuoteForm() {
         },
         body: JSON.stringify({
           ...cleanFormData,
-          _subject: `${BRANDING.businessName} - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+          _subject: `Tulsa Maids - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+          sourcePage: typeof window !== 'undefined' ? window.location.pathname : '',
         }),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit quote');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to submit quote');
       }
 
       setConfirmationNumber(confirmationNumber);
       setSubmitted(true);
-      
-      // Scroll to top to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('There was an error submitting the form. Please try again or contact us directly.');
+      setSubmitError('Something went wrong. Please try again or contact us directly.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -410,7 +398,7 @@ export default function QuoteForm() {
                 </label>
                 <input
                   type="tel"
-                  placeholder={BRANDING.phone.display}
+                  placeholder={CONTACT_INFO.phone.display}
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.phone ? 'border-red-500' : 'border-white/20'
                   }`}
@@ -468,18 +456,55 @@ export default function QuoteForm() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  Zip Code*
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 11201"
+                  className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
+                    errors.zipCode ? 'border-red-500' : 'border-white/20'
+                  }`}
+                  style={{ background: getFormBg() }}
+                  value={formData.zipCode}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 5);
+                    setFormData({ ...formData, zipCode: val });
+                  }}
+                  maxLength={5}
+                />
+                {errors.zipCode && <p className="text-red-400 text-sm mt-1">{errors.zipCode}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  Home Size*
+                </label>
+                <select
+                  value={formData.squareFootage}
+                  onChange={(e) => setFormData({ ...formData, squareFootage: e.target.value })}
+                  className="w-full p-3 border border-white/20 rounded-lg text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
+                  style={{ background: getFormBg() }}
+                >
+                  <option value="Under 1,000 sqft">Under 1,000 sqft</option>
+                  <option value="1,000-2,000 sqft">1,000 - 2,000 sqft</option>
+                  <option value="2,000-3,000 sqft">2,000 - 3,000 sqft</option>
+                  <option value="3,000+ sqft">3,000+ sqft</option>
+                </select>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-semibold mb-2 text-white">
-                Service Type
+              <label className="block text-sm font-semibold mb-3 text-white">
+                Select Your Cleaning Type*
+                <span className="text-[#dfbd69] ml-2 text-xs">(Choose one to continue)</span>
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {[
                   { id: 'standard', name: 'Standard Clean', description: 'Regular maintenance' },
                   { id: 'deep', name: 'Deep Clean', description: 'Thorough cleaning' },
-                  { id: 'moveout', name: 'Move Out Clean', description: 'Complete move-out' },
-                  { id: 'post-construction', name: 'Post Construction', description: 'Post-renovation' },
-                  { id: 'carpet', name: 'Carpet Cleaning', description: 'Deep carpet clean' },
-                  { id: 'handyman', name: 'Handyman', description: 'Assembly & repairs' }
+                  { id: 'moveout', name: 'Move Out Clean', description: 'Complete move-out' }
                 ].map(({ id, name, description }) => (
                   <button
                     key={id}
@@ -487,116 +512,138 @@ export default function QuoteForm() {
                     onClick={() => handleServiceTypeChange(id)}
                     className={`relative cursor-pointer group ${
                       formData.serviceType === id
-                        ? 'ring-2 ring-[#dfbd69] animate-glow border-[0.5px] border-white animate-selected-pulse'
-                        : 'ring-1 ring-white/20 hover:ring-2 hover:ring-white/40'
-                    } rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all ${
-                      formData.serviceType === id ? 'bg-white/40' : 'bg-white/10'
-                    } backdrop-blur-sm`}
-                    style={formData.serviceType === id ? {boxShadow: '0 0 20px rgba(26, 74, 46, 0.3)'} : {}}
-                    onMouseEnter={(e) => {
-                      if (formData.serviceType !== id) {
-                        e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.2)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (formData.serviceType !== id) {
-                        e.currentTarget.style.boxShadow = 'none';
-                      }
-                    }}
+                        ? 'ring-2 ring-[#dfbd69] bg-white/40'
+                        : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
+                    } rounded-lg p-4 flex flex-col items-center justify-center text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                   >
-                    <div className="flex flex-col gap-2">
-                      <span className="text-sm font-medium text-white">{name}</span>
-                      <span className="text-xs text-white/70">{description}</span>
-                    </div>
+                    <span className="text-sm font-semibold text-white mb-1">{name}</span>
+                    <span className="text-xs text-white/70">{description}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {formData.serviceType !== 'post-construction' && formData.serviceType !== 'carpet' && formData.serviceType !== 'handyman' && (
+            {/* Frequency Selection - hidden for move out, only shows after service type selected */}
+            {formData.serviceType && formData.serviceType !== 'moveout' && (
               <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  Add-ons (Optional)
+                <label className="block text-sm font-semibold mb-3 text-white">
+                  How often do you need cleaning?*
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {ADDONS.map((addon) => {
-                  const isAutoIncluded = 
-                    (formData.serviceType === 'deep' && 
-                      (addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning')) ||
-                    (formData.serviceType === 'moveout' && 
-                      (addon.key === 'bedroomBathroomCabinets' || addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning'));
-                  
-                  const isSelected = formData.addons[addon.key as keyof typeof formData.addons];
-                  
-                  return (
-                  <label key={addon.key} className={`relative ${isAutoIncluded ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
-                    onMouseEnter={(e) => {
-                      if (!formData.addons[addon.key as keyof typeof formData.addons] && !isAutoIncluded) {
-                        const div = e.currentTarget.querySelector('div');
-                        if (div) div.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.2)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!formData.addons[addon.key as keyof typeof formData.addons] && !isAutoIncluded) {
-                        const div = e.currentTarget.querySelector('div');
-                        if (div) div.style.boxShadow = 'none';
-                      }
-                    }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.addons[addon.key as keyof typeof formData.addons]}
-                      disabled={isAutoIncluded}
-                      onChange={() => {
-                        if (!isAutoIncluded) {
-                          setFormData(prev => ({
-                            ...prev,
-                            addons: {
-                              ...prev.addons,
-                              [addon.key]: !prev.addons[addon.key as keyof typeof prev.addons]
-                            }
-                          }));
-                        }
-                      }}
-                      className="sr-only peer"
-                    />
-                    <div className={`w-full p-3 rounded-lg text-center transition-all backdrop-blur-sm ${
-                      isAutoIncluded || isSelected
-                        ? 'ring-2 ring-[#dfbd69] bg-white/40 animate-glow border-[0.5px] border-white animate-selected-pulse'
-                        : 'ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-white/40'
-                    }`} style={isAutoIncluded || isSelected ? {boxShadow: '0 0 20px rgba(26, 74, 46, 0.3)'} : {}}>
-                      <div className="flex flex-col gap-2">
-                        <div className="w-8 h-8 mx-auto">
-                          <Image
-                            src={`/icons/addons/${addon.icon}`}
-                            alt={addon.label}
-                            width={32}
-                            height={32}
-                            className="w-full h-full object-contain"
-                          />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { id: 'One Time', name: 'One Time', popular: false },
+                    { id: 'Weekly', name: 'Weekly', popular: false },
+                    { id: 'Monthly', name: 'Monthly', popular: true },
+                    { id: 'Quarterly', name: 'Quarterly', popular: false }
+                  ].map(({ id, name, popular }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, frequency: id }))}
+                      className={`relative ${
+                        formData.frequency === id
+                          ? 'ring-2 ring-[#dfbd69] bg-white/40 border border-white'
+                          : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
+                      } rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
+                    >
+                      {popular && (
+                        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#dfbd69] text-[#283845] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                          MOST POPULAR
+                        </span>
+                      )}
+                      <span className="text-sm font-semibold text-white">{name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Add-ons Tray - Only shows after service type selected */}
+            {showAddonsTray && (
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-white">
+                  Add Extra Services (Optional)
+                </label>
+
+                {formData.serviceType === 'deep' && (
+                  <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+                    <strong>Included:</strong> Baseboards, Wall Stains, Tile & Grout
+                  </div>
+                )}
+                {formData.serviceType === 'moveout' && (
+                  <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+                    <strong>Included:</strong> Cabinets, Baseboards, Wall Stains, Tile & Grout
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {ADDONS.filter((addon) => {
+                    if (addon.key === 'dishes') return false;
+                    if (addon.key === 'superDeepClean' && formData.serviceType === 'moveout') return false;
+                    const isAutoIncluded = 
+                      (formData.serviceType === 'deep' && 
+                        (addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning')) ||
+                      (formData.serviceType === 'moveout' && 
+                        (addon.key === 'bedroomBathroomCabinets' || addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning'));
+                    return !isAutoIncluded;
+                  }).map((addon) => {
+                    const isSelected = formData.addons[addon.key as keyof typeof formData.addons];
+                    return (
+                      <label key={addon.key} className="relative cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.addons[addon.key as keyof typeof formData.addons]}
+                          onChange={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              addons: {
+                                ...prev.addons,
+                                [addon.key]: !prev.addons[addon.key as keyof typeof prev.addons]
+                              }
+                            }));
+                          }}
+                          className="sr-only peer"
+                        />
+                        <div className={`w-full p-3 rounded-lg text-center transition-all duration-300 ease-in-out backdrop-blur-sm ${
+                          isSelected
+                            ? 'ring-2 ring-[#dfbd69] bg-white/40'
+                            : 'ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-[#dfbd69]/50'
+                        }`}>
+                          <div className="flex flex-col gap-2">
+                            <div className="w-8 h-8 mx-auto">
+                              <Image
+                                src={`/icons/addons/${addon.icon}`}
+                                alt={addon.label}
+                                width={32}
+                                height={32}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <div className="text-xs font-medium text-white">{addon.label}</div>
+                            <div className="text-[10px] text-white/70">{addon.description}</div>
+                          </div>
                         </div>
-                        <div className="text-xs font-medium text-white leading-tight">{addon.label}</div>
-                        <div className="text-[10px] text-white/70 leading-tight">
-                          {isAutoIncluded ? 'Included' : addon.description}
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-                  );
-                })}
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             <p className="text-xs text-white/60 text-center mb-4 mt-8">
-              By submitting this form, you agree to receive communications from {BRANDING.businessName} regarding your quote request. We respect your privacy and will never share your information.
+              By submitting this form, you agree to receive communications from Tulsa Maids regarding your quote request.
             </p>
+
+            {submitError && (
+              <p className="text-red-400 text-sm text-center">{submitError}</p>
+            )}
 
             <button
               onClick={handleSubmit}
-              disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !isValidEmail(formData.email) || !isValidPhone(formData.phone)}
-              className="button-quaternary w-full"
+              disabled={isSubmitting || !formData.serviceType || !formData.firstName || !formData.lastName || !formData.email || !formData.phone || !isValidEmail(formData.email) || !isValidPhone(formData.phone)}
+              className="button-quaternary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
 
             <div className="mt-6 flex items-center justify-center gap-8">
@@ -608,10 +655,10 @@ export default function QuoteForm() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm text-white/80">4.9 (141 Reviews)</span>
+                <span className="text-sm text-white/80">4.9 (171 Reviews)</span>
               </div>
               <div className="text-sm text-white/80">
-                <span className="font-semibold">141</span> Happy Customers
+                <span className="font-semibold">171</span> Happy Customers
               </div>
             </div>
 
@@ -660,6 +707,12 @@ export default function QuoteForm() {
                     {cleaningTypes.find(type => type.id === formData.serviceType)?.name}
                   </p>
                 </div>
+                {formData.serviceType !== 'moveout' && (
+                  <div>
+                    <span className="text-base font-semibold text-white">Frequency:</span>
+                    <p className="text-base text-white/80">{formData.frequency}</p>
+                  </div>
+                )}
                 <div>
                   <span className="text-base font-semibold text-white">Selected Add-ons:</span>
                   <div className="mt-1">
@@ -686,16 +739,16 @@ export default function QuoteForm() {
               <div className="space-y-6">
                 <div className="space-y-3">
                   <a 
-                    href="tel:+18136805200" 
+                    href={CONTACT_INFO.phone.href} 
                     className="flex items-center space-x-3 text-base text-white/80 hover:text-white transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    <span>{BRANDING.phone.display}</span>
+                    <span>{CONTACT_INFO.phone.display}</span>
                   </a>
                   <a 
-                    href={BRANDING.phone.smsHref} 
+                    href={`sms:${CONTACT_INFO.phone.raw}`} 
                     className="flex items-center space-x-3 text-base text-white/80 hover:text-white transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -704,13 +757,13 @@ export default function QuoteForm() {
                     <span>Text us</span>
                   </a>
                   <a 
-                    href={BRANDING.email.href} 
+                    href={CONTACT_INFO.email.href} 
                     className="flex items-center space-x-3 text-base text-white/80 hover:text-white transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span>{BRANDING.email.display}</span>
+                    <span>{CONTACT_INFO.email.display}</span>
                   </a>
                 </div>
 
@@ -728,7 +781,7 @@ export default function QuoteForm() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-white/90">What areas do you serve?</p>
                       <p className="text-xs text-white/70 leading-relaxed">
-                        {QUOTE_FORM_SERVICE_AREA_TEXT} Contact us to confirm service in your area.
+                        We serve Tulsa, Broken Arrow, Owasso, Jenks, Bixby, Sand Springs, Sapulpa, Glenpool, Claremore, and Catoosa. Contact us to confirm service in your area.
                       </p>
                     </div>
 
