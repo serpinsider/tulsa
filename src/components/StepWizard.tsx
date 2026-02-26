@@ -712,12 +712,12 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
 
                 {formData.serviceType === 'deep' && (
                   <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
-                    <strong>Included:</strong> Baseboards, Wall Stains, Tile & Grout
+                    <strong>Deep Clean:</strong> Extra time for baseboards, windowsills, doorframes, tile & grout
                   </div>
                 )}
                 {formData.serviceType === 'moveout' && (
                   <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
-                    <strong>Included:</strong> Cabinets, Baseboards, Wall Stains, Tile & Grout
+                    <strong>Move Out:</strong> Everything in a deep clean plus inside all cabinets
                   </div>
                 )}
 
