@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Privacy Policy - Tulsa Maids',
     description: 'Privacy policy for Tulsa Maids house cleaning services.',
-    url: 'https://www.tulsamaids.com/privacy',
+    url: 'https://tulsamaids.com/privacy',
     siteName: 'Tulsa Maids',
     type: 'website',
   },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'Privacy Policy - Tulsa Maids',
   },
-  alternates: { canonical: 'https://www.tulsamaids.com/privacy' },
+  alternates: { canonical: 'https://tulsamaids.com/privacy' },
 };
 
 export default function PrivacyLayout({ children }: { children: React.ReactNode }) {

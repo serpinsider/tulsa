@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { locations } from '@/lib/locations'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.tulsamaids.com'
+  const baseUrl = 'https://tulsamaids.com'
   
   const staticPages = [
     {

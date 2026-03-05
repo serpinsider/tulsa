@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Gift Cards - Tulsa Maids',
     description: 'Give the gift of a clean home. Purchase a Tulsa Maids gift card for house cleaning services in Tulsa & OK.',
-    url: 'https://www.tulsamaids.com/gift-cards',
+    url: 'https://tulsamaids.com/gift-cards',
     siteName: 'Tulsa Maids',
     type: 'website',
   },
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'Give the gift of a clean home. Purchase a Tulsa Maids gift card for house cleaning services in Tulsa & OK.',
   },
   alternates: {
-    canonical: 'https://www.tulsamaids.com/gift-cards',
+    canonical: 'https://tulsamaids.com/gift-cards',
   },
 };
 

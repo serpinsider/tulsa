@@ -7,7 +7,7 @@ export const BRANDING = {
   businessId: 'tulsa',
 
   domain: 'tulsamaids.com',
-  url: 'https://www.tulsamaids.com',
+  url: 'https://tulsamaids.com',
 
   primaryCity: 'Tulsa',
   primaryState: 'OK',

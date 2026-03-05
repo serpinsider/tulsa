@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Refund Policy - Tulsa Maids',
     description: 'Refund policy for Tulsa Maids house cleaning services.',
-    url: 'https://www.tulsamaids.com/refund',
+    url: 'https://tulsamaids.com/refund',
     siteName: 'Tulsa Maids',
     type: 'website',
   },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'Refund Policy - Tulsa Maids',
   },
-  alternates: { canonical: 'https://www.tulsamaids.com/refund' },
+  alternates: { canonical: 'https://tulsamaids.com/refund' },
 };
 
 export default function RefundLayout({ children }: { children: React.ReactNode }) {

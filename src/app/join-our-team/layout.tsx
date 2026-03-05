@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Join Our Team - Tulsa Maids',
     description: 'Join the Tulsa Maids team. We are hiring house cleaners in Tulsa OK.',
-    url: 'https://www.tulsamaids.com/join-our-team',
+    url: 'https://tulsamaids.com/join-our-team',
     siteName: 'Tulsa Maids',
     type: 'website',
   },
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: 'Join Our Team - Tulsa Maids',
     description: 'Join the Tulsa Maids team. We are hiring house cleaners in Tulsa OK.',
   },
-  alternates: { canonical: 'https://www.tulsamaids.com/join-our-team' },
+  alternates: { canonical: 'https://tulsamaids.com/join-our-team' },
 };
 
 export default function JoinOurTeamLayout({ children }: { children: React.ReactNode }) {

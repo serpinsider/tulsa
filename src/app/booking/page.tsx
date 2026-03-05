@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Book Your Cleaning - Tulsa Maids',
     description: 'Book your home cleaning service in minutes. Choose your cleaning type, schedule your preferred date and time, and let Tulsa Maids take care of the rest.',
-    url: 'https://www.tulsamaids.com/booking',
+    url: 'https://tulsamaids.com/booking',
     siteName: 'Tulsa Maids',
     images: [
       {
