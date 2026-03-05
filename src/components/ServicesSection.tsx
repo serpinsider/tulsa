@@ -213,7 +213,7 @@ export default function ServicesSection({ location = "Tulsa, OK" }: ServicesSect
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {services.map((service) => (
-              <div key={service.id} className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
+              <div key={service.id} className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
                 {service.isNew && (
                   <div className="absolute -top-3 -right-3 bg-[#dfbd69] text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                     NEW
@@ -293,7 +293,7 @@ export default function ServicesSection({ location = "Tulsa, OK" }: ServicesSect
             </div>
 
             {showAllServices && (
-              <div className="mt-6 bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 animate-in slide-in-from-top duration-300">
+              <div className="mt-6 bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 animate-in slide-in-from-top duration-300">
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {Object.entries(serviceCategories).map(([key, category]) => (
                     <div key={key}>

@@ -76,7 +76,7 @@ export default function TermsClient() {
           <section className="mb-12">
             <h2 className="text-xl font-semibold text-[${COLORS.brand.gold}] mb-6">Liability and Insurance</h2>
             <div className="space-y-4 text-white/80">
-              <p>{BRANDING.businessName} is fully insured and bonded. However:</p>
+              <p>Tulsa Maids is fully insured and bonded. However:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Report any damages within 24 hours of service completion</li>
                 <li>We're insured for accidental damages during normal cleaning operations</li>
@@ -92,11 +92,11 @@ export default function TermsClient() {
               <p>We currently serve:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Tulsa (all neighborhoods)</li>
-                <li>Broken Arrow</li>
-                <li>Owasso</li>
-                <li>Jenks</li>
-                <li>Bixby</li>
-                <li>Sand Springs and surrounding areas</li>
+                <li>Manhattan</li>
+                <li>Queens</li>
+                <li>Bronx</li>
+                <li>Staten Island</li>
+                <li>Jersey City and surrounding areas</li>
               </ul>
             </div>
           </section>

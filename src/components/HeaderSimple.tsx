@@ -38,7 +38,7 @@ export default function HeaderSimple() {
             ? 'backdrop-blur-md border-b border-white/10' 
             : 'bg-transparent'
         }`}
-        style={isScrolled ? { background: 'rgba(15, 23, 42, 0.95)' } : {}}
+        style={isScrolled ? { background: 'rgba(26, 55, 85, 0.95)' } : {}}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Desktop Layout */}
@@ -105,7 +105,7 @@ export default function HeaderSimple() {
           />
           
           {/* Menu Content */}
-          <div className="relative backdrop-blur-md border-b border-white/10" style={{ background: 'rgba(15, 23, 42, 0.95)' }}>
+          <div className="relative backdrop-blur-md border-b border-white/10" style={{ background: 'rgba(26, 55, 85, 0.95)' }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
               <nav className="flex flex-col space-y-4">
                 {/* Mobile Contact */}

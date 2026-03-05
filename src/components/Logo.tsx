@@ -20,7 +20,7 @@ export default function Logo({ size = 'md', linkToHome = true, className = '' }:
     <span 
       className={`font-[family-name:var(--font-playfair)] font-bold ${sizeClasses[size]} ${className}`}
       style={{
-        background: `linear-gradient(135deg, #dfbd69 0%, #926f34 100%)`,
+        background: `linear-gradient(135deg, #dfbd69 0%, #b8956d 100%)`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',

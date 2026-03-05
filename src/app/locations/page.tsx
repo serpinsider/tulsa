@@ -23,6 +23,11 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Service Areas - ${BRANDING.businessName}`,
+    description: `${BRANDING.businessName} provides house cleaning services across ${BRANDING.serviceAreaLong}.`,
+  },
   alternates: {
     canonical: `${BRANDING.url}/locations`,
   },

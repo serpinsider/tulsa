@@ -1,4 +1,5 @@
 'use client';
+import { BRANDING } from '@/config/branding';
 
 import { useState } from 'react';
 import { CONTACT_INFO } from '@/lib/contact';
@@ -68,11 +69,12 @@ export default function CarpetQuoteForm() {
     if (formData.hasPetStains) extras.push('Pet stains/odors');
 
     try {
-      const response = await fetch('https://formspree.io/f/[FORMSPREE_ID]', {
+      const response = await fetch('https://formspree.io/f/mrbjzvde', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          business: '[BUSINESS_NAME]',
+          business: 'Tulsa Maids',
+          businessId: 'tulsa',
           serviceType: 'Carpet Cleaning',
           'First Name': formData.firstName,
           'Last Name': formData.lastName,
@@ -83,7 +85,7 @@ export default function CarpetQuoteForm() {
           'Extras': extras.length > 0 ? extras.join(', ') : 'None',
           'Notes': formData.notes || 'No additional notes',
           'Confirmation Number': confirmNum,
-          _subject: `Vegas Maids - Carpet Cleaning Quote from ${formData.firstName} ${formData.lastName} - #${confirmNum}`,
+          _subject: `Tulsa Maids - Carpet Cleaning Quote from ${formData.firstName} ${formData.lastName} - #${confirmNum}`,
           _gotcha: ''
         })
       });
@@ -146,7 +148,7 @@ export default function CarpetQuoteForm() {
 
             <div>
               <label className="block text-sm font-semibold mb-2 text-white">Zip Code</label>
-              <input type="text" placeholder="74103" value={formData.zipCode} onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '').slice(0, 5) })} maxLength={5}
+              <input type="text" placeholder="11201" value={formData.zipCode} onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '').slice(0, 5) })} maxLength={5}
                 className="w-full md:w-1/2 p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]" style={{ background: getFormBg() }} />
             </div>
 
@@ -240,7 +242,7 @@ export default function CarpetQuoteForm() {
             </div>
 
             <p className="text-xs text-white/60 text-center mb-4 mt-8">
-              By submitting this form, you agree to receive communications from Vegas Maids regarding your quote request.
+              By submitting this form, you agree to receive communications from Tulsa Maids regarding your quote request.
             </p>
 
             <button onClick={handleSubmit} disabled={!canSubmit} className="button-quaternary w-full">Submit</button>

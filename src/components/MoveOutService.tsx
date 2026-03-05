@@ -120,7 +120,7 @@ export default function MoveOutService() {
         description: "Professional move in and move out cleaning services"
       }} />
       
-      <MoveOutHero location="New York, NY" />
+      <MoveOutHero location="Tulsa, OK" />
       <QuoteBar />
       
       {/* Move-Out Services Section */}
@@ -137,7 +137,7 @@ export default function MoveOutService() {
 
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {moveOutServices.map((service, index) => (
-              <div key={index} className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
+              <div key={index} className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-serif font-bold text-[#dfbd69] mb-3 drop-shadow-lg min-h-[56px] flex items-center justify-center">
                     {service.title}
@@ -185,7 +185,7 @@ export default function MoveOutService() {
             {moveOutChecklist.map((section, index) => (
               <div 
                 key={index}
-                className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl border border-white/10 p-8"
+                className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl border border-white/10 p-8"
               >
                 <h3 className="text-[#dfbd69] font-serif font-bold text-xl mb-6 text-center">
                   {section.category}

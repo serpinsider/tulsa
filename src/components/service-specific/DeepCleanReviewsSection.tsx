@@ -59,7 +59,7 @@ export default function DeepCleanReviewsSection() {
           {reviews.map((review, index) => (
             <div 
               key={index}
-              className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 hover:bg-[rgba(15,23,42,0.98)] transition-all"
+              className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 hover:bg-[rgba(22,48,75,0.98)] transition-all"
             >
               <div className="flex items-start gap-4 mb-4">
                 <Image

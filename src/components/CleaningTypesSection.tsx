@@ -55,7 +55,7 @@ export default function CleaningTypesSection({ location = "Tulsa, OK" }: Cleanin
   return (
     <>
       {/* Cleaning Details Section */}
-      <section id="standard-details" className="py-20 bg-[rgba(15,23,42,0.95)]">
+      <section id="standard-details" className="py-20 bg-[rgba(22,48,75,0.95)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[#dfbd69] mb-4">
@@ -69,7 +69,7 @@ export default function CleaningTypesSection({ location = "Tulsa, OK" }: Cleanin
           {/* Simple Comparison Table */}
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {Object.entries(cleaningTypes).map(([key, type]) => (
-              <div key={key} className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-2xl shadow-xl border border-white/10 p-8 text-center">
+              <div key={key} className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-2xl shadow-xl border border-white/10 p-8 text-center">
                 <h3 className="text-2xl font-serif font-bold text-[#dfbd69] mb-2">
                   {type.title}
                 </h3>

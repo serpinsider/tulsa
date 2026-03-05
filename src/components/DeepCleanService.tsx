@@ -92,7 +92,7 @@ export default function DeepCleanService() {
         description: "Professional deep cleaning services for homes and apartments"
       }} />
       
-      <DeepCleanHero location="New York, NY" />
+      <DeepCleanHero location="Tulsa, OK" />
       <QuoteBar />
       
       {/* Deep Clean Services Section */}
@@ -109,7 +109,7 @@ export default function DeepCleanService() {
 
           <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {deepCleanServices.map((service, index) => (
-              <div key={index} className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
+              <div key={index} className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-serif font-bold text-[#dfbd69] mb-3 drop-shadow-lg min-h-[56px] flex items-center justify-center">
                     {service.title}
@@ -157,7 +157,7 @@ export default function DeepCleanService() {
             {whenToBook.map((item, index) => (
               <div 
                 key={index}
-                className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl border border-white/10 p-6 hover:bg-[rgba(15,23,42,0.98)] transition-all"
+                className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl border border-white/10 p-6 hover:bg-[rgba(22,48,75,0.98)] transition-all"
               >
                 <h3 className="text-[#dfbd69] font-serif font-bold text-lg mb-2">
                   {item.title}

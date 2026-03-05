@@ -5,10 +5,10 @@ interface HandymanHeroProps {
   location?: string;
 }
 
-export default function HandymanHero({ location = "Las Vegas" }: HandymanHeroProps) {
+export default function HandymanHero({ location = "Tulsa, OK" }: HandymanHeroProps) {
   return (
     <BaseHero
-      title="Handyman Services in Las Vegas"
+      title="Handyman Services in Tulsa"
       description="Professional handyman services for all your home repair and improvement needs. TV mounting, furniture assembly, minor repairs and more."
       location={location}
       showWizard={true}

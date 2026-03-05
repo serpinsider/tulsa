@@ -42,14 +42,14 @@ export default function WhatWeCleanSection() {
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto overflow-x-auto bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-lg shadow-xl mb-20">
+        <div className="max-w-5xl mx-auto overflow-x-auto bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-lg shadow-xl mb-20">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="p-2 sm:p-3 bg-[rgba(15,23,42,0.98)] border border-white/10 text-white w-2/5 text-left text-[11px] sm:text-sm">Cleaning Tasks</th>
-                <th className="p-2 sm:p-3 bg-[rgba(15,23,42,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Standard</th>
-                <th className="p-2 sm:p-3 bg-[rgba(15,23,42,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Deep</th>
-                <th className="p-2 sm:p-3 bg-[rgba(15,23,42,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Move-In</th>
+                <th className="p-2 sm:p-3 bg-[rgba(22,48,75,0.98)] border border-white/10 text-white w-2/5 text-left text-[11px] sm:text-sm">Cleaning Tasks</th>
+                <th className="p-2 sm:p-3 bg-[rgba(22,48,75,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Standard</th>
+                <th className="p-2 sm:p-3 bg-[rgba(22,48,75,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Deep</th>
+                <th className="p-2 sm:p-3 bg-[rgba(22,48,75,0.98)] border border-white/10 text-white text-center text-[11px] sm:text-sm">Move-In</th>
               </tr>
             </thead>
             <tbody>

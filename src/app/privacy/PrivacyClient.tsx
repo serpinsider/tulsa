@@ -34,7 +34,7 @@ export default function PrivacyClient() {
           <section className="mb-12">
             <h2 className="text-xl font-semibold text-[${COLORS.brand.gold}] mb-6">Text Message Communications</h2>
             <div className="space-y-4 text-white/80">
-              <p>By providing your phone number, you consent to receive text messages from {BRANDING.businessName} regarding:</p>
+              <p>By providing your phone number, you consent to receive text messages from Tulsa Maids regarding:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Quote confirmations and follow-ups</li>
                 <li>Service appointment confirmations and reminders</li>

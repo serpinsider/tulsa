@@ -7,16 +7,16 @@ const postConstructionReviews = [
   {
     id: 1,
     name: "Tom B.",
-    location: "Henderson",
+    location: "Tulsa, OK",
     rating: 5,
-    text: "Just finished a full home renovation. Vegas Maids removed all the dust and debris. House was move-in ready in one day!",
+    text: "Just finished a full home renovation. Tulsa Maids removed all the dust and debris. House was move-in ready in one day!",
     date: "1 week ago",
     image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 2,
     name: "Sandra M.",
-    location: "Summerlin",
+    location: "Broken Arrow, OK",
     rating: 5,
     text: "Kitchen remodel left a mess. They cleaned every surface, removed paint splatters, and made it look brand new. Amazing work!",
     date: "2 weeks ago",
@@ -25,7 +25,7 @@ const postConstructionReviews = [
   {
     id: 3,
     name: "Kevin P.",
-    location: "Las Vegas",
+    location: "Owasso, OK",
     rating: 5,
     text: "New construction home needed final cleaning before closing. Inspector was impressed with how clean everything was!",
     date: "5 days ago",
@@ -34,7 +34,7 @@ const postConstructionReviews = [
   {
     id: 4,
     name: "Maria G.",
-    location: "North Las Vegas",
+    location: "Owasso, OK",
     rating: 5,
     text: "Bathroom renovation cleanup was thorough. They got grout dust out of everywhere. Would definitely use again!",
     date: "3 weeks ago",
@@ -43,7 +43,7 @@ const postConstructionReviews = [
   {
     id: 5,
     name: "Daniel R.",
-    location: "Paradise",
+    location: "Bixby, OK",
     rating: 5,
     text: "Commercial build-out for my retail space. Professional team, fast service, and the floors looked incredible after.",
     date: "1 week ago",
@@ -52,7 +52,7 @@ const postConstructionReviews = [
   {
     id: 6,
     name: "Angela W.",
-    location: "Spring Valley",
+    location: "Sand Springs, OK",
     rating: 5,
     text: "Whole house repaint meant dust everywhere. They deep cleaned every room, windows, and fixtures. Spotless results!",
     date: "4 days ago",
@@ -82,7 +82,7 @@ export default function PostConstructionReviewsSection() {
             Post-Construction Cleaning Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            Trusted by Las Vegas homeowners and contractors for construction cleanup.
+            Trusted by Your Area homeowners and contractors for construction cleanup.
           </p>
         </div>
 

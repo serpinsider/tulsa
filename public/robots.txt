@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://www.YOURDOMAIN.com/sitemap.xml
+Sitemap: https://www.tulsamaids.com/sitemap.xml
 
 # Allow search engines to crawl important pages
 Allow: /locations/
@@ -22,6 +22,8 @@ Disallow: /account/
 Disallow: /setup-guide/
 Disallow: /quote-new/
 Disallow: /unauthorized/
+Disallow: /login
+Disallow: /signup
 
 # Crawl delay
 Crawl-delay: 1

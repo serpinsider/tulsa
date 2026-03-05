@@ -38,13 +38,13 @@ export const BUTTONS = {
   heroQuote: "button-tertiary animate-glow flex items-center justify-center h-12 px-8 font-semibold min-w-[160px] gap-2",
   
   // Gold button (solid background)
-  goldSolid: "bg-[#dfbd69] text-[#283845] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69]/90 transition-all",
+  goldSolid: "bg-[#dfbd69] text-[#1a3755] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69]/90 transition-all",
   
   // Navy button (solid background)
-  navySolid: "bg-[#283845] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#283845]/90 transition-all",
+  navySolid: "bg-[#1a3755] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1a3755]/90 transition-all",
   
   // Outlined buttons
-  outlined: "bg-transparent border-2 border-[#dfbd69] text-[#dfbd69] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69] hover:text-[#283845] transition-all",
+  outlined: "bg-transparent border-2 border-[#dfbd69] text-[#dfbd69] px-8 py-3 rounded-lg font-semibold hover:bg-[#dfbd69] hover:text-[#1a3755] transition-all",
   outlinedWhite: "bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all",
   
   // ===== FORM BUTTONS =====
@@ -91,6 +91,6 @@ export const BUTTON_INLINE_STYLES = {
   
   // Gold gradient
   goldGradient: {
-    background: 'linear-gradient(135deg, #dfbd69 0%, #926f34 100%)',
+    background: 'linear-gradient(135deg, #dfbd69 0%, #b8956d 100%)',
   },
 };

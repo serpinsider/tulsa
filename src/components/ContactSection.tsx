@@ -56,10 +56,11 @@ export default function ContactSection() {
         phone: formData.phone,
         message: formData.message,
         confirmationNumber,
-        _subject: `Contact Form from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '',
+        _subject: `Tulsa Maids - Contact from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
       };
 
-      const formspreeResponse = await fetch('https://formspree.io/f/mqazolgp', {
+      const formspreeResponse = await fetch('https://formspree.io/f/mrbjzvde', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,14 +161,14 @@ export default function ContactSection() {
                 <input
                   type="text"
                   placeholder="First Name*"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#926f34] focus:ring-1 focus:ring-[#926f34]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 />
                 <input
                   type="text"
                   placeholder="Last Name*"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#926f34] focus:ring-1 focus:ring-[#926f34]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 />
@@ -177,14 +178,14 @@ export default function ContactSection() {
                 <input
                   type="email"
                   placeholder="Email*"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#926f34] focus:ring-1 focus:ring-[#926f34]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
                 <input
                   type="tel"
                   placeholder="Phone*"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#926f34] focus:ring-1 focus:ring-[#926f34]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.phone}
                   onChange={(e) => {
                     const formatted = formatPhoneNumber(e.target.value);
@@ -196,7 +197,7 @@ export default function ContactSection() {
 
               <textarea
                 placeholder="Your message or questions*"
-                className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#926f34] focus:ring-1 focus:ring-[#926f34] h-32 resize-none"
+                className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d] h-32 resize-none"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               />

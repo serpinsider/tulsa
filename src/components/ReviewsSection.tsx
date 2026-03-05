@@ -97,7 +97,7 @@ export default function ReviewsSection({ location }: ReviewsSectionProps) {
         {/* Reviews Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {reviews.map((review) => (
-            <div key={review.id} className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl p-6 shadow-xl border border-white/10 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all">
+            <div key={review.id} className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl p-6 shadow-xl border border-white/10 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <Image

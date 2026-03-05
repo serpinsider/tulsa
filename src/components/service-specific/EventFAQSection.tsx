@@ -38,7 +38,7 @@ export default function EventFAQSection() {
   ];
 
   return (
-    <section id="faq" className="py-20" style={{background: 'rgba(15, 23, 42, 0.95)'}}>
+    <section id="faq" className="py-20" style={{background: 'rgba(26, 55, 85, 0.95)'}}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-3xl lg:text-3xl font-serif font-bold text-[#dfbd69] mb-6 drop-shadow-lg">

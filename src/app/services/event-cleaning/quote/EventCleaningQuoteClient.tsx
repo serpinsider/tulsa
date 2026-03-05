@@ -61,12 +61,12 @@ export default function EventCleaningQuoteClient() {
         notes: formData.notes,
         service: 'event-cleaning',
         confirmationNumber,
-        businessId: BRANDING.businessId,
-        business: BRANDING.businessName,
-        _subject: `${BRANDING.businessName} - Event Cleaning Quote - ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
+        businessId: 'tulsa',
+        business: 'Tulsa Maids',
+        _subject: `Tulsa Maids - Event Cleaning Quote from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
       };
 
-      const formspreeResponse = await fetch(`https://formspree.io/f/${BRANDING.integrations.formspreeId}`, {
+      const formspreeResponse = await fetch('https://formspree.io/f/mrbjzvde', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(structuredData),
@@ -223,7 +223,7 @@ export default function EventCleaningQuoteClient() {
             </button>
 
             <p className="text-xs text-white/60 text-center mt-4 leading-relaxed">
-              By submitting this form, you agree to receive communications from {BRANDING.businessName} regarding your quote request.
+              By submitting this form, you agree to receive communications from Tulsa Maids regarding your quote request.
             </p>
           </div>
         </div>

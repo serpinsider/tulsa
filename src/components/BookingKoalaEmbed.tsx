@@ -26,7 +26,7 @@ export default function BookingKoalaEmbed() {
     window.addEventListener('resize', updateHeight)
 
     const script = document.createElement('script')
-    script.src = 'https://brooklynmaids.bookingkoala.com/resources/embed.js'
+    script.src = 'https://pine.bookingkoala.com/resources/embed.js'
     script.defer = true
     document.body.appendChild(script)
 

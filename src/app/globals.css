@@ -1,51 +1,54 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Tulsa Maids color palette - Dark slate with gold accents */
-  --background: #FCFAED;
-  --foreground: #283845;
-  --slate-50: #FCFAED;
-  --slate-100: #f5f4e8;
-  --slate-200: #e8e6d5;
-  --slate-300: #d4d0b8;
-  --slate-400: #b8b297;
-  --slate-500: #9c9478;
-  --slate-600: #7a7460;
-  --slate-700: #5a554a;
-  --slate-800: #283845;
-  --slate-900: #1a252f;
+  /* Tulsa Maids color palette - Pacific Ocean theme - Royal Blue */
+  --background: #E0F2F7;
+  --foreground: #1a3755;
+  --slate-50: #E0F2F7;
+  --slate-100: #B2E0EA;
+  --slate-200: #80CED6;
+  --slate-300: #4DB8C4;
+  --slate-400: #5b9aa8;
+  --slate-500: #3d7a8a;
+  --slate-600: #2a5a6a;
+  --slate-700: #1a3755;
+  --slate-800: rgba(26, 55, 85, 0.95);
+  --slate-900: rgba(22, 48, 75, 0.95);
   
-  /* Button system */
-  --primary-button-bg: #283845;
-  --primary-button-text: #FCFAED;
-  --primary-button-hover-bg: #1a252f;
+  /* Button system - Pacific Ocean Theme */
+  --primary-button-bg: rgba(18, 40, 65, 1);
+  --primary-button-text: #FFFFFF;
+  --primary-button-hover-bg: rgba(22, 48, 75, 1);
   
   --secondary-button-bg: transparent;
-  --secondary-button-text: #FCFAED;
-  --secondary-button-border: #FCFAED;
-  --secondary-button-hover-bg: rgba(252, 250, 237, 0.1);
+  --secondary-button-text: #FFFFFF;
+  --secondary-button-border: #FFFFFF;
+  --secondary-button-hover-bg: rgba(224, 242, 247, 0.1);
   
   --tertiary-button-bg: transparent;
   --tertiary-button-text: #dfbd69;
   --tertiary-button-border: #dfbd69;
   --tertiary-button-hover-bg: rgba(223, 189, 105, 0.1);
   
-  --quaternary-button-bg: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
-  --quaternary-button-text: #283845;
-  --quaternary-button-hover-bg: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
+  --quaternary-button-bg: linear-gradient(135deg, #dfbd69 0%, #b8956d 100%);
+  --quaternary-button-text: #194169;
+  --quaternary-button-hover-bg: linear-gradient(135deg, #dfbd69 0%, #b8956d 100%);
 
   /* Accent colors */
-  --accent-orange: #ED8936;
-  --accent-teal: #38B2AC;
-  --accent-cream: #FCFAED;
+  --brand-gold: #dfbd69;
+  --brand-gold-dark: #b8956d;
+  --brand-white: #FFFFFF;
+  --brand-ocean: #1a3755;
+  --brand-coastal: #5b9aa8;
   
   /* Accessible text colors */
-  --text-on-dark: #FCFAED;      /* Cream on dark backgrounds */
-  --text-on-light: #283845;     /* Dark on light backgrounds */
-  --text-muted-dark: #e8e6d5;   /* Light muted text on dark */
-  --text-muted-light: #5a554a;  /* Dark muted text on light */
+  --text-on-dark: #FFFFFF;
+  --text-on-light: #194169;
+  --text-muted-dark: #A3D3E1;
+  --text-muted-light: #2a5a6a;
 }
 
 @theme inline {
@@ -61,45 +64,34 @@
   --color-slate-700: var(--slate-700);
   --color-slate-800: var(--slate-800);
   --color-slate-900: var(--slate-900);
-  --color-forest-green: var(--forest-green);
-  --color-earth-brown: var(--earth-brown);
-  --color-winter-white: var(--winter-white);
-  --color-text-on-dark: var(--text-on-dark);
-  --color-text-on-light: var(--text-on-light);
-  --color-text-muted-dark: var(--text-muted-dark);
-  --color-text-muted-light: var(--text-muted-light);
-  --color-button-light: var(--secondary-button-bg);
-  --color-button-light-hover: var(--secondary-button-hover-bg);
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
-  --font-logo: var(--font-playfair);
-  --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #193755;
+    --foreground: #E8F4F8;
+  }
+}
+
+/* Base styles */
+* {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--text-on-dark);
+  background: var(--primary-button-bg);
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Smooth scrolling for anchor links */
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 120px; /* Account for fixed header and announcement bar */
-}
-
-/* Enhanced smooth scrolling with custom timing */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    scroll-behavior: smooth !important;
-  }
-  
+/* Smooth scrolling */
+@layer base {
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* Custom smooth scrolling animation */
 @supports (scroll-behavior: smooth) {
   html {
     scroll-behavior: smooth;
@@ -151,11 +143,12 @@ html {
 }
 
 .button-tertiary:hover {
+  background-color: var(--tertiary-button-hover-bg);
   transform: translateY(-1px);
 }
 
 .button-quaternary {
-  background: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
+  background: linear-gradient(135deg, #d4a574 0%, #b8956d 100%);
   color: var(--quaternary-button-text);
   border: 2px solid transparent;
   padding: 0.5rem 1rem;
@@ -171,6 +164,7 @@ html {
 }
 
 .button-quaternary:hover {
+  filter: brightness(1.1);
   transform: translateY(-1px);
 }
 
@@ -190,58 +184,70 @@ html {
   margin-right: auto !important;
 }
 
-#quote-form-container.expand {
-  width: 100% !important;
-  max-width: 800px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+/* Custom scrollbar - Gold theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-/* Pulse ring animation for form container */
-@keyframes pulse-ring {
-  0% { transform: scale(1); }
-  50% { opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
-.animate-pulse-ring {
-  animation: pulse-ring 1s cubic-bezier(0.4, 0, 0.6, 1);
+::-webkit-scrollbar-thumb {
+  background: var(--brand-gold);
+  border-radius: 4px;
 }
 
-/* Button glow animation */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-gold-dark);
+}
+
+/* Hero Title Styling */
+.hero-title {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+  background: linear-gradient(135deg, #d4a574 0%, #b8956d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* Form styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Animation classes */
 @keyframes glow {
-  0% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
-  }
-  100% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-  }
+  0%, 100% { box-shadow: 0 0 20px rgba(74, 155, 142, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(74, 155, 142, 0.5); }
+}
+
+@keyframes selected-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 .animate-glow {
-  animation: glow 3s ease-in-out infinite;
+  animation: glow 2s ease-in-out infinite;
 }
 
-/* Form shake animation */
-@keyframes form-shake {
-  0% { transform: translateX(0); }
-  10% { transform: translateX(-3px); }
-  20% { transform: translateX(3px); }
-  30% { transform: translateX(-3px); }
-  40% { transform: translateX(3px); }
-  50% { transform: translateX(-2px); }
-  60% { transform: translateX(2px); }
-  70% { transform: translateX(-1px); }
-  80% { transform: translateX(1px); }
-  90% { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
-}
-
-.animate-form-shake-gentle {
-  animation: form-shake 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+.animate-selected-pulse {
+  animation: selected-pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes fadeInUp {
@@ -257,312 +263,4 @@ html {
 
 .fadeInUp {
   animation: fadeInUp 0.4s ease-out;
-}
-
-@keyframes border-glow {
-  0% {
-    box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 25px rgba(223, 189, 105, 0.9);
-  }
-}
-
-@keyframes selected-pulse {
-  0% {
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  50% {
-    border-color: rgba(255, 255, 255, 0.8);
-  }
-  100% {
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-}
-
-.animate-selected-pulse {
-  animation: selected-pulse 2s ease-in-out infinite;
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
-}
-
-@keyframes slideDown {
-  0% {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    max-height: 2000px;
-    transform: translateY(0);
-  }
-}
-
-.animate-slideDown {
-  animation: slideDown 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Hero title specific styling */
-.hero-title {
-  font-size:  1.5rem;
-  line-height: 1.2;
-  font-weight: 700;
-  background: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@media (min-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-}
-
-/* React Big Calendar Styles for Admin Calendar View - moved to top */
-
-/* Dark Theme Overrides for Calendar */
-.rbc-calendar {
-  color: #ffffff;
-}
-
-.rbc-header {
-  background: #252525;
-  border-color: #2a2a2a;
-  border-width: 1px;
-  color: #ffffff;
-  padding: 12px;
-  font-weight: 500;
-}
-
-.rbc-month-view,
-.rbc-time-view {
-  background: #1a1a1a;
-  border-color: #2a2a2a;
-  border-width: 1px;
-}
-
-.rbc-month-view {
-  border: 1px solid #2a2a2a;
-}
-
-.rbc-time-view {
-  border: 1px solid #2a2a2a;
-}
-
-.rbc-day-bg,
-.rbc-time-slot {
-  border-color: #2a2a2a;
-  border-width: 1px;
-}
-
-.rbc-time-slot {
-  border-top-width: 0;
-  border-left-width: 0;
-  border-right-width: 0;
-}
-
-.rbc-day-slot .rbc-time-slot {
-  border: none;
-}
-
-.rbc-time-column {
-  border-left: none;
-  border-right: 1px solid #2a2a2a;
-}
-
-.rbc-time-content {
-  border-top: 1px solid #2a2a2a;
-}
-
-.rbc-timeslot-group {
-  border-bottom: 1px solid #2a2a2a;
-  min-height: 60px;
-}
-
-.rbc-time-content > * + * > * {
-  border-left: 1px solid #2a2a2a;
-}
-
-.rbc-time-slot-group {
-  border: none;
-}
-
-.rbc-day-slot {
-  border-right: 1px solid #2a2a2a;
-}
-
-/* Fix week/day view height */
-.rbc-time-view {
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.rbc-time-content {
-  max-height: calc(100% - 50px);
-  overflow-y: auto;
-}
-
-.rbc-time-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.rbc-time-content::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-.rbc-time-content::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
-  border-radius: 4px;
-}
-
-.rbc-time-content::-webkit-scrollbar-thumb:hover {
-  background: #404040;
-}
-
-/* Calendar cells - allow proper scrolling when many events */
-.rbc-month-view .rbc-row {
-  min-height: 80px;
-}
-
-.rbc-off-range-bg {
-  background: #0f0f0f;
-}
-
-.rbc-today {
-  background: rgba(223, 189, 105, 0.15);
-}
-
-.rbc-event {
-  /* Background color is set inline via eventPropGetter */
-  color: white;
-  border-radius: 6px;
-  border: none !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.rbc-event:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  filter: brightness(1.1);
-}
-
-.rbc-toolbar button {
-  background: #252525;
-  border-color: #2a2a2a;
-  color: #a0a0a0;
-}
-
-.rbc-toolbar button:hover {
-  background: #2a2a2a;
-  color: #ffffff;
-}
-
-.rbc-toolbar button.rbc-active {
-  background: linear-gradient(135deg, #dfbd69 0%, #926f34 100%);
-  border-color: #dfbd69;
-  color: #000000;
-}
-
-.rbc-month-row {
-  border-color: #2a2a2a;
-  border-width: 1px;
-}
-
-.rbc-date-cell {
-  border-right: 1px solid #2a2a2a;
-}
-
-.rbc-day-bg + .rbc-day-bg {
-  border-left: 1px solid #2a2a2a;
-}
-
-.rbc-header + .rbc-header {
-  border-left: 1px solid #2a2a2a;
-}
-
-.rbc-date-cell {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.rbc-current {
-  color: #dfbd69;
-  font-weight: bold;
-}
-
-/* Custom Scrollbar Styles for entire app */
-/* WebKit browsers (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #dfbd69 0%, #926f34 100%);
-  border-radius: 6px;
-  border: 2px solid #1a1a1a;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #f0cd7a 0%, #a37e3f 100%);
-}
-
-::-webkit-scrollbar-corner {
-  background: #1a1a1a;
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #dfbd69 #1a1a1a;
-}
-
-/* Specific scrollbar for light backgrounds */
-.light-scrollbar::-webkit-scrollbar-track {
-  background: #f5f4e8;
-}
-
-.light-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #dfbd69 0%, #926f34 100%);
-  border: 2px solid #f5f4e8;
-}
-
-/* Toast animations */
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
 }

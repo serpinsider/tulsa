@@ -1,15 +1,14 @@
 import { Metadata } from 'next';
-import { BRANDING } from '@/config/branding';
 import JoinOurTeamClient from './JoinOurTeamClient';
 
 export const metadata: Metadata = {
-  title: `Join Our Team - ${BRANDING.businessName}`,
-  description: `Join the ${BRANDING.businessName} team. We're looking for reliable, detail-oriented cleaners to join our growing team.`,
+  title: 'Join Our Team - Tulsa Maids',
+  description: 'Apply to join our professional cleaning team. Competitive pay, flexible scheduling, and ongoing training. Start your career with Tulsa Maids today.',
   openGraph: {
-    title: `Join Our Team - ${BRANDING.businessName}`,
-    description: `Join the ${BRANDING.businessName} team. We're looking for reliable, detail-oriented cleaners to join our growing team.`,
-    url: `${BRANDING.url}/join-our-team`,
-    siteName: BRANDING.businessName,
+    title: 'Join Our Team - Tulsa Maids',
+    description: 'Apply to join our professional cleaning team. Competitive pay, flexible scheduling, and ongoing training.',
+    url: 'https://tulsamaids.com/join-our-team',
+    siteName: 'Tulsa Maids',
     type: 'website',
   },
 };

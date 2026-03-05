@@ -32,7 +32,7 @@ export default function AreasWeServeSection() {
             <Link 
               key={location.slug}
               href={`/locations/${location.slug}`}
-              className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 hover:border-[#dfbd69]/50 transition-all duration-300 group"
+              className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-6 hover:border-[#dfbd69]/50 transition-all duration-300 group"
             >
               <div className="flex items-start">
                 <svg className="w-5 h-5 text-[#dfbd69] mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

@@ -5,10 +5,10 @@ interface CommercialCleaningHeroProps {
   location?: string;
 }
 
-export default function CommercialCleaningHero({ location = "Las Vegas" }: CommercialCleaningHeroProps) {
+export default function CommercialCleaningHero({ location = "Tulsa, OK" }: CommercialCleaningHeroProps) {
   return (
     <BaseHero
-      title="Commercial Cleaning Services in Las Vegas"
+      title="Commercial Cleaning Services in Tulsa"
       description="Professional cleaning for offices, retail stores, restaurants and more. Flexible scheduling, trained staff, reliable service."
       location={location}
       showWizard={true}

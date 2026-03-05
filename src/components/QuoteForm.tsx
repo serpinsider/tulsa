@@ -547,7 +547,7 @@ export default function QuoteForm() {
                       } rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                     >
                       {popular && (
-                        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#dfbd69] text-[#283845] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#dfbd69] text-[#1a3755] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
                           MOST POPULAR
                         </span>
                       )}

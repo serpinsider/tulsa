@@ -27,11 +27,11 @@ export default function AnnouncementBar() {
   }, [messages.length]);
 
   return (
-    <div className="bg-[#dfbd69] text-[#283845] px-4 py-2 fixed w-full top-0 border-b border-[#dfbd69]/20 z-[60]">
+    <div className="bg-[#dfbd69] text-[#1a3755] px-4 py-2 fixed w-full top-0 border-b border-[#dfbd69]/20 z-[60]">
       <div className="container mx-auto">
         <div className="max-w-5xl mx-auto flex items-center justify-center h-8">
           <div className={`transition-opacity duration-500 ${animating ? 'opacity-0' : 'opacity-100'}`}>
-            <span className="text-xs sm:text-sm font-medium text-[#283845] leading-none">
+            <span className="text-xs sm:text-sm font-medium text-[#1a3755] leading-none">
               {messages[currentMessageIndex]}
             </span>
           </div>

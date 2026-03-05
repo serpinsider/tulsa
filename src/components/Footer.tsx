@@ -9,7 +9,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0f172a] text-white border-t border-white/5">
+    <footer className="bg-[#1a3755] text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Main Footer Grid */}
         <div className="py-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-10">
@@ -25,6 +25,8 @@ export default function Footer() {
               <li><Link href="/services/handyman" className="text-xs text-white/80 hover:text-white">Handyman</Link></li>
               <li><Link href="/services/car-cleaning" className="text-xs text-white/80 hover:text-white">Car Detailing</Link></li>
               <li><Link href="/services/airbnb" className="text-xs text-white/80 hover:text-white">Airbnb Cleaning</Link></li>
+              <li><Link href="/services/event-cleaning" className="text-xs text-white/80 hover:text-white">Event Cleaning</Link></li>
+              <li><Link href="/services/post-construction" className="text-xs text-white/80 hover:text-white">Post-Construction</Link></li>
             </ul>
           </div>
 

@@ -51,7 +51,7 @@ export const BRANDING = {
     formspreeId: 'mrbjzvde',
     posthogKey: '',
     fathomSiteId: '',
-    bookingKoalaSubdomain: 'brooklynmaids',
+    bookingKoalaSubdomain: 'pine',
   },
 
   seo: {

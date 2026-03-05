@@ -28,7 +28,7 @@ export default function SuccessMessage({ type, confirmationNumber, frequency, in
 
   const containerClasses = inline 
     ? "w-full py-8"
-    : "min-h-screen bg-[#0f172a] flex items-center justify-center px-4 py-12";
+    : "min-h-screen bg-[#1a3755] flex items-center justify-center px-4 py-12";
 
   return (
     <div className={containerClasses}>

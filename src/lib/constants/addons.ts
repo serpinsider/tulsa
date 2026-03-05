@@ -110,10 +110,10 @@ export const ADDONS: AddOn[] = [
   },
   { 
     key: 'washerDryer', 
-    label: 'Stair Cleaning', 
-    description: 'Stairway cleaning', 
-    icon: 'stairs.png',
-    tooltip: "Clean your stairs."
+    label: 'Washer & Dryer', 
+    description: 'Clean appliances', 
+    icon: 'washing-machine.png',
+    tooltip: "We clean your washer and dryer inside and out."
   },
   { 
     key: 'officeCleaning', 
@@ -128,7 +128,54 @@ export const ADDONS: AddOn[] = [
     description: 'Heavily soiled homes', 
     icon: 'super-cleaning.png',
     tooltip: "Intensive cleaning for heavily soiled homes, extreme messes, odors, or neglect. Adds $300 to your cleaning."
+  },
+  { 
+    key: 'dishwasher', 
+    label: 'Dishwasher', 
+    description: 'Deep clean dishwasher', 
+    icon: 'dishes.png',
+    tooltip: "We deep clean your dishwasher inside and out."
+  },
+  { 
+    key: 'stairwayCleaning', 
+    label: 'Stairway Clean', 
+    description: 'Clean stairs', 
+    icon: 'stairs.png',
+    tooltip: "Deep cleaning for stairways and steps."
+  },
+  { 
+    key: 'handymanServices', 
+    label: 'Handyman', 
+    description: 'Minor repairs', 
+    icon: 'helmet.png',
+    tooltip: "30 minutes of handyman services for minor repairs and tasks."
+  },
+  { 
+    key: 'insideKitchenCabinets', 
+    label: 'Kitchen Cabinets', 
+    description: 'Clean kitchen cabinets', 
+    icon: 'cabinets.png',
+    tooltip: "We clean the inside of your kitchen cabinets."
+  },
+  { 
+    key: 'extraHour', 
+    label: 'Extra Hour', 
+    description: 'Additional time', 
+    icon: 'extra-hour.png',
+    tooltip: "Add an extra hour of cleaning time for larger jobs."
+  },
+  {
+    key: 'carpetCleaning',
+    label: 'Carpet Cleaning',
+    description: 'Deep carpet clean',
+    icon: 'carpet.png',
+    tooltip: "Professional carpet cleaning service."
+  },
+  {
+    key: 'windowBlinds',
+    label: 'Window Blinds',
+    description: 'Clean blinds',
+    icon: 'blinds.png',
+    tooltip: "We wet wipe your window blinds."
   }
 ];
-
-

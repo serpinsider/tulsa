@@ -1,37 +1,31 @@
-import { Metadata } from 'next';
-import { BRANDING, getBookingKoalaUrl } from '@/config/branding';
+'use client';
 
-export const metadata: Metadata = {
-  title: `Login to Your Account - ${BRANDING.businessName}`,
-  description: `Access your ${BRANDING.businessName} account to manage bookings, view history, and update preferences.`,
-  openGraph: {
-    title: `Login to Your Account - ${BRANDING.businessName}`,
-    description: `Access your ${BRANDING.businessName} account to manage bookings, view history, and update preferences.`,
-    url: `${BRANDING.url}/login`,
-    siteName: BRANDING.businessName,
-    type: 'website',
-  },
-};
+import Script from 'next/script';
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen pt-36 pb-20" style={{ background: 'rgba(15, 23, 42, 0.95)' }}>
-      <div className="max-w-2xl mx-auto px-6">
-        <div 
-          className="rounded-2xl overflow-hidden shadow-2xl"
-          style={{ 
-            background: 'rgba(15, 23, 42, 0.5)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
-          }}
-        >
-          <iframe
-            src={getBookingKoalaUrl('login')}
-            width="100%"
-            height="600"
-            frameBorder="0"
-            title={`${BRANDING.businessName} Login`}
-            className="w-full"
-          />
+    <main className="min-h-screen pt-48 pb-16 px-4" style={{ background: 'rgba(30, 35, 40, 0.98)' }}>
+      <div className="max-w-4xl mx-auto">
+        <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: 'rgba(20, 25, 30, 0.5)' }}>
+          <h1 className="text-3xl font-bold text-white mb-2 text-center">Log In</h1>
+          <p className="text-white/80 mb-8 text-center">Access your account</p>
+          
+          <div className="bg-white rounded-lg overflow-hidden" style={{ minHeight: '650px' }}>
+            <iframe 
+              src="https://pine.bookingkoala.com/login?embed=true" 
+              style={{
+                border: 'none',
+                height: '650px',
+                width: '100%'
+              }}
+              scrolling="no"
+              title="Log In"
+            />
+            <Script 
+              src="https://pine.bookingkoala.com/resources/embed.js" 
+              strategy="lazyOnload"
+            />
+          </div>
         </div>
       </div>
     </main>

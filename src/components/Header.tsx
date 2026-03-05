@@ -52,7 +52,7 @@ export default function Header({ forceCollapsed = false }: HeaderProps) {
             className="relative w-full transition-all duration-700 ease-in-out"
             style={{ 
               height: effectiveScrollProgress > 0.1 ? "64px" : "96px",
-              background: effectiveScrollProgress > 0.1 ? `rgba(15, 23, 42, 0.85)` : 'transparent',
+              background: effectiveScrollProgress > 0.1 ? `rgba(26, 55, 85, 0.85)` : 'transparent',
               backdropFilter: effectiveScrollProgress > 0.1 ? 'blur(12px)' : 'none',
               borderBottom: effectiveScrollProgress > 0.1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
             }}
@@ -131,7 +131,7 @@ export default function Header({ forceCollapsed = false }: HeaderProps) {
           <div 
             className="relative w-full transition-all duration-700 ease-in-out"
             style={{ 
-              background: effectiveScrollProgress > 0.1 ? `rgba(15, 23, 42, 0.85)` : 'transparent',
+              background: effectiveScrollProgress > 0.1 ? `rgba(26, 55, 85, 0.85)` : 'transparent',
               backdropFilter: effectiveScrollProgress > 0.1 ? 'blur(12px)' : 'none',
               borderBottom: effectiveScrollProgress > 0.1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
             }}
@@ -170,7 +170,7 @@ export default function Header({ forceCollapsed = false }: HeaderProps) {
             }`}
             style={{
               top: '112px', // Account for announcement bar + header
-              background: 'rgba(15, 23, 42, 0.98)',
+              background: 'rgba(26, 55, 85, 0.98)',
               backdropFilter: 'blur(12px)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
             }}

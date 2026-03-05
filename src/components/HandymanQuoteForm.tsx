@@ -51,11 +51,12 @@ export default function HandymanQuoteForm() {
     const confirmNum = 'TM-HANDY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
     try {
-      const response = await fetch('https://formspree.io/f/[FORMSPREE_ID]', {
+      const response = await fetch('https://formspree.io/f/mrbjzvde', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          business: '[BUSINESS_NAME]',
+          business: 'Tulsa Maids',
+          businessId: 'tulsa',
           serviceType: 'Handyman Services',
           'First Name': formData.firstName,
           'Last Name': formData.lastName,
@@ -66,7 +67,7 @@ export default function HandymanQuoteForm() {
           'Job Description': formData.jobDescription || 'Not provided',
           'Notes': formData.notes || 'No additional notes',
           'Confirmation Number': confirmNum,
-          _subject: `[BUSINESS_NAME] - Handyman Quote from ${formData.firstName} ${formData.lastName} - #${confirmNum}`,
+          _subject: `Tulsa Maids - Handyman Quote from ${formData.firstName} ${formData.lastName} - #${confirmNum}`,
           _gotcha: ''
         })
       });
@@ -95,7 +96,7 @@ export default function HandymanQuoteForm() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div><label className="block text-sm font-semibold mb-2 text-white">Email*</label><input type="email" placeholder="email@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${errors.email ? 'border-red-500' : 'border-white/20'}`} style={{ background: getFormBg() }} /><div className="h-5 mt-1">{errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}</div></div>
               <div><label className="block text-sm font-semibold mb-2 text-white">Phone*</label><input type="tel" placeholder={CONTACT_INFO.phone.display} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })} maxLength={14} className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${errors.phone ? 'border-red-500' : 'border-white/20'}`} style={{ background: getFormBg() }} /><div className="h-5 mt-1">{errors.phone && <p className="text-red-400 text-sm">{errors.phone}</p>}</div></div>
-              <div><label className="block text-sm font-semibold mb-2 text-white">Zip Code</label><input type="text" placeholder="74103" value={formData.zipCode} onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '').slice(0, 5) })} maxLength={5} className="w-full p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69]" style={{ background: getFormBg() }} /><div className="h-5 mt-1"></div></div>
+              <div><label className="block text-sm font-semibold mb-2 text-white">Zip Code</label><input type="text" placeholder="11201" value={formData.zipCode} onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '').slice(0, 5) })} maxLength={5} className="w-full p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69]" style={{ background: getFormBg() }} /><div className="h-5 mt-1"></div></div>
             </div>
 
             <div className="pt-6 border-t border-white/20">
@@ -109,7 +110,7 @@ export default function HandymanQuoteForm() {
             </div>
 
             <div><label className="block text-sm font-semibold mb-2 text-white">Additional Details (Optional)</label><textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={2} placeholder="Access codes, parking info, anything else we should know..." className="w-full p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69]" style={{ background: getFormBg() }} /></div>
-            <p className="text-xs text-white/60 text-center mb-4 mt-8">By submitting this form, you agree to receive communications from Vegas Maids regarding your quote request.</p>
+            <p className="text-xs text-white/60 text-center mb-4 mt-8">By submitting this form, you agree to receive communications from Tulsa Maids regarding your quote request.</p>
             <button onClick={handleSubmit} disabled={!canSubmit} className="button-quaternary w-full">Submit</button>
             <div className="mt-6 flex items-center justify-center gap-8"><div className="flex items-center gap-2"><div className="flex">{[1,2,3,4,5].map((star) => (<svg key={star} className="w-4 h-4 text-[#dfbd69]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>))}</div><span className="text-sm text-white/80">4.9 (141 Reviews)</span></div><div className="text-sm text-white/80"><span className="font-semibold">141</span> Happy Customers</div></div>
           </div>

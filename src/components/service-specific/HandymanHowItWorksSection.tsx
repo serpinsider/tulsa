@@ -35,7 +35,7 @@ export default function HandymanHowItWorksSection() {
         <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
-              <div className={`w-16 h-16 bg-[#926f34] rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6`}>
+              <div className={`w-16 h-16 bg-[#b8956d] rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6`}>
                 {step.number}
               </div>
               

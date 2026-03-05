@@ -7,7 +7,7 @@ const carReviews = [
   {
     id: 1,
     name: "Marcus J.",
-    location: "Summerlin",
+    location: "Tulsa, OK",
     rating: 5,
     text: "Amazing car detailing! My SUV looks like it just came off the lot. Interior was spotless and they got rid of that pet smell completely.",
     date: "3 days ago",
@@ -16,7 +16,7 @@ const carReviews = [
   {
     id: 2,
     name: "Sarah K.",
-    location: "Henderson",
+    location: "Broken Arrow, OK",
     rating: 5,
     text: "Best mobile detailing service! They came to my office and detailed my car while I worked. So convenient and the results were incredible.",
     date: "1 week ago",
@@ -25,7 +25,7 @@ const carReviews = [
   {
     id: 3,
     name: "Tony M.",
-    location: "Las Vegas",
+    location: "Your Area",
     rating: 5,
     text: "Had my truck detailed before a road trip. They cleaned every inch inside and out. The leather conditioning made my seats look brand new!",
     date: "5 days ago",
@@ -34,7 +34,7 @@ const carReviews = [
   {
     id: 4,
     name: "Jessica R.",
-    location: "Spring Valley",
+    location: "Jenks, OK",
     rating: 5,
     text: "Professional and thorough! They removed coffee stains from my seats that I thought were permanent. Highly recommend for interior detailing.",
     date: "2 weeks ago",
@@ -43,7 +43,7 @@ const carReviews = [
   {
     id: 5,
     name: "Chris D.",
-    location: "North Las Vegas",
+    location: "Your Area",
     rating: 5,
     text: "Full detail on my sports car - they were careful with the paint and the wax job is beautiful. Engine bay looks factory fresh!",
     date: "1 week ago",
@@ -52,7 +52,7 @@ const carReviews = [
   {
     id: 6,
     name: "Amanda L.",
-    location: "Paradise",
+    location: "Sand Springs, OK",
     rating: 5,
     text: "Mobile service is a game changer! They detailed my minivan at home while I watched the kids. Car seats are finally clean!",
     date: "4 days ago",
@@ -82,7 +82,7 @@ export default function CarCleaningReviewsSection() {
             Car Detailing Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            See what Las Vegas car owners say about our mobile detailing services.
+            See what Your Area car owners say about our mobile detailing services.
           </p>
         </div>
 

@@ -66,12 +66,10 @@ export default function JoinOurTeamClient() {
         transportation: formData.transportation,
         notes: formData.notes,
         applicationNumber,
-        businessId: BRANDING.businessId,
-        business: BRANDING.businessName,
-        _subject: `${BRANDING.businessName} - Maid Application from ${formData.firstName} ${formData.lastName} - #${applicationNumber}`,
+        _subject: `Tulsa Maids - Application from ${formData.firstName} ${formData.lastName} - #${applicationNumber}`,
       };
 
-      const formspreeResponse = await fetch(`https://formspree.io/f/${BRANDING.integrations.formspreeId}`, {
+      const formspreeResponse = await fetch('https://formspree.io/f/mrbjzvde', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +110,7 @@ export default function JoinOurTeamClient() {
               <li>• Competitive pay and flexible scheduling</li>
               <li>• Supplies and equipment provided</li>
               <li>• Ongoing training and support</li>
-              <li>• Work in beautiful homes across NYC</li>
+              <li>• Work in beautiful homes across Tulsa</li>
               <li>• Build lasting relationships with clients</li>
               <li>• Background check and insurance provided</li>
             </ul>
@@ -264,7 +262,7 @@ export default function JoinOurTeamClient() {
             </button>
 
             <p className="text-xs text-white/60 text-center mt-4 leading-relaxed">
-              By submitting this form, you agree to receive communications from {BRANDING.businessName} regarding your application.
+              By submitting this form, you agree to receive communications from Tulsa Maids regarding your application.
               <br />
               We respect your privacy and will never share your information.
             </p>

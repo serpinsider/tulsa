@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { locations } from '@/lib/locations'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.YOURDOMAIN.com'
+  const baseUrl = 'https://www.tulsamaids.com'
   
   const staticPages = [
     {
@@ -52,12 +52,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/login`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
     },
     {
       url: `${baseUrl}/gift-cards`,
@@ -133,5 +127,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  return [...staticPages, ...locationPages, ...servicePages]
+  const serviceQuotePages = [
+    'carpet-cleaning', 'handyman', 'commercial', 'airbnb',
+    'post-construction', 'car-cleaning',
+  ].map((service) => ({
+    url: `${baseUrl}/services/${service}/quote`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticPages, ...locationPages, ...servicePages, ...serviceQuotePages]
 }

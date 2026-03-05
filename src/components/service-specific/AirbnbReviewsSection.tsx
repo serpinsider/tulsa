@@ -7,7 +7,7 @@ const airbnbReviews = [
   {
     id: 1,
     name: "David H.",
-    location: "The Strip",
+    location: "Tulsa, OK",
     rating: 5,
     text: "Best turnover service! They've been cleaning my 3 Airbnb units for 6 months. Always on time, always spotless. My guests love the presentation.",
     date: "2 days ago",
@@ -16,7 +16,7 @@ const airbnbReviews = [
   {
     id: 2,
     name: "Michelle T.",
-    location: "Downtown",
+    location: "Broken Arrow, OK",
     rating: 5,
     text: "Same-day turnovers are a lifesaver! Had a last-minute booking and they got my place guest-ready in 2 hours. Incredible service!",
     date: "1 week ago",
@@ -25,16 +25,16 @@ const airbnbReviews = [
   {
     id: 3,
     name: "Robert K.",
-    location: "Summerlin",
+    location: "Owasso, OK",
     rating: 5,
-    text: "They handle everything - cleaning, linens, and restocking. My 5-star ratings went up after I started using Vegas Maids!",
+    text: "They handle everything - cleaning, linens, and restocking. My 5-star ratings went up after I started using Tulsa Maids!",
     date: "5 days ago",
     image: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 4,
     name: "Jennifer M.",
-    location: "Henderson",
+    location: "Jenks, OK",
     rating: 5,
     text: "Professional and reliable. They understand the Airbnb business and treat every turnover like my guests are VIPs. Worth every penny!",
     date: "3 weeks ago",
@@ -43,7 +43,7 @@ const airbnbReviews = [
   {
     id: 5,
     name: "Steve L.",
-    location: "Paradise",
+    location: "Bixby, OK",
     rating: 5,
     text: "Consistent quality every time. I manage 7 properties and they handle all my turnovers. Communication is excellent.",
     date: "1 week ago",
@@ -52,7 +52,7 @@ const airbnbReviews = [
   {
     id: 6,
     name: "Lisa P.",
-    location: "Spring Valley",
+    location: "Sand Springs, OK",
     rating: 5,
     text: "Great for VRBO too! They send photos after every clean so I can verify before guests arrive. So professional!",
     date: "6 days ago",
@@ -82,7 +82,7 @@ export default function AirbnbReviewsSection() {
             Airbnb Host Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            Trusted by Las Vegas Airbnb and VRBO hosts for reliable turnover cleaning.
+            Trusted by Your Area Airbnb and VRBO hosts for reliable turnover cleaning.
           </p>
         </div>
 

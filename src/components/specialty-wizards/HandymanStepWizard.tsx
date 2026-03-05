@@ -76,9 +76,10 @@ export default function HandymanStepWizard({ onFormExpand }: HandymanStepWizardP
     setIsSubmitting(true); setSubmitError('');
     try {
       const confirmationNumber = 'TM-HANDY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-      const response = await fetch('https://formspree.io/f/[FORMSPREE_ID]', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const response = await fetch('https://formspree.io/f/mrbjzvde', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          business: '[BUSINESS_NAME]', 
+          business: 'Tulsa Maids', 
+          businessId: 'tulsa',
           serviceType: 'Handyman Services', 
           firstName: formData.firstName, 
           lastName: formData.lastName, 
@@ -86,7 +87,7 @@ export default function HandymanStepWizard({ onFormExpand }: HandymanStepWizardP
           phone: formData.phone,
           jobDescription: formData.jobDescription || 'No details provided', 
           confirmationNumber,
-          _subject: `[BUSINESS_NAME] - Handyman Quote from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`, 
+          _subject: `Tulsa Maids - Handyman Quote from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`, 
           _gotcha: '' 
         }) 
       });
@@ -140,7 +141,7 @@ export default function HandymanStepWizard({ onFormExpand }: HandymanStepWizardP
               {formData.jobDescription && <div><span className="text-sm font-semibold text-white">Job Description:</span><p className="text-sm text-white/80">{formData.jobDescription}</p></div>}
             </div>
             {submitError && <div className="bg-red-500/20 border border-red-400 rounded-lg p-4"><p className="text-red-300 text-sm text-center">{submitError}</p></div>}
-            <p className="text-[10px] sm:text-xs text-white/60 text-center leading-relaxed">By submitting, you agree to receive communications from [BUSINESS_NAME] regarding your quote request.</p>
+            <p className="text-[10px] sm:text-xs text-white/60 text-center leading-relaxed">By submitting, you agree to receive communications from Tulsa Maids regarding your quote request.</p>
           </div>
         );
       default: return null;
@@ -158,10 +159,10 @@ export default function HandymanStepWizard({ onFormExpand }: HandymanStepWizardP
         <div className="flex gap-4 mt-8">
           {currentStep > 1 && <button onClick={prevStep} className="flex-1 p-3 rounded-lg font-semibold bg-white/30 text-white hover:bg-white/40 transition-all duration-300 hover:-translate-y-[1px]">Back</button>}
           {currentStep === 3 ? (
-            <button onClick={handleSubmit} disabled={!canProceed() || isSubmitting} className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${canProceed() && !isSubmitting ? 'bg-[#dfbd69] text-[#283845] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]' : 'bg-white/20 text-white/50 cursor-not-allowed'}`}>
+            <button onClick={handleSubmit} disabled={!canProceed() || isSubmitting} className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${canProceed() && !isSubmitting ? 'bg-[#dfbd69] text-[#1a3755] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]' : 'bg-white/20 text-white/50 cursor-not-allowed'}`}>
               {isSubmitting ? (<><svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Submitting...</>) : 'Submit Request'}
             </button>
-          ) : <button onClick={nextStep} disabled={!canProceed()} className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 ${canProceed() ? 'bg-[#dfbd69] text-[#283845] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]' : 'bg-white/20 text-white/50 cursor-not-allowed'}`}>Continue</button>}
+          ) : <button onClick={nextStep} disabled={!canProceed()} className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 ${canProceed() ? 'bg-[#dfbd69] text-[#1a3755] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]' : 'bg-white/20 text-white/50 cursor-not-allowed'}`}>Continue</button>}
         </div>
         {currentStep > 1 && <div className="mt-6 text-center pt-4 border-t border-white/20"><p className="text-xs sm:text-sm text-white/80 mb-2">Need help?</p><p className="text-sm sm:text-base text-white font-semibold">Call or text us! <a href={CONTACT_INFO.phone.href} className="text-[#dfbd69] hover:text-[#dfbd69]/80 transition-colors duration-200 underline">{CONTACT_INFO.phone.display}</a></p></div>}
         {currentStep === 3 && <div className="mt-6 flex items-center justify-center gap-8"><div className="flex items-center gap-2"><div className="flex">{[1,2,3,4,5].map(star => <svg key={star} className="w-4 h-4 text-[#dfbd69]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}</div><span className="text-sm text-white/80">4.9 (141 Reviews)</span></div><div className="text-sm text-white/80"><span className="font-semibold">141</span> Happy Customers</div></div>}

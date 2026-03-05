@@ -113,7 +113,7 @@ export const TYPOGRAPHY = {
   // ===== SPECIAL CASES =====
   
   // Announcement bar
-  announcementBar: "text-xs sm:text-sm font-medium text-[#283845] leading-none",
+  announcementBar: "text-xs sm:text-sm font-medium text-[#1a3755] leading-none",
   
   // Badge/Pill text
   badge: "text-xs font-semibold uppercase tracking-wide",

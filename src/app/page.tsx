@@ -11,6 +11,11 @@ import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
 
 export const metadata: Metadata = {
+  title: 'Tulsa Maids - House Cleaning & Maid Service in Tulsa, OK',
+  description: 'Professional house cleaning and maid service serving Tulsa, Broken Arrow, Owasso, and surrounding Oklahoma areas. Book online in 60 seconds.',
+  alternates: {
+    canonical: 'https://tulsamaids.com',
+  },
 };
 
 export default function Home() {

@@ -73,10 +73,10 @@ export const LAYOUTS = {
   
   card: {
     // Standard service card
-    service: "bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full",
+    service: "bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl shadow-xl border border-white/10 p-8 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all relative flex flex-col h-full",
     
     // Review card
-    review: "bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl p-6 shadow-xl border border-white/10 hover:bg-[rgba(15,23,42,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all",
+    review: "bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl p-6 shadow-xl border border-white/10 hover:bg-[rgba(22,48,75,0.98)] hover:shadow-2xl hover:shadow-black/30 transition-all",
     
     // FAQ item
     faq: "bg-white/10 backdrop-blur-md rounded-xl shadow-xl border border-white/10 overflow-hidden",
@@ -128,7 +128,7 @@ export const LAYOUTS = {
  * Inline style objects for backgrounds
  */
 export const INLINE_STYLES = {
-  primary: { background: 'rgba(15, 23, 42, 0.95)' },
-  secondary: { background: 'rgba(15, 23, 42, 0.95)' },
+  primary: { background: 'rgba(26, 55, 85, 0.95)' },
+  secondary: { background: 'rgba(26, 55, 85, 0.95)' },
 };
 

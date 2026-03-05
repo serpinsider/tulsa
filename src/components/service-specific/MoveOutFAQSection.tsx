@@ -68,7 +68,7 @@ export default function MoveOutFAQSection() {
           {faqs.map((faq, index) => (
             <div 
               key={index}
-              className="bg-[rgba(15,23,42,0.95)] backdrop-blur-md rounded-xl border border-white/10 overflow-hidden"
+              className="bg-[rgba(22,48,75,0.95)] backdrop-blur-md rounded-xl border border-white/10 overflow-hidden"
             >
               <button
                 className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-white/[0.03] transition-colors"

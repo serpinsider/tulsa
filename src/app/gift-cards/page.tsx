@@ -1,35 +1,33 @@
-import type { Metadata } from 'next';
-import { BRANDING, getBookingKoalaUrl } from '@/config/branding';
+'use client';
 
-export const metadata: Metadata = {
-  title: `Gift Cards - ${BRANDING.businessName}`,
-  description: `Send the gift of a clean home! Purchase ${BRANDING.businessName} gift cards for friends, family, or clients. Perfect for housewarmings, holidays, or any special occasion.`,
-};
+import Script from 'next/script';
 
 export default function GiftCardsPage() {
   return (
-    <div className="min-h-screen pt-48 pb-12" style={{ background: 'rgba(15, 23, 42, 0.95)' }}>
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-3xl font-serif font-bold text-[#dfbd69] mb-6 drop-shadow-lg">
-            Gift Cards
-          </h1>
-          <p className="text-base sm:text-base lg:text-medium text-gray-100 leading-relaxed drop-shadow-md">
-            Give the gift of a spotless home to someone you care about
-          </p>
-        </div>
-
-        <div className="bg-slate-800/50 backdrop-blur-md rounded-xl shadow-xl border border-white/10 overflow-hidden">
-          <iframe 
-            src={getBookingKoalaUrl('gift-cards/send')}
-            style={{ border: 'none', height: '1000px' }} 
-            width="100%" 
-            scrolling="no"
-            title="Gift Cards"
-          />
+    <main className="min-h-screen pt-48 pb-16 px-4" style={{ background: 'rgba(30, 35, 40, 0.98)' }}>
+      <div className="max-w-4xl mx-auto">
+        <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: 'rgba(20, 25, 30, 0.5)' }}>
+          <h1 className="text-3xl font-bold text-white mb-2 text-center">Gift Cards</h1>
+          <p className="text-white/80 mb-8 text-center">Give the gift of a spotless home</p>
+          
+          <div className="bg-white rounded-lg overflow-hidden" style={{ minHeight: '1000px' }}>
+            <iframe 
+              src="https://pine.bookingkoala.com/gift-cards/send?embed=true" 
+              style={{
+                border: 'none',
+                height: '1000px',
+                width: '100%'
+              }}
+              scrolling="no"
+              title="Gift Cards"
+            />
+            <Script 
+              src="https://pine.bookingkoala.com/resources/embed.js" 
+              strategy="lazyOnload"
+            />
+          </div>
         </div>
       </div>
-      <script src={`https://${BRANDING.integrations.bookingKoalaSubdomain}.bookingkoala.com/resources/embed.js`} defer />
-    </div>
+    </main>
   );
 }

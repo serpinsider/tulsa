@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Car Cleaning Quote - [BUSINESS_NAME]',
+  title: 'Car Cleaning Quote - ${BRANDING.businessName}',
   description: 'Get a quote for professional car cleaning and detailing in [LOCATION]. Interior, exterior, and full detail packages.',
   alternates: {
     canonical: 'https://[DOMAIN]/services/car-cleaning/quote',

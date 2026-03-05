@@ -7,7 +7,7 @@ const commercialReviews = [
   {
     id: 1,
     name: "Mark S.",
-    location: "Downtown Office",
+    location: "Tulsa Office",
     rating: 5,
     text: "They clean our 5,000 sq ft office nightly. Always professional, reliable, and thorough. Our employees love coming to a clean workspace!",
     date: "1 week ago",
@@ -16,16 +16,16 @@ const commercialReviews = [
   {
     id: 2,
     name: "Patricia L.",
-    location: "Henderson Medical",
+    location: "Broken Arrow Medical",
     rating: 5,
-    text: "We run a dental practice and cleanliness is critical. Vegas Maids understands medical-grade cleaning. Highly professional team!",
+    text: "We run a dental practice and cleanliness is critical. Tulsa Maids understands medical-grade cleaning. Highly professional team!",
     date: "2 weeks ago",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
   },
   {
     id: 3,
     name: "James W.",
-    location: "Summerlin Retail",
+    location: "Owasso Retail",
     rating: 5,
     text: "Our retail store needs daily cleaning before opening. They're always done on time and the floors shine. Great for business!",
     date: "5 days ago",
@@ -34,7 +34,7 @@ const commercialReviews = [
   {
     id: 4,
     name: "Nancy K.",
-    location: "Las Vegas Restaurant",
+    location: "Tulsa Restaurant",
     rating: 5,
     text: "Kitchen deep cleaning every week. They handle the hood, floors, everything. Health inspector was impressed!",
     date: "3 weeks ago",
@@ -43,7 +43,7 @@ const commercialReviews = [
   {
     id: 5,
     name: "Brian T.",
-    location: "North Las Vegas Gym",
+    location: "Jenks Gym",
     rating: 5,
     text: "Gym cleaning is tough but they handle it perfectly. Equipment wiped, locker rooms spotless, members are happy!",
     date: "1 week ago",
@@ -82,7 +82,7 @@ export default function CommercialReviewsSection() {
             Commercial Cleaning Reviews
           </h2>
           <p className="text-sm sm:text-base text-white/70 max-w-3xl mx-auto">
-            Trusted by Las Vegas businesses for reliable commercial cleaning.
+            Trusted by Your Area businesses for reliable commercial cleaning.
           </p>
         </div>
 

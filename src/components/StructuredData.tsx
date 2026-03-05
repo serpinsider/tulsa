@@ -66,10 +66,11 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             "worstRating": "1"
           },
           "sameAs": [
-            BRANDING.social.facebook,
-            BRANDING.social.instagram,
-            BRANDING.social.yelp
-          ].filter(Boolean)
+            "https://www.facebook.com/tulsamaids",
+            "https://www.instagram.com/tulsamaids",
+            "https://www.linkedin.com/company/tulsamaids",
+            "https://twitter.com/tulsamaids"
+          ]
         };
 
       case 'organization':
@@ -79,7 +80,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           "name": BRANDING.businessName,
           "url": BRANDING.url,
           "logo": `${BRANDING.url}${BRANDING.assets.logo}`,
-          "description": `Professional house cleaning services in ${BRANDING.serviceArea}.`,
+          "description": "House cleaning services across Tulsa and surrounding areas.",
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": BRANDING.phone.raw,
@@ -88,10 +89,11 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             "availableLanguage": "English"
           },
           "sameAs": [
-            BRANDING.social.facebook,
-            BRANDING.social.instagram,
-            BRANDING.social.yelp
-          ].filter(Boolean)
+            "https://www.facebook.com/tulsamaids",
+            "https://www.instagram.com/tulsamaids",
+            "https://www.linkedin.com/company/tulsamaids",
+            "https://twitter.com/tulsamaids"
+          ]
         };
 
       case 'website':
