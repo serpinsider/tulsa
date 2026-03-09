@@ -40,8 +40,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           },
           "geo": {
             "@type": "GeoCoordinates",
-            "latitude": 40.6782,
-            "longitude": -73.9442
+            "latitude": 36.1540,
+            "longitude": -95.9928
           },
           "areaServed": [
             {

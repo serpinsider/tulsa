@@ -5,12 +5,16 @@ import Image from 'next/image';
 import { ADDONS } from '@/lib/constants/addons';
 import { CONTACT_INFO } from '@/lib/contact';
 import SuccessMessage from '@/components/shared/SuccessMessage';
+import type { StepWizardConfig } from '@/lib/step-wizard-config';
+
+declare global {
+  interface Window {
+    fathom?: { trackEvent: (name: string) => void };
+  }
+}
 
 interface FormData {
-  // Step 1 - Contact
   phone: string;
-  
-  // Step 2 - Property & Service Details
   firstName: string;
   lastName: string;
   email: string;
@@ -20,47 +24,24 @@ interface FormData {
   squareFootage: string;
   frequency: string;
   serviceType: string;
-  
-  // Confirmation
   confirmationNumber?: string;
-  
-  // Step 3 - Add-ons (Boolean Object)
-  addons: {
-    insideFridge: boolean;
-    insideOven: boolean;
-    carpet: boolean;
-    microwave: boolean;
-    organization: boolean;
-    handymanServices: boolean;
-    deepClean: boolean;
-    moveInOut: boolean;
-    bedroomBathroomCabinets: boolean;
-    insideKitchenCabinets: boolean;
-    interiorWindows: boolean;
-    dishes: boolean;
-    laundry: boolean;
-    hardwood: boolean;
-    basementCleaning: boolean;
-    petCleaning: boolean;
-    wallStainRemoval: boolean;
-    baseboardCleaning: boolean;
-    carpetCleaning: boolean;
-    tileAndGrout: boolean;
-    officeCleaning: boolean;
-    extraHour: boolean;
-    washerDryer: boolean;
-    stairwayCleaning: boolean;
-    dishwasher: boolean;
-    movingServices: boolean;
-    superDeepClean: boolean;
-  };
+  addons: Record<string, boolean>;
 }
 
 interface StepWizardProps {
   onFormExpand?: (expanded: boolean, immediate?: boolean) => void;
+  config: StepWizardConfig;
 }
 
-export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
+function buildInitialAddons(): Record<string, boolean> {
+  const addons: Record<string, boolean> = {};
+  for (const addon of ADDONS) {
+    addons[addon.key] = false;
+  }
+  return addons;
+}
+
+export default function StepWizard({ onFormExpand, config }: StepWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,48 +63,15 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
     squareFootage: 'Under 1,000 sqft',
     frequency: 'One Time',
     serviceType: '',
-    addons: {
-      insideFridge: false,
-      insideOven: false,
-      carpet: false,
-      microwave: false,
-      organization: false,
-      handymanServices: false,
-      deepClean: false,
-      moveInOut: false,
-      bedroomBathroomCabinets: false,
-      insideKitchenCabinets: false,
-      interiorWindows: false,
-      dishes: false,
-      laundry: false,
-      hardwood: false,
-      basementCleaning: false,
-      petCleaning: false,
-      wallStainRemoval: false,
-      baseboardCleaning: false,
-      carpetCleaning: false,
-      tileAndGrout: false,
-      officeCleaning: false,
-      extraHour: false,
-      washerDryer: false,
-      stairwayCleaning: false,
-      dishwasher: false,
-      movingServices: false,
-      superDeepClean: false,
-    }
+    addons: buildInitialAddons(),
   });
 
-  // Initialize mounted state
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Phone number formatting
   const formatPhoneNumber = (value: string): string => {
-    // Remove all non-digits
     const cleaned = value.replace(/\D/g, '');
-    
-    // Format as (XXX) XXX-XXXX
     if (cleaned.length >= 10) {
       return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
     } else if (cleaned.length >= 6) {
@@ -136,17 +84,13 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
     return cleaned;
   };
 
-  // Validation functions
   const validateEmail = (email: string): boolean => {
     if (!email) return false;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const validatePhoneNumber = (phone: string): boolean => {
-    // Remove formatting and check if we have exactly 10 digits
-    const cleaned = phone.replace(/\D/g, '');
-    return cleaned.length === 10;
+    return phone.replace(/\D/g, '').length === 10;
   };
 
   const validateStep = (step: number): Record<string, string> => {
@@ -182,79 +126,56 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       }
     }
 
-    // Step 3 is summary - no validation needed
-
     return newErrors;
   };
 
-  // Notify parent when form expands beyond step 1
   useEffect(() => {
     if (onFormExpand && isMounted) {
       const isCurrentlyExpanded = currentStep >= 2;
       if (typeof prevExpandedStateRef.current === 'undefined' || prevExpandedStateRef.current !== isCurrentlyExpanded) {
         prevExpandedStateRef.current = isCurrentlyExpanded;
-        onFormExpand(isCurrentlyExpanded, true); // immediate=true for step changes
+        onFormExpand(isCurrentlyExpanded, true);
       }
     }
   }, [currentStep, onFormExpand, isMounted]);
 
-  // Scroll to top of page when reaching review step
   useEffect(() => {
     if (currentStep === 3) {
       window.scrollTo(0, 0);
     }
   }, [currentStep]);
 
+  const isAddonBundled = (addonKey: string, serviceType: string): boolean => {
+    if (serviceType === 'deep') {
+      return config.deepCleanBundledAddons.includes(addonKey);
+    }
+    if (serviceType === 'moveout') {
+      return config.moveOutBundledAddons.includes(addonKey);
+    }
+    return false;
+  };
+
+  const getBundledAddonsForService = (serviceType: string): Record<string, boolean> => {
+    const bundled: Record<string, boolean> = {};
+    const list = serviceType === 'deep'
+      ? config.deepCleanBundledAddons
+      : serviceType === 'moveout'
+        ? config.moveOutBundledAddons
+        : [];
+    for (const key of list) {
+      bundled[key] = true;
+    }
+    return bundled;
+  };
+
   const updateFormData = (field: string, value: string) => {
-    // If changing service type to deep or moveout, reset and auto-enable required addons
     if (field === 'serviceType') {
-      const resetAddons = {
-        insideFridge: false,
-        insideOven: false,
-        carpet: false,
-        microwave: false,
-        organization: false,
-        handymanServices: false,
-        deepClean: false,
-        moveInOut: false,
-        bedroomBathroomCabinets: false,
-        insideKitchenCabinets: false,
-        interiorWindows: false,
-        dishes: false,
-        laundry: false,
-        hardwood: false,
-        basementCleaning: false,
-        petCleaning: false,
-        wallStainRemoval: false,
-        baseboardCleaning: false,
-        carpetCleaning: false,
-        tileAndGrout: false,
-        officeCleaning: false,
-        extraHour: false,
-        washerDryer: false,
-        stairwayCleaning: false,
-        dishwasher: false,
-        movingServices: false,
-        superDeepClean: false,
-      };
-      
-      const serviceTypeAddons = value === 'deep' ? {
-        wallStainRemoval: true,
-        tileAndGrout: true,
-        baseboardCleaning: true
-      } : value === 'moveout' ? {
-        bedroomBathroomCabinets: true,
-        insideKitchenCabinets: true,
-        interiorWindows: true,
-        wallStainRemoval: true,
-        tileAndGrout: true,
-        baseboardCleaning: true
-      } : {};
-      
+      const resetAddons = buildInitialAddons();
+      const serviceTypeAddons = getBundledAddonsForService(value);
+
       setFormData(prev => ({
         ...prev,
         [field]: value,
-        // Move out is always one-time, no frequency discounts
         frequency: value === 'moveout' ? 'One Time' : prev.frequency,
         addons: {
           ...resetAddons,
@@ -267,7 +188,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
     
-    // Real-time validation
     if (field === 'email') {
       if (value && !validateEmail(value)) {
         setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
@@ -285,28 +205,18 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         setErrors(prev => ({ ...prev, serviceType: '' }));
       }
     } else {
-      // Clear error for other fields when user starts typing
       if (errors[field]) {
         setErrors(prev => ({ ...prev, [field]: '' }));
       }
     }
     
-    // Clear submit error when user makes changes
     if (submitError) {
       setSubmitError('');
     }
   };
 
   const toggleAddOn = (addonKey: string) => {
-    // Prevent unchecking auto-included addons
-    const isAutoIncluded = 
-      (formData.serviceType === 'deep' && 
-        (addonKey === 'wallStainRemoval' || addonKey === 'tileAndGrout' || addonKey === 'baseboardCleaning')) ||
-      (formData.serviceType === 'moveout' && 
-        (addonKey === 'bedroomBathroomCabinets' || addonKey === 'insideKitchenCabinets' || addonKey === 'interiorWindows' || addonKey === 'wallStainRemoval' || addonKey === 'tileAndGrout' || addonKey === 'baseboardCleaning'));
-    
-    // If trying to uncheck an auto-included addon, do nothing
-    if (isAutoIncluded && formData.addons[addonKey as keyof typeof formData.addons]) {
+    if (isAddonBundled(addonKey, formData.serviceType) && formData.addons[addonKey]) {
       return;
     }
     
@@ -314,18 +224,15 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       ...prev,
       addons: {
         ...prev.addons,
-        [addonKey]: !prev.addons[addonKey as keyof typeof prev.addons]
+        [addonKey]: !prev.addons[addonKey]
       }
     }));
   };
-
-
 
   const nextStep = async () => {
     const stepErrors = validateStep(currentStep);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
-      // Scroll to first error so user sees what to fix
       const order = ['serviceType', 'zipCode', 'firstName', 'lastName', 'email'];
       const firstKey = order.find((k) => stepErrors[k]);
       requestAnimationFrame(() => {
@@ -346,10 +253,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      // If going back to step 1, notify parent to collapse form and scroll to hero
       if (currentStep - 1 === 1 && onFormExpand) {
         onFormExpand(false, true);
-        // Scroll to top of hero section
         setTimeout(() => {
           const heroElement = document.querySelector('#hero') || document.querySelector('main');
           if (heroElement) {
@@ -361,7 +266,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   };
 
   const handleCloseSuccess = () => {
-    // Reset form and go back to hero
     setCurrentStep(1);
     setFormData({
       phone: '',
@@ -374,35 +278,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       squareFootage: 'Under 1,000 sqft',
       frequency: 'One Time',
       serviceType: '',
-      addons: {
-        insideFridge: false,
-        insideOven: false,
-        carpet: false,
-        microwave: false,
-        organization: false,
-        handymanServices: false,
-        deepClean: false,
-        moveInOut: false,
-        bedroomBathroomCabinets: false,
-        insideKitchenCabinets: false,
-        interiorWindows: false,
-        dishes: false,
-        laundry: false,
-        hardwood: false,
-        basementCleaning: false,
-        petCleaning: false,
-        wallStainRemoval: false,
-        baseboardCleaning: false,
-        carpetCleaning: false,
-        tileAndGrout: false,
-        officeCleaning: false,
-        extraHour: false,
-        washerDryer: false,
-        stairwayCleaning: false,
-        dishwasher: false,
-        movingServices: false,
-        superDeepClean: false,
-      }
+      addons: buildInitialAddons(),
     });
     if (onFormExpand) {
       onFormExpand(false);
@@ -410,29 +286,33 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
   };
 
   const handleSubmit = async (retryCount = 0) => {
-    // No validation needed for step 4 (summary) - already validated in step 3
     setIsSubmitting(true);
     setSubmitError('');
     setErrors({});
 
     try {
-      const confirmationNumber = 'TM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const confirmationNumber = `${config.confirmationPrefix}-` + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-      // Prepare selected addons (exclude auto-included ones from display)
-      const includedInService = formData.serviceType === 'deep'
-        ? ['wallStainRemoval', 'tileAndGrout', 'baseboardCleaning']
+      const bundledKeys = formData.serviceType === 'deep'
+        ? config.deepCleanBundledAddons
         : formData.serviceType === 'moveout'
-        ? ['bedroomBathroomCabinets', 'insideKitchenCabinets', 'interiorWindows', 'wallStainRemoval', 'tileAndGrout', 'baseboardCleaning']
-        : [];
+          ? config.moveOutBundledAddons
+          : [];
+
       const selectedAddons = Object.entries(formData.addons)
-        .filter(([key, value]) => value && !includedInService.includes(key))
+        .filter(([key, value]) => value && !bundledKeys.includes(key))
         .map(([key]) => key)
         .join(', ');
 
-      // Prepare data for Formspree - NO price calculation, bot handles pricing
+      const serviceTypeNames: Record<string, string> = {
+        standard: 'Standard Clean',
+        deep: 'Deep Clean',
+        moveout: 'Move Out Clean',
+      };
+
       const formspreeData = {
-        business: 'Tulsa Maids',
-        businessId: 'tulsa',
+        business: config.businessName,
+        businessId: config.businessId,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -445,22 +325,30 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         serviceType: formData.serviceType,
         addons: formData.addons,
         confirmationNumber,
+        'First Name': formData.firstName,
+        'Last Name': formData.lastName,
+        'Email': formData.email,
+        'Phone': formData.phone,
+        'Zip Code': formData.zipCode,
+        'Service Type': serviceTypeNames[formData.serviceType] || formData.serviceType,
+        'Bedrooms': formData.bedrooms,
+        'Bathrooms': formData.bathrooms,
+        'Square Footage': formData.squareFootage,
+        'Frequency': formData.frequency,
         'Selected Add-ons': selectedAddons || 'None',
-        _subject: `Tulsa Maids - Quote Request from ${formData.firstName} ${formData.lastName}`,
+        'Confirmation Number': confirmationNumber,
+        _subject: `${config.businessName} - Quote Request from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
         sourcePage: typeof window !== 'undefined' ? window.location.pathname : '',
       };
 
-      // Submit to Formspree
       let response;
       try {
-        response = await fetch('https://formspree.io/f/mrbjzvde', {
+        response = await fetch(`https://formspree.io/f/${config.formspreeEndpoint}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formspreeData)
         });
-      } catch (error) {
+      } catch {
         setSubmitError('Network error. Please check your connection and try again.');
         setIsSubmitting(false);
         return;
@@ -469,6 +357,9 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       if (response.ok) {
         setFormData(prev => ({ ...prev, confirmationNumber }));
         setCurrentStep(4);
+        if (typeof window !== 'undefined' && window.fathom) {
+          window.fathom.trackEvent('Quote Submitted - StepWizard');
+        }
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Server error: ${response.status}`);
@@ -493,6 +384,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
     }
   };
 
+  const accent = config.accentColor;
+  const accentDark = config.accentDark;
+  const btnText = config.btnTextColor;
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -515,11 +410,12 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   const formatted = formatPhoneNumber(e.target.value);
                   updateFormData('phone', formatted);
                 }}
-                placeholder="(918) 818-2460"
+                placeholder={config.phonePlaceholder}
                 maxLength={14}
-                className={`w-full px-3 py-3 border rounded-lg bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-[#dfbd69] focus:border-white backdrop-blur-sm ${
+                className={`w-full px-3 py-3 border rounded-lg bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:border-white backdrop-blur-sm ${
                   errors.phone ? 'border-red-400 ring-1 ring-red-400' : 'border-white/30'
                 }`}
+                style={{ '--tw-ring-color': accent } as React.CSSProperties}
                 required
               />
               {errors.phone && (
@@ -548,7 +444,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   <select
                     value={formData.bedrooms}
                     onChange={(e) => updateFormData('bedrooms', e.target.value)}
-                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm"
+                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none backdrop-blur-sm"
+                    style={{ '--focus-color': accent } as React.CSSProperties}
                   >
                     <option value="Studio">Studio</option>
                     <option value="1">1 Bedroom</option>
@@ -572,7 +469,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   <select
                     value={formData.bathrooms}
                     onChange={(e) => updateFormData('bathrooms', e.target.value)}
-                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm"
+                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none backdrop-blur-sm"
                   >
                     <option value="1">1 Bathroom</option>
                     <option value="1.5">1.5 Bathrooms</option>
@@ -601,7 +498,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   <select
                     value={formData.squareFootage}
                     onChange={(e) => updateFormData('squareFootage', e.target.value)}
-                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm"
+                    className="w-full p-3 pr-10 border border-white/20 rounded-lg bg-white/10 text-white appearance-none backdrop-blur-sm"
                   >
                     <option value="Under 1,000 sqft">Under 1,000 sqft</option>
                     <option value="1,000-2,000 sqft">1,000-2,000 sqft</option>
@@ -623,8 +520,8 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   type="text"
                   value={formData.zipCode}
                   onChange={(e) => updateFormData('zipCode', e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  placeholder="11201"
-                  className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/40 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm ${
+                  placeholder={config.zipPlaceholder}
+                  className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/40 backdrop-blur-sm ${
                     errors.zipCode ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'
                   }`}
                 />
@@ -634,11 +531,11 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
               </div>
             </div>
 
-            {/* Service Type - REQUIRED FIRST */}
+            {/* Service Type */}
             <div id="field-serviceType">
               <label className="block text-sm font-semibold mb-3 text-white">
                 Select Your Cleaning Type* 
-                <span className="text-[#dfbd69] ml-2 text-xs">(Choose one to continue)</span>
+                <span className="ml-2 text-xs" style={{ color: accent }}>(Choose one to continue)</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {[
@@ -652,9 +549,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                     onClick={() => updateFormData('serviceType', id)}
                     className={`relative cursor-pointer group ${
                       formData.serviceType === id
-                        ? 'ring-2 ring-[#dfbd69] bg-white/40'
-                        : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
+                        ? 'bg-white/40'
+                        : 'ring-1 ring-white/30 hover:ring-2 bg-white/10'
                     } rounded-lg p-4 flex flex-col items-center justify-center text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
+                    style={formData.serviceType === id ? { boxShadow: `0 0 0 2px ${accent}` } : { '--hover-ring': accent } as React.CSSProperties}
                   >
                     <span className="text-sm font-semibold text-white mb-1">{name}</span>
                     <span className="text-xs text-white/70">{description}</span>
@@ -666,7 +564,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
               )}
             </div>
 
-            {/* Frequency Selection - hidden for move out */}
+            {/* Frequency Selection */}
             {formData.serviceType && formData.serviceType !== 'moveout' && (
               <div>
                 <label className="block text-sm font-semibold mb-3 text-white">
@@ -685,12 +583,16 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                       onClick={() => updateFormData('frequency', id)}
                       className={`relative cursor-pointer group ${
                         formData.frequency === id
-                          ? 'ring-2 ring-[#dfbd69] bg-white/40 border border-white'
-                          : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
+                          ? 'bg-white/40 border border-white'
+                          : 'ring-1 ring-white/30 hover:ring-2 bg-white/10'
                       } rounded-lg p-4 flex flex-col items-center justify-center text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
+                      style={formData.frequency === id ? { boxShadow: `0 0 0 2px ${accent}` } : undefined}
                     >
                       {popular && (
-                        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#dfbd69] text-[#1a3755] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <span
+                          className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+                          style={{ backgroundColor: accent, color: btnText }}
+                        >
                           MOST POPULAR
                         </span>
                       )}
@@ -701,7 +603,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
               </div>
             )}
 
-            {/* Add-ons Tray - Only shows after service type selected */}
+            {/* Add-ons Tray */}
             {showAddonsTray && (
               <div className="space-y-3 transition-all duration-700 ease-out animate-slideDown">
                 <label className="block text-sm font-semibold text-white">
@@ -709,46 +611,39 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                 </label>
 
                 {formData.serviceType === 'deep' && (
-                  <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+                  <div className="text-xs border rounded-lg p-3" style={{ color: accent, backgroundColor: `${accent}1a`, borderColor: `${accent}4d` }}>
                     <strong>Deep Clean:</strong> Extra time for baseboards, windowsills, doorframes, tile & grout
                   </div>
                 )}
                 {formData.serviceType === 'moveout' && (
-                  <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+                  <div className="text-xs border rounded-lg p-3" style={{ color: accent, backgroundColor: `${accent}1a`, borderColor: `${accent}4d` }}>
                     <strong>Move Out:</strong> Everything in a deep clean plus inside all cabinets
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {ADDONS.filter((addon) => {
-                    // Hide dishes from all service types and hide included addons from the list
                     if (addon.key === 'dishes') return false;
-                    
-                    // Super Deep Clean only available for Standard and Deep cleans
                     if (addon.key === 'superDeepClean' && formData.serviceType === 'moveout') return false;
-                    
-                    const isAutoIncluded = 
-                      (formData.serviceType === 'deep' && 
-                        (addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning')) ||
-                      (formData.serviceType === 'moveout' && 
-                        (addon.key === 'bedroomBathroomCabinets' || addon.key === 'insideKitchenCabinets' || addon.key === 'interiorWindows' || addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning'));
-                    return !isAutoIncluded;
+                    return !isAddonBundled(addon.key, formData.serviceType);
                   }).map((addon) => {
-                    const isSelected = formData.addons[addon.key as keyof typeof formData.addons];
+                    const isSelected = formData.addons[addon.key];
                     
                     return (
                       <label key={addon.key} className="relative cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={formData.addons[addon.key as keyof typeof formData.addons]}
+                          checked={formData.addons[addon.key] || false}
                           onChange={() => toggleAddOn(addon.key)}
                           className="sr-only peer"
                         />
                         <div className={`w-full p-3 rounded-lg text-center transition-all duration-300 ease-in-out backdrop-blur-sm ${
                           isSelected
-                            ? 'ring-2 ring-[#dfbd69] bg-white/40'
-                            : 'ring-1 ring-white/20 bg-white/10 hover:ring-2 hover:ring-[#dfbd69]/50'
-                        }`}>
+                            ? 'bg-white/40'
+                            : 'ring-1 ring-white/20 bg-white/10 hover:ring-2'
+                        }`}
+                        style={isSelected ? { boxShadow: `0 0 0 2px ${accent}` } : undefined}
+                        >
                           <div className="flex flex-col gap-2">
                             <div className="w-8 h-8 mx-auto">
                               <Image
@@ -772,7 +667,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                   })}
                 </div>
 
-                {/* Contact Information - Shows after addons */}
+                {/* Contact Information */}
                 <div className="pt-8 mt-8 border-t border-white/20">
                   <h4 className="text-base font-semibold text-white mb-6">Your Contact Information</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -785,7 +680,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                         value={formData.firstName}
                         onChange={(e) => updateFormData('firstName', e.target.value)}
                         placeholder="ex. Jane"
-                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm ${
+                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 backdrop-blur-sm ${
                           errors.firstName ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'
                         }`}
                         required
@@ -803,7 +698,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                         value={formData.lastName}
                         onChange={(e) => updateFormData('lastName', e.target.value)}
                         placeholder="ex. Smith"
-                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm ${
+                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 backdrop-blur-sm ${
                           errors.lastName ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'
                         }`}
                         required
@@ -821,7 +716,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                         value={formData.email}
                         onChange={(e) => updateFormData('email', e.target.value)}
                         placeholder="email@example.com"
-                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] backdrop-blur-sm ${
+                        className={`w-full p-3 border rounded-lg bg-white/10 text-white placeholder-white/50 backdrop-blur-sm ${
                           errors.email ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'
                         }`}
                         required
@@ -854,7 +749,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
               </p>
             </div>
 
-            {/* Quote Summary - Modern Grid Layout */}
             <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -877,7 +771,7 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-white/60 uppercase tracking-wide">Service</p>
-                  <p className="text-base font-medium text-[#dfbd69]">
+                  <p className="text-base font-medium" style={{ color: accent }}>
                     {formData.serviceType === 'standard' && 'Standard Clean'}
                     {formData.serviceType === 'deep' && 'Deep Clean'}
                     {formData.serviceType === 'moveout' && 'Move Out Clean'}
@@ -888,7 +782,11 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
                     <p className="text-xs text-white/60 uppercase tracking-wide">Add-ons</p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {selectedAddons.map((addon) => addon && (
-                        <span key={addon.key} className="px-3 py-1 bg-[#dfbd69]/20 border border-[#dfbd69]/40 rounded-full text-xs font-medium text-[#dfbd69]">
+                        <span
+                          key={addon.key}
+                          className="px-3 py-1 border rounded-full text-xs font-medium"
+                          style={{ backgroundColor: `${accent}33`, borderColor: `${accent}66`, color: accent }}
+                        >
                           {addon.label}
                         </span>
                       ))}
@@ -898,7 +796,6 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
               </div>
             </div>
 
-            {/* Submit Error Display */}
             {submitError && (
               <div className="bg-red-500/20 border border-red-400 rounded-lg p-4">
                 <p className="text-red-300 text-sm text-center">{submitError}</p>
@@ -906,11 +803,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
             )}
 
             <p className="text-[10px] sm:text-xs text-white/60 text-center leading-relaxed">
-              By submitting, you agree to receive communications from Tulsa Maids regarding your quote request.
+              By submitting, you agree to receive communications from {config.businessName} regarding your quote request.
             </p>
           </div>
         );
-        
 
       default:
         return null;
@@ -922,11 +818,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
       case 1:
         return formData.phone && validatePhoneNumber(formData.phone);
       case 2:
-        // Move out doesn't require frequency selection
         const frequencyValid = formData.serviceType === 'moveout' || formData.frequency;
         return formData.serviceType && frequencyValid && formData.firstName && formData.lastName && formData.email && validateEmail(formData.email);
       case 3:
-        return true; // Summary step - always can proceed
+        return true;
       default:
         return false;
     }
@@ -947,17 +842,14 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         <h2 className="text-xl sm:text-2xl font-serif font-bold text-white mb-3 drop-shadow-lg">
           Get a free quote instantly!
         </h2>
-        {/* Progress indicator */}
         <div className="flex flex-col items-center gap-1.5">
           <div className="flex items-center gap-2">
-            <div className={`h-1 w-12 rounded-full transition-all duration-300 ${currentStep >= 1 ? 'bg-[#dfbd69]' : 'bg-white/20'}`} />
-            <div className={`h-1 w-12 rounded-full transition-all duration-300 ${currentStep >= 2 ? 'bg-[#dfbd69]' : 'bg-white/20'}`} />
+            <div className="h-1 w-12 rounded-full transition-all duration-300" style={{ backgroundColor: currentStep >= 1 ? accent : 'rgba(255,255,255,0.2)' }} />
+            <div className="h-1 w-12 rounded-full transition-all duration-300" style={{ backgroundColor: currentStep >= 2 ? accent : 'rgba(255,255,255,0.2)' }} />
           </div>
           <span className="text-white/40 text-xs">Step {Math.min(currentStep, 2)} of 2</span>
         </div>
       </div>
-      
-
 
       {/* Step Content */}
       <div ref={stepContentRef} className="max-w-2xl mx-auto">
@@ -980,9 +872,10 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
             disabled={!canProceed() || isSubmitting}
             className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
               canProceed() && !isSubmitting
-                ? 'bg-[#dfbd69] text-[#1a3755] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]'
+                ? 'hover:-translate-y-[1px]'
                 : 'bg-white/20 text-white/50 cursor-not-allowed'
             }`}
+            style={canProceed() && !isSubmitting ? { backgroundColor: accent, color: btnText } : undefined}
           >
             {isSubmitting ? (
               <>
@@ -1002,23 +895,25 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
             disabled={!canProceed()}
             className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 ${
               canProceed()
-                ? 'bg-[#dfbd69] text-[#1a3755] hover:bg-[#dfbd69]/90 hover:-translate-y-[1px]'
+                ? 'hover:-translate-y-[1px]'
                 : 'bg-white/20 text-white/50 cursor-not-allowed'
             }`}
+            style={canProceed() ? { backgroundColor: accent, color: btnText } : undefined}
           >
             Continue
           </button>
         )}
       </div>
 
-      {/* Help Text - Only show on steps 2, 3 */}
+      {/* Help Text */}
       {currentStep > 1 && (
         <div className="text-center mt-6 pt-4 border-t border-white/10">
           <p className="text-sm text-white/70">
             Need help?{' '}
             <a 
               href={`sms:${CONTACT_INFO.phone.raw}`}
-              className="text-[#dfbd69] hover:text-[#dfbd69]/80 font-semibold transition-colors duration-200"
+              className="font-semibold transition-colors duration-200"
+              style={{ color: accent }}
             >
               Text {CONTACT_INFO.phone.display}
             </a>
@@ -1026,13 +921,13 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
         </div>
       )}
 
-      {/* Reviews Section - Only show on step 3 (last step before submission) */}
+      {/* Reviews Section */}
       {currentStep === 3 && (
         <div className="mt-6 flex items-center justify-center gap-8">
           <div className="flex items-center gap-2">
             <div className="flex">
               {[1,2,3,4,5].map((star) => (
-                <svg key={star} className="w-4 h-4 text-[#dfbd69]" fill="currentColor" viewBox="0 0 20 20">
+                <svg key={star} className="w-4 h-4" style={{ color: accent }} fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               ))}
@@ -1048,7 +943,3 @@ export default function StepWizard({ onFormExpand }: StepWizardProps = {}) {
     </div>
   );
 }
- 
-
-
-

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import { BRANDING } from "@/config/branding";
@@ -86,6 +87,11 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[100] focus:bg-[#dfbd69] focus:text-slate-900 focus:px-4 focus:py-2 focus:font-semibold">Skip to main content</a>
+        <Script
+          src="https://cdn.usefathom.com/script.js"
+          data-site="QJHZPKBB"
+          strategy="afterInteractive"
+        />
         <ScrollRestoration />
         <StructuredData type="local-business" />
         <StructuredData type="organization" />

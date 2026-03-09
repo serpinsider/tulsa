@@ -141,6 +141,8 @@ export default function QuoteForm() {
       baseboardCleaning: true
     } : type === 'moveout' ? {
       bedroomBathroomCabinets: true,
+      insideKitchenCabinets: true,
+      interiorWindows: true,
       wallStainRemoval: true,
       tileAndGrout: true,
       baseboardCleaning: true
@@ -159,12 +161,20 @@ export default function QuoteForm() {
     setShowAddonsTray(true);
   };
 
-  const formatPhoneNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length === 0) return '';
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
-    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  const formatPhoneNumber = (newValue: string, prevValue: string) => {
+    const newDigits = newValue.replace(/\D/g, '');
+    const prevDigits = prevValue.replace(/\D/g, '');
+    if (newDigits.length < prevDigits.length) {
+      const trimmed = prevDigits.slice(0, -1);
+      if (trimmed.length === 0) return '';
+      if (trimmed.length <= 3) return trimmed;
+      if (trimmed.length <= 6) return `(${trimmed.slice(0, 3)}) ${trimmed.slice(3)}`;
+      return `(${trimmed.slice(0, 3)}) ${trimmed.slice(3, 6)}-${trimmed.slice(6, 10)}`;
+    }
+    if (newDigits.length === 0) return '';
+    if (newDigits.length <= 3) return newDigits;
+    if (newDigits.length <= 6) return `(${newDigits.slice(0, 3)}) ${newDigits.slice(3)}`;
+    return `(${newDigits.slice(0, 3)}) ${newDigits.slice(3, 6)}-${newDigits.slice(6, 10)}`;
   };
 
   const isValidEmail = (email: string) => {
@@ -216,7 +226,7 @@ export default function QuoteForm() {
 
       // Define what's included in each service type
       const includedInDeep = ['wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
-      const includedInMoveOut = ['bedroomBathroomCabinets', 'wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
+      const includedInMoveOut = ['bedroomBathroomCabinets', 'insideKitchenCabinets', 'interiorWindows', 'wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
       
       // Filter out addons that are already included in the selected service
       const includedAddons = formData.serviceType === 'deep' ? includedInDeep :
@@ -405,8 +415,14 @@ export default function QuoteForm() {
                   style={{ background: getFormBg() }}
                   value={formData.phone}
                   onChange={(e) => {
-                    const formatted = formatPhoneNumber(e.target.value);
-                    setFormData({ ...formData, phone: formatted });
+                    const input = e.target;
+                    const raw = input.value;
+                    const digits = raw.replace(/\D/g, '').slice(0, 10);
+                    let fmt = digits;
+                    if (digits.length > 6) fmt = `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+                    else if (digits.length > 3) fmt = `(${digits.slice(0,3)}) ${digits.slice(3)}`;
+                    else if (digits.length > 0) fmt = digits;
+                    setFormData({ ...formData, phone: fmt });
                   }}
                   maxLength={14}
                 />
@@ -572,7 +588,7 @@ export default function QuoteForm() {
                 )}
                 {formData.serviceType === 'moveout' && (
                   <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
-                    <strong>Move Out:</strong> Everything in a deep clean plus inside all cabinets
+                    <strong>Move Out:</strong> Includes all rooms, cabinets, baseboards, and windows
                   </div>
                 )}
 
@@ -584,7 +600,7 @@ export default function QuoteForm() {
                       (formData.serviceType === 'deep' && 
                         (addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning')) ||
                       (formData.serviceType === 'moveout' && 
-                        (addon.key === 'bedroomBathroomCabinets' || addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning'));
+                        (addon.key === 'bedroomBathroomCabinets' || addon.key === 'insideKitchenCabinets' || addon.key === 'interiorWindows' || addon.key === 'wallStainRemoval' || addon.key === 'tileAndGrout' || addon.key === 'baseboardCleaning'));
                     return !isAutoIncluded;
                   }).map((addon) => {
                     const isSelected = formData.addons[addon.key as keyof typeof formData.addons];

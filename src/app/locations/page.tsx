@@ -62,7 +62,7 @@ export default function LocationsPage() {
   }, {} as Record<string, typeof locations>);
 
   return (
-    <main className="min-h-screen pt-48 pb-12" style={{ background: 'rgba(30, 35, 40, 0.98)' }}>
+    <main className="min-h-screen pt-48 pb-12" style={{ background: 'rgba(15, 23, 42, 1)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-[#dfbd69] mb-6">

@@ -1,12 +1,14 @@
 'use client';
 
 import StepWizard from '../StepWizard';
+import { STEP_WIZARD_CONFIG } from '@/lib/step-wizard-config';
 import Link from 'next/link';
 import Image from 'next/image';
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { TYPOGRAPHY } from '@/styles/typography';
 import { COLORS, INLINE_STYLES } from '@/styles/colors';
 import { LAYOUTS } from '@/styles/layouts';
+import { CONTACT_INFO } from '@/lib/contact';
 
 const avatars = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face&auto=format&q=80",
@@ -21,50 +23,47 @@ interface BaseHeroProps {
   description: string;
   location?: string;
   showWizard?: boolean;
-  quoteUrl?: string;
-  CustomWizard?: React.ComponentType<{ onFormExpand?: (expanded: boolean, immediate?: boolean) => void }>;
 }
 
 export default function BaseHero({ 
   title, 
   description, 
-  location = "Near You",
-  showWizard = true,
-  quoteUrl,
-  CustomWizard
+  location = "Tulsa, OK",
+  showWizard = true 
 }: BaseHeroProps) {
   const [isFormExpanded, setIsFormExpanded] = useState(false);
   const [immediateTransition, setImmediateTransition] = useState(false);
   
   const handleFormExpand = useCallback((expanded: boolean, immediate: boolean = false) => {
-    console.log("Form expansion status:", expanded, "Immediate:", immediate);
-    
+    // Preserve scroll position and prevent scroll during transition
     const currentScrollY = window.scrollY;
     const currentScrollX = window.scrollX;
     
+    // Lock scroll position temporarily
     const lockScroll = () => {
       window.scrollTo({ top: currentScrollY, left: currentScrollX, behavior: 'auto' });
     };
     
+    // Add scroll lock listener
     window.addEventListener('scroll', lockScroll);
     
     setIsFormExpanded(expanded);
     setImmediateTransition(immediate);
     
+    // Direct DOM manipulation for immediate effect
     const formContainer = document.getElementById('quote-form-container');
     if (formContainer) {
       if (expanded) {
         formContainer.classList.add('expand');
-        console.log('Added expand class from handleFormExpand');
       } else {
         formContainer.classList.remove('expand');
-        console.log('Removed expand class from handleFormExpand');
       }
     }
     
+    // Remove scroll lock after transition completes
     setTimeout(() => {
       window.removeEventListener('scroll', lockScroll);
-    }, 600);
+    }, 600); // Slightly longer than the 500ms transition duration
   }, []);
 
   return (
@@ -106,10 +105,10 @@ export default function BaseHero({
                 Services
               </Link>
               <a 
-                href="tel:+17254254620" 
+                href={CONTACT_INFO.phone.href}
                 className={`flex items-center justify-center h-12 px-8 text-sm ${COLORS.text.secondary} hover:text-white transition-colors min-w-[160px]`}
               >
-                call or text <span className={`${COLORS.text.accent} font-semibold ml-1`}>(725) 425-4620</span>
+                call or text <span className={`${COLORS.text.accent} font-semibold ml-1`}>{CONTACT_INFO.phone.display}</span>
               </a>
             </div>
 
@@ -120,7 +119,7 @@ export default function BaseHero({
                   <Image
                     key={index}
                     src={avatar}
-                    alt={`Customer ${index + 1}`}
+                    alt={`Tulsa Maids customer ${index + 1}`}
                     width={32}
                     height={32}
                     className="w-8 h-8 rounded-full border border-white/20 object-cover -ml-1 first:ml-0"
@@ -131,7 +130,7 @@ export default function BaseHero({
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-[#dfbd69]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-4 h-4 text-[#926f34]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
@@ -143,8 +142,8 @@ export default function BaseHero({
             </div>
           </div>
 
-          {/* Step Wizard or Quote Button */}
-          {showWizard ? (
+          {/* Step Wizard */}
+          {showWizard && (
             <div 
               id="quote-form-container"
               className={`${LAYOUTS.hero.formContainer} ${
@@ -155,30 +154,13 @@ export default function BaseHero({
               }}
             >
               <div className={LAYOUTS.hero.formCard}>
-                {CustomWizard ? <CustomWizard onFormExpand={handleFormExpand} /> : <StepWizard onFormExpand={handleFormExpand} />}
+                <StepWizard onFormExpand={handleFormExpand} config={STEP_WIZARD_CONFIG} />
               </div>
             </div>
-          ) : quoteUrl ? (
-            <div className="w-full lg:w-auto flex flex-col items-center lg:items-start mt-8 lg:mt-0">
-              <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: 'rgba(20, 25, 30, 0.8)' }}>
-                <h3 className="text-xl font-serif font-bold text-[#dfbd69] mb-4 text-center">Get a Free Quote</h3>
-                <p className="text-white/80 text-sm mb-6 text-center max-w-xs">
-                  Fill out our quick form and we'll get back to you with a customized quote for your specific needs.
-                </p>
-                <Link 
-                  href={quoteUrl}
-                  className="block w-full bg-[#dfbd69] text-[#1a1f24] font-bold py-4 px-8 rounded-lg hover:bg-[#c9a84f] transition-colors text-center shadow-lg"
-                >
-                  Get Your Quote
-                </Link>
-                <p className="text-white/60 text-xs mt-4 text-center">
-                  Or call <a href="tel:+17254254620" className="text-[#dfbd69] hover:underline">(725) 425-4620</a>
-                </p>
-              </div>
-            </div>
-          ) : null}
+          )}
         </div>
       </div>
     </section>
   );
 }
+
