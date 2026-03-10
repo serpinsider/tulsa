@@ -338,6 +338,12 @@ export default function QuoteForm() {
     return <SuccessMessage type="quote" confirmationNumber={confirmationNumber} />;
   }
 
+  // Calculate which addons are included in the selected service type
+  const includedInDeep = ['wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
+  const includedInMoveOut = ['bedroomBathroomCabinets', 'insideKitchenCabinets', 'interiorWindows', 'insideFridge', 'insideOven', 'microwave', 'wallStainRemoval', 'tileAndGrout', 'baseboardCleaning'];
+  const includedAddons = formData.serviceType === 'deep' ? includedInDeep :
+                        formData.serviceType === 'moveout' ? includedInMoveOut : [];
+
   return (
     <div className="w-full max-w-full sm:container mx-auto px-4 pt-48 pb-20">
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
@@ -737,7 +743,13 @@ export default function QuoteForm() {
                         {Object.entries(formData.addons).map(([key, value]) => {
                           if (value) {
                             const addonLabel = ADDONS.find(addon => addon.key === key)?.label;
-                            return addonLabel && <li key={key}>{addonLabel}</li>;
+                            const isIncluded = includedAddons.includes(key);
+                            return addonLabel && (
+                              <li key={key}>
+                                {addonLabel}
+                                {isIncluded && <span className="text-[#dfbd69] ml-2">(Included)</span>}
+                              </li>
+                            );
                           }
                           return null;
                         })}
