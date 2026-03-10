@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function QuotePage() {
   return (
-    <main className="min-h-screen" style={INLINE_STYLES.primary}>
+    <main className="min-h-screen pt-32" style={INLINE_STYLES.primary}>
       <QuoteForm />
     </main>
   );
