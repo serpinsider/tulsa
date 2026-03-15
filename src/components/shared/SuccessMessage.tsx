@@ -7,11 +7,12 @@ interface SuccessMessageProps {
   type: 'quote' | 'booking';
   confirmationNumber?: string;
   frequency?: string;
+  serviceLabel?: string;
   inline?: boolean;
   onClose?: () => void;
 }
 
-export default function SuccessMessage({ type, confirmationNumber, frequency, inline = false, onClose }: SuccessMessageProps) {
+export default function SuccessMessage({ type, confirmationNumber, frequency, serviceLabel, inline = false, onClose }: SuccessMessageProps) {
   const router = useRouter();
 
   const handleGetAnotherQuote = () => {
@@ -46,9 +47,11 @@ export default function SuccessMessage({ type, confirmationNumber, frequency, in
             </h3>
             
             <p className="text-white/90 text-base sm:text-lg">
-              {type === 'quote' 
-                ? "We've saved your information to make booking easier."
-                : "Your booking request has been submitted successfully."}
+              {type === 'booking'
+                ? "Your booking request has been submitted successfully."
+                : serviceLabel
+                  ? `We'll be in touch about your ${serviceLabel} request.`
+                  : "We've saved your information to make booking easier."}
             </p>
           </div>
 
@@ -57,12 +60,12 @@ export default function SuccessMessage({ type, confirmationNumber, frequency, in
               <>
                 <p className="text-white text-sm leading-relaxed">
                   <strong className="text-[#dfbd69] block mb-3 text-base">What happens next?</strong>
-                  You'll receive a quote via text in about 60 seconds
-                  <br /><br />
-                  A team member will follow up to answer questions and help you schedule using your saved details.
+                  {serviceLabel
+                    ? `A team member will reach out shortly to discuss your ${serviceLabel} needs and provide a custom quote.`
+                    : <>You&apos;ll receive a quote via text in about 60 seconds<br /><br />A team member will follow up to answer questions and help you schedule using your saved details.</>}
                 </p>
 
-                {frequency && frequency !== 'Once' && frequency !== 'One Time' && (
+                {!serviceLabel && frequency && frequency !== 'Once' && frequency !== 'One Time' && (
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <p className="text-white text-sm leading-relaxed">
                       <strong className="text-[#dfbd69] block mb-2">About {frequency} Service</strong>
