@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: https: blob:",
               "media-src 'self' blob:",
-              "connect-src 'self' https://cdn.usefathom.com https://*.googleapis.com https://*.googleusercontent.com https://us.i.posthog.com https://us-assets.i.posthog.com https://formspree.io",
+              "connect-src 'self' https://cdn.usefathom.com https://*.googleapis.com https://*.googleusercontent.com https://us.i.posthog.com https://us-assets.i.posthog.com https://formspree.io https://assistant-ashy-five.vercel.app https://*.serpinsiders-projects.vercel.app",
               "frame-src 'self' https://accounts.google.com https://*.bookingkoala.com",
               "object-src 'none'",
               "base-uri 'self'",
