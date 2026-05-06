@@ -68,6 +68,8 @@ interface Props {
   businessName: string;
   accentColor?: string;
   btnTextColor?: string;
+  /** Card / input background. Pass any CSS color (rgba/hex). Default keeps legacy navy. */
+  cardBg?: string;
 }
 
 export default function NativeBookingForm({
@@ -75,6 +77,7 @@ export default function NativeBookingForm({
   businessName,
   accentColor = '#dfbd69',
   btnTextColor = '#000',
+  cardBg = 'rgba(26, 55, 85, 0.5)',
 }: Props) {
   const [opts, setOpts] = useState<BrandOptions | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
@@ -431,8 +434,7 @@ export default function NativeBookingForm({
     );
   }
 
-  // Background helper for inputs/selects/textareas — matches QuoteForm.tsx
-  const inputBg = 'rgba(26, 55, 85, 0.5)';
+  const inputBg = cardBg;
   const inputClass =
     'w-full p-3 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]';
 
