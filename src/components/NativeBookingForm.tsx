@@ -295,19 +295,35 @@ export default function NativeBookingForm({
     return () => clearTimeout(t);
   }, [refreshQuote]);
 
-  const formValid =
-    !!service &&
-    !!bedrooms &&
-    !!bathrooms &&
-    !!scheduledDate &&
-    !!scheduledTime &&
-    firstName.trim().length > 1 &&
-    lastName.trim().length > 1 &&
-    (phone.replace(/\D/g, '').length >= 10 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) &&
-    line1.trim().length > 3 &&
-    city.trim().length > 1 &&
-    usState.trim().length >= 2 &&
-    /^\d{5}$/.test(zip.trim());
+  // Build a humanized "what's missing" list. Order roughly matches the form
+  // top-to-bottom so the hint reads natural ("Pick a service, add bedrooms,
+  // a date..." vs jumping around). Used both to drive `formValid` and to
+  // render the hint above the submit button.
+  const missingFields: string[] = [];
+  if (!service) missingFields.push('service');
+  if (!bedrooms) missingFields.push('bedrooms');
+  if (!bathrooms) missingFields.push('bathrooms');
+  if (!scheduledDate) missingFields.push('date');
+  if (!scheduledTime) missingFields.push('time');
+  if (firstName.trim().length <= 1) missingFields.push('first name');
+  if (lastName.trim().length <= 1) missingFields.push('last name');
+  if (phone.replace(/\D/g, '').length < 10 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    missingFields.push('phone or email');
+  }
+  if (line1.trim().length <= 3) missingFields.push('street address');
+  if (city.trim().length <= 1) missingFields.push('city');
+  if (usState.trim().length < 2) missingFields.push('state');
+  if (!/^\d{5}$/.test(zip.trim())) missingFields.push('ZIP');
+
+  const formValid = missingFields.length === 0;
+
+  const missingHint = (() => {
+    if (missingFields.length === 0) return null;
+    if (missingFields.length === 1) return `Add ${missingFields[0]} to book.`;
+    if (missingFields.length === 2) return `Add ${missingFields[0]} and ${missingFields[1]} to book.`;
+    const head = missingFields.slice(0, -1).join(', ');
+    return `Add ${head}, and ${missingFields[missingFields.length - 1]} to book.`;
+  })();
 
   const submit = async () => {
     if (!formValid || submitting) return;
@@ -718,6 +734,20 @@ export default function NativeBookingForm({
                 {submitErr}
               </div>
             )}
+            {missingHint && (
+              <div
+                className="text-[12px] rounded-lg px-3 py-2 border"
+                style={{
+                  color: accentColor,
+                  borderColor: `${accentColor}40`,
+                  background: `${accentColor}14`,
+                }}
+                role="status"
+                aria-live="polite"
+              >
+                {missingHint}
+              </div>
+            )}
             <button
               type="button"
               onClick={submit}
@@ -866,6 +896,20 @@ export default function NativeBookingForm({
               </div>
             )}
 
+            {missingHint && (
+              <div
+                className="text-[12px] rounded-lg px-3 py-2 border"
+                style={{
+                  color: accentColor,
+                  borderColor: `${accentColor}40`,
+                  background: `${accentColor}14`,
+                }}
+                role="status"
+                aria-live="polite"
+              >
+                {missingHint}
+              </div>
+            )}
             <button
               type="button"
               onClick={submit}
