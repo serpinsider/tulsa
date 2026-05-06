@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { COLORS } from '@/styles/colors';
 import { BRANDING } from '@/config/branding';
 
 export default function EventCleaningQuoteClient() {
@@ -66,7 +65,7 @@ export default function EventCleaningQuoteClient() {
         _subject: `Tulsa Maids - Event Cleaning Quote from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
       };
 
-      const formspreeResponse = await fetch('https://formspree.io/f/mrbjzvde', {
+      const formspreeResponse = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(structuredData),
@@ -85,12 +84,12 @@ export default function EventCleaningQuoteClient() {
   };
 
   return (
-    <div className={`min-h-screen ${COLORS.backgrounds.hero} pt-48 pb-12`}>
+    <div className="min-h-screen bg-gradient-to-br from-[#1a3755] to-[#234b73] pt-48 pb-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-slate-800/50 backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10">
           
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-3xl font-serif font-bold text-[${COLORS.brand.gold}] mb-6 drop-shadow-lg">
+            <h1 className="text-2xl md:text-3xl lg:text-3xl font-serif font-semibold text-[#dfbd69] mb-6 drop-shadow-lg">
               Get Your Event Cleaning Quote
             </h1>
             <p className="text-base sm:text-base lg:text-medium text-gray-100 leading-relaxed drop-shadow-md">
@@ -105,7 +104,7 @@ export default function EventCleaningQuoteClient() {
                 <input
                   type="text"
                   placeholder="ex. Jane"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 />
@@ -115,7 +114,7 @@ export default function EventCleaningQuoteClient() {
                 <input
                   type="text"
                   placeholder="ex. Smith"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 />
@@ -128,7 +127,7 @@ export default function EventCleaningQuoteClient() {
                 <input
                   type="email"
                   placeholder="email@example.com"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
@@ -138,7 +137,7 @@ export default function EventCleaningQuoteClient() {
                 <input
                   type="tel"
                   placeholder={BRANDING.phone.display}
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
                   maxLength={14}
@@ -152,7 +151,7 @@ export default function EventCleaningQuoteClient() {
                 <select
                   value={formData.eventType}
                   onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                 >
                   <option value="">Select type</option>
                   <option value="wedding">Wedding</option>
@@ -166,7 +165,7 @@ export default function EventCleaningQuoteClient() {
                 <label className="block text-sm font-semibold mb-2 text-white">Event Date*</label>
                 <input
                   type="date"
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                   value={formData.eventDate}
                   onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
                 />
@@ -179,7 +178,7 @@ export default function EventCleaningQuoteClient() {
                 <select
                   value={formData.guestCount}
                   onChange={(e) => setFormData({ ...formData, guestCount: e.target.value })}
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                 >
                   <option value="">Select range</option>
                   <option value="under-25">Under 25</option>
@@ -193,7 +192,7 @@ export default function EventCleaningQuoteClient() {
                 <select
                   value={formData.serviceNeeded}
                   onChange={(e) => setFormData({ ...formData, serviceNeeded: e.target.value })}
-                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}]"
+                  className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white appearance-none focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d]"
                 >
                   <option value="">Select service</option>
                   <option value="pre-event">Pre-Event Setup & Clean</option>
@@ -208,7 +207,7 @@ export default function EventCleaningQuoteClient() {
               <label className="block text-sm font-semibold mb-2 text-white">Additional Details</label>
               <textarea
                 placeholder="Venue details, special requirements, setup needs, etc."
-                className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[${COLORS.brand.goldMuted}] focus:ring-1 focus:ring-[${COLORS.brand.goldMuted}] h-24 resize-none"
+                className="w-full p-3 border border-white/20 rounded-lg bg-slate-900/50 text-white placeholder-white/50 focus:border-[#b8956d] focus:ring-1 focus:ring-[#b8956d] h-24 resize-none"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               />
@@ -217,7 +216,7 @@ export default function EventCleaningQuoteClient() {
             <button
               onClick={handleSubmit}
               disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.eventType || !formData.eventDate || !formData.serviceNeeded || !isValidEmail(formData.email) || !isValidPhone(formData.phone)}
-              className="w-full bg-[${COLORS.brand.gold}] text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-[${COLORS.brand.gold}]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#dfbd69] text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-[#dfbd69]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Get My Quote
             </button>

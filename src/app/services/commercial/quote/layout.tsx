@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Commercial Cleaning Quote - ${BRANDING.businessName}',
-  description: 'Get a quote for professional commercial cleaning in [LOCATION]. Offices, retail, restaurants, and more.',
+  title: 'Commercial Cleaning Quote - Tulsa Maids',
+  description: 'Get a quote for professional commercial cleaning in Tulsa, OK. Offices, retail, restaurants, and more.',
   alternates: {
-    canonical: 'https://[DOMAIN]/services/commercial/quote',
+    canonical: 'https://tulsamaids.com/services/commercial/quote',
   },
 };
 

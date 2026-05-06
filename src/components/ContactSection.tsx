@@ -50,17 +50,11 @@ export default function ContactSection() {
       const confirmationNumber = 'TM-CONTACT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
       const structuredData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
-        confirmationNumber,
         sourcePage: typeof window !== 'undefined' ? window.location.pathname : '',
         _subject: `Tulsa Maids - Contact from ${formData.firstName} ${formData.lastName} - #${confirmationNumber}`,
       };
 
-      const formspreeResponse = await fetch('https://formspree.io/f/mrbjzvde', {
+      const formspreeResponse = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

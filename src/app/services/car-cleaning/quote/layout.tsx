@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Car Cleaning Quote - ${BRANDING.businessName}',
-  description: 'Get a quote for professional car cleaning and detailing in [LOCATION]. Interior, exterior, and full detail packages.',
+  title: 'Car Cleaning Quote - Tulsa Maids',
+  description: 'Get a quote for professional car cleaning and detailing in Tulsa, OK. Interior, exterior, and full detail packages.',
   alternates: {
-    canonical: 'https://[DOMAIN]/services/car-cleaning/quote',
+    canonical: 'https://tulsamaids.com/services/car-cleaning/quote',
   },
 };
 

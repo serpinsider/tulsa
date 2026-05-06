@@ -5,18 +5,7 @@ import Image from 'next/image';
 import { CONTACT_INFO } from '@/lib/contact';
 import { ADDONS } from '@/lib/constants/addons';
 import SuccessMessage from '@/components/shared/SuccessMessage';
-import { COLORS } from '@/styles/colors';
-
-// Helper to get form background color
-const getFormBg = () => {
-  const primary = COLORS.backgrounds.primary;
-  // If it's a CSS variable, fallback to dark background
-  if (primary.includes('var(')) {
-    return 'rgba(45, 20, 16, 0.5)';
-  }
-  // Otherwise replace opacity in rgba string
-  return primary.replace('0.95', '0.5');
-};
+const FORM_BG = 'rgba(255, 255, 255, 0.05)';
 
 type AddonsType = {
   insideFridge: boolean;
@@ -307,7 +296,7 @@ export default function QuoteForm() {
         'Confirmation Number': confirmationNumber
       };
 
-      const response = await fetch('https://formspree.io/f/mrbjzvde', {
+      const response = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -347,8 +336,8 @@ export default function QuoteForm() {
   return (
     <div className="w-full max-w-full sm:container mx-auto px-4 pt-48 pb-20">
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-        <div className="lg:col-span-2 backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: getFormBg() }}>
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Get a free quote instantly!</h1>
+        <div className="lg:col-span-2 backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: FORM_BG }}>
+          <h1 className="text-3xl md:text-4xl font-serif font-semibold text-white mb-4">Get a free quote instantly!</h1>
           <p className="text-white/80 mb-6">
             Fill out the form and we&apos;ll send you a detailed quote.
           </p>
@@ -365,7 +354,7 @@ export default function QuoteForm() {
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.firstName ? 'border-red-500' : 'border-white/20'
                   }`}
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 />
@@ -381,7 +370,7 @@ export default function QuoteForm() {
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.lastName ? 'border-red-500' : 'border-white/20'
                   }`}
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 />
@@ -400,7 +389,7 @@ export default function QuoteForm() {
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.email ? 'border-red-500' : 'border-white/20'
                   }`}
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
@@ -418,7 +407,7 @@ export default function QuoteForm() {
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.phone ? 'border-red-500' : 'border-white/20'
                   }`}
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                   value={formData.phone}
                   onChange={(e) => {
                     const input = e.target;
@@ -447,7 +436,7 @@ export default function QuoteForm() {
                   value={formData.bedrooms}
                   onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
                   className="w-full p-3 border border-white/20 rounded-lg text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                 >
                   <option value="Studio">Studio</option>
                   <option value="1">1 Bedroom</option>
@@ -465,7 +454,7 @@ export default function QuoteForm() {
                   value={formData.bathrooms}
                   onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
                   className="w-full p-3 border border-white/20 rounded-lg text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                 >
                   <option value="1">1 Bathroom</option>
                   <option value="1.5">1.5 Bathrooms</option>
@@ -485,11 +474,11 @@ export default function QuoteForm() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. 11201"
+                  placeholder="e.g. 74103"
                   className={`w-full p-3 border rounded-lg text-white placeholder-white/50 focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69] ${
                     errors.zipCode ? 'border-red-500' : 'border-white/20'
                   }`}
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                   value={formData.zipCode}
                   onChange={(e) => {
                     const val = e.target.value.replace(/\D/g, '').slice(0, 5);
@@ -507,7 +496,7 @@ export default function QuoteForm() {
                   value={formData.squareFootage}
                   onChange={(e) => setFormData({ ...formData, squareFootage: e.target.value })}
                   className="w-full p-3 border border-white/20 rounded-lg text-white appearance-none focus:border-[#dfbd69] focus:ring-1 focus:ring-[#dfbd69]"
-                  style={{ background: getFormBg() }}
+                  style={{ background: FORM_BG }}
                 >
                   <option value="Under 1,000 sqft">Under 1,000 sqft</option>
                   <option value="1,000-2,000 sqft">1,000 - 2,000 sqft</option>
@@ -690,12 +679,12 @@ export default function QuoteForm() {
           </div>
         </div>
 
-        <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: getFormBg() }}>
+        <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: FORM_BG }}>
 
 
           <div className="space-y-8">
             <div>
-              <h3 className="text-xl font-serif font-bold mb-4 text-white">Quote Summary</h3>
+              <h3 className="text-xl font-serif font-semibold mb-4 text-white">Quote Summary</h3>
               <div className="space-y-4">
                 {formData.firstName && formData.lastName && (
                   <div>
@@ -763,7 +752,7 @@ export default function QuoteForm() {
             </div>
 
             <div className="pt-6 border-t border-white/10">
-              <h3 className="text-xl font-serif font-bold mb-4 text-white">Need Help?</h3>
+              <h3 className="text-xl font-serif font-semibold mb-4 text-white">Need Help?</h3>
               <div className="space-y-6">
                 <div className="space-y-3">
                   <a 

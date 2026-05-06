@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { BRANDING } from '@/config/branding';
 
 interface SuccessMessageProps {
@@ -13,17 +12,23 @@ interface SuccessMessageProps {
 }
 
 export default function SuccessMessage({ type, confirmationNumber, frequency, serviceLabel, inline = false, onClose }: SuccessMessageProps) {
-  const router = useRouter();
-
   const handleGetAnotherQuote = () => {
-    router.push('/test-quote');
+    if (typeof window === 'undefined') return;
+    const target = '/test-quote';
+    if (window.location.pathname === target) {
+      window.location.reload();
+    } else {
+      window.location.assign(target);
+    }
   };
 
   const handleGoHome = () => {
     if (inline && onClose) {
       onClose();
-    } else {
-      router.push('/');
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.location.assign('/');
     }
   };
 

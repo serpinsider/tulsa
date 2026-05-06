@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Carpet Cleaning Quote - ${BRANDING.businessName}',
-  description: 'Get a quote for professional carpet cleaning in [LOCATION]. Deep steam cleaning, stain removal, pet odor treatment.',
+  title: 'Carpet Cleaning Quote - Tulsa Maids',
+  description: 'Get a quote for professional carpet cleaning in Tulsa, OK. Deep steam cleaning, stain removal, pet odor treatment.',
   alternates: {
-    canonical: 'https://[DOMAIN]/services/carpet-cleaning/quote',
+    canonical: 'https://tulsamaids.com/services/carpet-cleaning/quote',
   },
 };
 

@@ -1,6 +1,6 @@
 /**
  * Tulsa Maids Color Palette
- * Pacific Ocean-inspired colors: Deep ocean blues and vibrant teals
+ * Deep navy blues with gold accents
  */
 
 export const COLORS = {

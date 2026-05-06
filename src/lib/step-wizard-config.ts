@@ -31,7 +31,7 @@ export const STEP_WIZARD_CONFIG: StepWizardConfig = {
   businessName: 'Tulsa Maids',
   businessId: 'tulsa',
   confirmationPrefix: 'TM',
-  formspreeEndpoint: 'mrbjzvde',
+  formspreeEndpoint: 'xvzwolek',
   accentColor: '#dfbd69',
   accentDark: '#c9a84c',
   btnTextColor: '#283845',

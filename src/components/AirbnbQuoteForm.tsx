@@ -61,7 +61,7 @@ export default function AirbnbQuoteForm() {
     if (formData.applianceCleaning) addons.push('Appliance Cleaning');
 
     try {
-      const response = await fetch('https://formspree.io/f/mrbjzvde', {
+      const response = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

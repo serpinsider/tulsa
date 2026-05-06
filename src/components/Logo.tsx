@@ -18,7 +18,7 @@ const sizeClasses = {
 export default function Logo({ size = 'md', linkToHome = true, className = '' }: LogoProps) {
   const logoText = (
     <span 
-      className={`font-[family-name:var(--font-playfair)] font-bold ${sizeClasses[size]} ${className}`}
+      className={`font-[family-name:var(--font-playfair)] font-semibold ${sizeClasses[size]} ${className}`}
       style={{
         background: `linear-gradient(135deg, #dfbd69 0%, #b8956d 100%)`,
         WebkitBackgroundClip: 'text',

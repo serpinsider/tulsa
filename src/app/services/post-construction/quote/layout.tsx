@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Post-Construction Cleaning Quote - ${BRANDING.businessName}',
-  description: 'Get a quote for post-construction cleanup in [LOCATION]. Thorough dust, debris, and detail cleaning after your project.',
+  title: 'Post-Construction Cleaning Quote - Tulsa Maids',
+  description: 'Get a quote for post-construction cleanup in Tulsa, OK. Thorough dust, debris, and detail cleaning after your project.',
   alternates: {
-    canonical: 'https://[DOMAIN]/services/post-construction/quote',
+    canonical: 'https://tulsamaids.com/services/post-construction/quote',
   },
 };
 

@@ -51,7 +51,7 @@ export default function HandymanQuoteForm() {
     const confirmNum = 'TM-HANDY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
     try {
-      const response = await fetch('https://formspree.io/f/mrbjzvde', {
+      const response = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

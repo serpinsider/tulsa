@@ -296,7 +296,6 @@ They can be manually deleted or will disappear when the site is copied.`,
     relatedFeatures: ['crm-removal-cleanup'],
   },
   {
-  {
     id: 'ghost-code-cleanup-2025-12',
     date: '2025-12-25',
     version: '5.1225',

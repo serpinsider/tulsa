@@ -9,7 +9,10 @@ import type { StepWizardConfig } from '@/lib/step-wizard-config';
 
 declare global {
   interface Window {
-    fathom?: { trackEvent: (name: string) => void };
+    fathom?: {
+      trackEvent: (name: string, opts?: { _value?: number }) => void;
+      trackGoal: (id: string, cents: number) => void;
+    };
   }
 }
 
@@ -313,18 +316,6 @@ export default function StepWizard({ onFormExpand, config }: StepWizardProps) {
       const formspreeData = {
         business: config.businessName,
         businessId: config.businessId,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        bedrooms: formData.bedrooms,
-        bathrooms: formData.bathrooms,
-        zipCode: formData.zipCode,
-        squareFootage: formData.squareFootage,
-        frequency: formData.frequency,
-        serviceType: formData.serviceType,
-        addons: formData.addons,
-        confirmationNumber,
         'First Name': formData.firstName,
         'Last Name': formData.lastName,
         'Email': formData.email,
@@ -870,7 +861,7 @@ export default function StepWizard({ onFormExpand, config }: StepWizardProps) {
           <button
             onClick={() => handleSubmit()}
             disabled={!canProceed() || isSubmitting}
-            className={`${currentStep === 1 ? 'w-full' : 'flex-1'} p-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+            className={`flex-1 p-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
               canProceed() && !isSubmitting
                 ? 'hover:-translate-y-[1px]'
                 : 'bg-white/20 text-white/50 cursor-not-allowed'

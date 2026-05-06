@@ -12,6 +12,7 @@ interface StructuredDataProps {
   type: 'local-business' | 'service' | 'location' | 'organization' | 'website' | 'faq';
   data?: {
     location?: string;
+    description?: string;
     service?: string;
     cities?: string[];
   };
@@ -56,15 +57,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           "serviceType": ["House Cleaning", "Maid Service", "Residential Cleaning"],
           "priceRange": "$80-$400",
           "openingHours": ["Mo-Fr 08:00-20:00", "Sa-Su 09:00-18:00"],
-          "paymentAccepted": ["Cash", "Credit Card", "Debit Card"],
+          "paymentAccepted": ["Credit Card", "Debit Card", "Zelle"],
           "currenciesAccepted": "USD",
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "267",
-            "bestRating": "5",
-            "worstRating": "1"
-          },
           "sameAs": [
             "https://www.facebook.com/tulsamaids",
             "https://www.instagram.com/tulsamaids",

@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-import { INLINE_STYLES } from '@/styles/colors';
 import EventCleaningQuoteClient from './EventCleaningQuoteClient';
-import { INLINE_STYLES } from '@/styles/colors';
 
 export const metadata: Metadata = {
   title: 'Get Your Event Cleaning Quote - Tulsa Maids',

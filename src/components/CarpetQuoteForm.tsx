@@ -69,7 +69,7 @@ export default function CarpetQuoteForm() {
     if (formData.hasPetStains) extras.push('Pet stains/odors');
 
     try {
-      const response = await fetch('https://formspree.io/f/mrbjzvde', {
+      const response = await fetch('https://formspree.io/f/xvzwolek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Handyman Services Quote - ${BRANDING.businessName}',
-  description: 'Get a quote for professional handyman services in [LOCATION]. TV mounting, furniture assembly, minor repairs and more.',
+  title: 'Handyman Services Quote - Tulsa Maids',
+  description: 'Get a quote for professional handyman services in Tulsa, OK. TV mounting, furniture assembly, minor repairs and more.',
   alternates: {
-    canonical: 'https://[DOMAIN]/services/handyman/quote',
+    canonical: 'https://tulsamaids.com/services/handyman/quote',
   },
 };
 
