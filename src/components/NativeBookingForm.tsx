@@ -198,6 +198,23 @@ export default function NativeBookingForm({
     }
   }, [opts, prefill.payload]);
 
+  // Referral code from `?ref=ABC123`. Persisted to sessionStorage so it
+  // survives the navigation quirks of single-page form-fill flows (the
+  // user can land on /book?ref=X, then click around to other pages, and
+  // come back to /book and still have their attribution intact). The
+  // server-side /api/public/bookings/create attributes on first booking.
+  const [referralCode, setReferralCode] = useState<string>('');
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const fromUrl = new URLSearchParams(window.location.search).get('ref');
+    const cached = sessionStorage.getItem('referralCode') || '';
+    const code = (fromUrl || cached || '').trim().toUpperCase().slice(0, 32);
+    if (code) {
+      sessionStorage.setItem('referralCode', code);
+      setReferralCode(code);
+    }
+  }, []);
+
   const includedAddons = useMemo(() => {
     if (!opts || !service) return new Set<string>();
     const arr = opts.inclusions?.[service] || [];
@@ -364,6 +381,10 @@ export default function NativeBookingForm({
           // the token so the CRM can attribute the booking back to the lead
           // / Quo conversation that minted it. Undefined when no token.
           quotePrefillToken: prefill.token || undefined,
+          // `?ref=<customer-referral-code>` from a friend's share link.
+          // Server attributes on first booking + grants $25 to both parties
+          // when status flips to completed.
+          referralCode: referralCode || undefined,
           botField,
         }),
       });
@@ -1252,6 +1273,43 @@ function AddressAutocomplete({
         autoComplete="street-address"
         style={{ background: inputBg, colorScheme: 'dark' }}
       />
+      <PacContainerDarkStyles />
     </div>
   );
+}
+
+let _pacStylesInjected = false;
+function PacContainerDarkStyles() {
+  useEffect(() => {
+    if (_pacStylesInjected || typeof document === 'undefined') return;
+    _pacStylesInjected = true;
+    const style = document.createElement('style');
+    style.dataset.pacDark = '1';
+    style.textContent = `
+      .pac-container {
+        background: #0b1220;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 8px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+        margin-top: 4px;
+        font-family: inherit;
+        z-index: 99999;
+      }
+      .pac-item {
+        padding: 10px 14px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.88);
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .pac-item:first-child { border-top: none; }
+      .pac-item:hover { background: rgba(255,255,255,0.06); }
+      .pac-item-selected, .pac-item-selected:hover { background: rgba(96,165,250,0.18); }
+      .pac-item-query { color: #fff; font-weight: 500; }
+      .pac-matched { color: #93c5fd; font-weight: 600; }
+      .pac-icon { filter: invert(1) opacity(0.55); }
+    `;
+    document.head.appendChild(style);
+  }, []);
+  return null;
 }
