@@ -1,33 +1,16 @@
-'use client';
+/**
+ * /login — passwordless login redirect.
+ *
+ * Replaces the legacy BookingKoala iframe embed (which was broken since
+ * we migrated bookings to the native CRM). Punts to the va-ops magic-link
+ * page where customers enter email/phone and receive a one-tap login SMS
+ * or email.
+ */
 
-import Script from 'next/script';
+import { redirect } from 'next/navigation';
+
+const PORTAL_LOGIN_URL = 'https://assistant-ashy-five.vercel.app/sign-in/magic';
 
 export default function LoginPage() {
-  return (
-    <main className="min-h-screen pt-48 pb-16 px-4" style={{ background: 'rgba(15, 23, 42, 1)' }}>
-      <div className="max-w-4xl mx-auto">
-        <div className="backdrop-blur-md p-8 rounded-xl shadow-xl border border-white/10" style={{ background: 'rgba(20, 25, 30, 0.5)' }}>
-          <h1 className="text-3xl font-bold text-white mb-2 text-center">Log In</h1>
-          <p className="text-white/80 mb-8 text-center">Access your account</p>
-          
-          <div className="bg-white rounded-lg overflow-hidden" style={{ minHeight: '650px' }}>
-            <iframe 
-              src="https://pine.bookingkoala.com/login?embed=true" 
-              style={{
-                border: 'none',
-                height: '650px',
-                width: '100%'
-              }}
-              scrolling="no"
-              title="Log In"
-            />
-            <Script 
-              src="https://pine.bookingkoala.com/resources/embed.js" 
-              strategy="lazyOnload"
-            />
-          </div>
-        </div>
-      </div>
-    </main>
-  );
+  redirect(PORTAL_LOGIN_URL);
 }
