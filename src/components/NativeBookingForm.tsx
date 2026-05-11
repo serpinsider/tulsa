@@ -330,6 +330,15 @@ export default function NativeBookingForm({
     setSubmitting(true);
     setSubmitErr(null);
     try {
+      // Send the picked date+time as brand-LOCAL naive parts. The server
+      // converts to UTC using the brand's service-area timezone. Earlier
+      // versions called `new Date(...).toISOString()` here which silently
+      // interpreted the picker as the customer's BROWSER timezone — wrong
+      // for any out-of-area customer (e.g. East Coast booking Pacific Maids
+      // got a 3-hour drift). The legacy field is kept for one release so a
+      // stale CDN cache doesn't break booking.
+      const scheduledLocalDate = scheduledDate;
+      const scheduledLocalTime = scheduledTime;
       const scheduledStartAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
       const res = await fetch(`${VA_OPS_URL}/api/public/bookings/create`, {
         method: 'POST',
@@ -343,6 +352,8 @@ export default function NativeBookingForm({
           addons: Array.from(selectedAddons),
           frequency,
           scheduledStartAt,
+          scheduledLocalDate,
+          scheduledLocalTime,
           customer: { firstName, lastName, phone, email },
           address: { line1, line2, city, state: usState, zip },
           entryMethod,
@@ -377,54 +388,105 @@ export default function NativeBookingForm({
   };
 
   if (successData) {
+    // Compact, scannable confirmation. The previous version was a tall
+    // wall of receipt + nested next-step explanations. New layout:
+    //   - hero check + headline + 1-line confirmation
+    //   - 4 receipt facts
+    //   - one Next-step card (changes based on Zelle vs card)
+    //   - contact strip (call/text + back to home) - addresses the
+    //     user complaint that contact details weren't on the page
+    const phoneTel = (CONTACT_INFO?.phone?.href || '').toString();
+    const phoneDisplay = (CONTACT_INFO?.phone?.display || '').toString();
+    const startDate = new Date(successData.scheduledStartAt);
+    const dateStr = startDate.toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+    });
+    const timeStr = startDate.toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
     return (
-      <div className="max-w-3xl mx-auto px-4 pt-48 pb-20">
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-10 text-center">
+      <div className="max-w-xl mx-auto px-4 pt-32 pb-16">
+        <div
+          className="rounded-2xl border p-6 sm:p-8 backdrop-blur-md"
+          style={{
+            background: cardBg,
+            borderColor: `${accentColor}40`,
+          }}
+        >
+          {/* Hero */}
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{ backgroundColor: accentColor }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={btnTextColor} strokeWidth="3">
+                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-semibold text-white leading-tight">You&apos;re booked.</h1>
+              <p className="text-xs text-white/55">
+                {businessName} confirmed for {dateStr} at {timeStr}
+              </p>
+            </div>
+          </div>
+
+          {/* Compact receipt strip */}
+          <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+            <div className="rounded-md bg-black/25 border border-white/10 px-3 py-2">
+              <div className="text-white/40 uppercase tracking-wide text-[10px]">Confirmation</div>
+              <div className="text-white font-mono mt-0.5">{successData.bookingId.slice(0, 8).toUpperCase()}</div>
+            </div>
+            <div className="rounded-md bg-black/25 border border-white/10 px-3 py-2">
+              <div className="text-white/40 uppercase tracking-wide text-[10px]">Total</div>
+              <div className="text-white font-semibold mt-0.5">${successData.total.toFixed(2)}</div>
+            </div>
+            <div className="rounded-md bg-black/25 border border-white/10 px-3 py-2 col-span-2">
+              <div className="text-white/40 uppercase tracking-wide text-[10px]">Payment</div>
+              <div className="text-white mt-0.5">
+                {successData.paymentMethodKind === 'zelle'
+                  ? 'Zelle — paid after service'
+                  : 'Card on file — charged after service'}
+              </div>
+            </div>
+          </div>
+
+          {/* Single next-step card. Branded with accentColor instead of
+              hardcoded gold so it matches every brand. */}
           <div
-            className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: accentColor }}
+            className="text-xs rounded-lg p-3 mb-4"
+            style={{
+              background: `${accentColor}15`,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: `${accentColor}50`,
+              color: accentColor,
+            }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={btnTextColor} strokeWidth="3">
-              <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <strong>Next:</strong>{' '}
+            {successData.paymentMethodKind === 'zelle'
+              ? 'we\u2019ll text you our Zelle handle + a unique reference once the cleaner finishes.'
+              : 'we\u2019ll text you a secure link to add a card on file. We only charge after the cleaning is done.'}
           </div>
-          <h1 className="text-3xl font-bold text-white mb-3">You&apos;re booked.</h1>
-          <p className="text-white/70 mb-6">
-            {businessName} received your booking. We&apos;ll text you shortly to confirm your cleaner and finalize the details.
-          </p>
-          <div className="text-left bg-black/30 rounded-lg p-4 mb-6 text-sm space-y-2">
-            <div className="flex justify-between">
-              <span className="text-white/60">Confirmation</span>
-              <span className="text-white font-mono">{successData.bookingId.slice(0, 8).toUpperCase()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/60">Date</span>
-              <span className="text-white">{new Date(successData.scheduledStartAt).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/60">Total</span>
-              <span className="text-white font-semibold">${successData.total.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/60">Payment</span>
-              <span className="text-white">
-                {successData.paymentMethodKind === 'zelle' ? 'Zelle (after service)' : 'Card on file'}
-              </span>
-            </div>
-          </div>
-          <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3 text-left">
-            {successData.paymentMethodKind === 'zelle' ? (
-              <>
-                <strong>Next step:</strong> we&apos;ll text you the Zelle email/phone and a unique
-                reference number after the cleaner finishes. Add the reference to the memo so we
-                can match the payment to your booking automatically.
-              </>
-            ) : (
-              <>
-                <strong>Next step:</strong> we&apos;ll text you a secure link to add a card on file.
-                Your card stays uncharged until the cleaner finishes the job.
-              </>
+
+          {/* Contact strip — call/text us + back home. */}
+          <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-white/10">
+            {phoneTel && (
+              <a
+                href={phoneTel}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white border border-white/20 hover:bg-white/10 transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <span>Call / text {phoneDisplay || 'us'}</span>
+              </a>
             )}
+            <a
+              href="/"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white"
+              style={{ backgroundColor: accentColor, color: btnTextColor }}
+            >
+              Back to home
+            </a>
           </div>
         </div>
       </div>
@@ -628,7 +690,19 @@ export default function NativeBookingForm({
           <Section title="7. Service address">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <TextField label="Street address" value={line1} onChange={setLine1} inputClass={inputClass} inputBg={inputBg} />
+                <AddressAutocomplete
+                  label="Street address"
+                  value={line1}
+                  onChange={setLine1}
+                  inputClass={inputClass}
+                  inputBg={inputBg}
+                  onPlace={(p) => {
+                    if (p.line1) setLine1(p.line1);
+                    if (p.city) setCity(p.city);
+                    if (p.state) setUsState(p.state);
+                    if (p.zip) setZip(p.zip);
+                  }}
+                />
               </div>
               <TextField label="Apt / Unit (optional)" value={line2} onChange={setLine2} required={false} inputClass={inputClass} inputBg={inputBg} />
               <TextField label="City" value={city} onChange={setCity} inputClass={inputClass} inputBg={inputBg} />
@@ -1061,6 +1135,121 @@ function TextField({
         onChange={(e) => onChange(e.target.value)}
         className={inputClass}
         placeholder={placeholder}
+        style={{ background: inputBg, colorScheme: 'dark' }}
+      />
+    </div>
+  );
+}
+
+interface PlacePick {
+  line1: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+}
+
+// Lazy-load google maps places library once per page. Falls back to a
+// plain text input when NEXT_PUBLIC_GOOGLE_MAPS_API_KEY isn't set or the
+// script fails to load — never blocks booking.
+let _gmapsLoad: Promise<boolean> | null = null;
+function loadGoogleMaps(): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false);
+  if ((window as unknown as { google?: { maps?: { places?: unknown } } })?.google?.maps?.places) {
+    return Promise.resolve(true);
+  }
+  if (_gmapsLoad) return _gmapsLoad;
+  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!key) return Promise.resolve(false);
+  _gmapsLoad = new Promise<boolean>((resolve) => {
+    const existing = document.querySelector<HTMLScriptElement>('script[data-gmaps-places]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(true));
+      existing.addEventListener('error', () => resolve(false));
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places&v=weekly`;
+    s.async = true;
+    s.defer = true;
+    s.dataset.gmapsPlaces = '1';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+  return _gmapsLoad;
+}
+
+function AddressAutocomplete({
+  label, value, onChange, inputClass, inputBg, onPlace,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  inputClass: string;
+  inputBg?: string;
+  onPlace: (p: PlacePick) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let ac: { addListener: (ev: string, cb: () => void) => void; getPlace: () => unknown } | null = null;
+    loadGoogleMaps().then((ok) => {
+      if (!ok || cancelled || !inputRef.current) return;
+      const w = window as unknown as {
+        google: {
+          maps: {
+            places: {
+              Autocomplete: new (
+                el: HTMLInputElement,
+                opts: { types?: string[]; componentRestrictions?: { country: string[] }; fields?: string[] },
+              ) => { addListener: (ev: string, cb: () => void) => void; getPlace: () => unknown };
+            };
+          };
+        };
+      };
+      ac = new w.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['address'],
+        componentRestrictions: { country: ['us'] },
+        fields: ['address_components', 'formatted_address'],
+      });
+      ac.addListener('place_changed', () => {
+        const place = ac!.getPlace() as {
+          address_components?: Array<{ types: string[]; long_name: string; short_name: string }>;
+          formatted_address?: string;
+        };
+        const comps = place.address_components || [];
+        const get = (type: string, short = false): string | null => {
+          const c = comps.find((x) => x.types.includes(type));
+          return c ? (short ? c.short_name : c.long_name) : null;
+        };
+        const street = [get('street_number'), get('route')].filter(Boolean).join(' ') || null;
+        const pick: PlacePick = {
+          line1: street || place.formatted_address?.split(',')[0] || null,
+          city: get('locality') || get('sublocality') || get('postal_town') || null,
+          state: get('administrative_area_level_1', true),
+          zip: get('postal_code'),
+        };
+        onPlace(pick);
+      });
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <label className="block text-sm font-semibold mb-2 text-white">
+        {label}*
+      </label>
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={inputClass}
+        placeholder="Start typing your address..."
+        autoComplete="street-address"
         style={{ background: inputBg, colorScheme: 'dark' }}
       />
     </div>
