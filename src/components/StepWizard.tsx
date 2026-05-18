@@ -74,17 +74,11 @@ export default function StepWizard({ onFormExpand, config }: StepWizardProps) {
   }, []);
 
   const formatPhoneNumber = (value: string): string => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length >= 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
-    } else if (cleaned.length >= 6) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-    } else if (cleaned.length >= 3) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
-    } else if (cleaned.length > 0) {
-      return `(${cleaned}`;
-    }
-    return cleaned;
+    const cleaned = value.replace(/\D/g, '').slice(0, 10);
+    if (cleaned.length === 0) return '';
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   };
 
   const validateEmail = (email: string): boolean => {
