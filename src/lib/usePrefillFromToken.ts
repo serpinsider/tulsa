@@ -41,8 +41,8 @@ import { useSearchParams } from 'next/navigation';
 
 const VA_OPS_URL =
   typeof process !== 'undefined' && typeof process.env !== 'undefined'
-    ? process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://assistant-ashy-five.vercel.app'
-    : 'https://assistant-ashy-five.vercel.app';
+    ? process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://maidcrm.com'
+    : 'https://maidcrm.com';
 
 export type PrefillCustomer = {
   firstName?: string;

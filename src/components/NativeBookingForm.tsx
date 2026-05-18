@@ -25,7 +25,7 @@ import { CONTACT_INFO } from '@/lib/contact';
 import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
 
 const VA_OPS_URL =
-  process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://assistant-ashy-five.vercel.app';
+  process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://maidcrm.com';
 
 type RuleOption = { ruleKey: string; label: string; cents: number };
 type BrandOptions = {
@@ -543,12 +543,42 @@ export default function NativeBookingForm({
         <div className="backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-xl border border-white/10 space-y-6" style={{ background: inputBg }}>
           <div>
             <h1 className="text-3xl md:text-4xl font-serif font-semibold text-white mb-4">
-              Book your cleaning with {businessName}
+              {prefill.payload?.total && prefill.status === 'ready'
+                ? `Confirm your booking with ${businessName}`
+                : `Book your cleaning with ${businessName}`}
             </h1>
             <p className="text-white/80 mb-2">
-              Tell us what you need. Pay after the service is done.
+              {prefill.payload?.total && prefill.status === 'ready'
+                ? 'Your details are already filled in. Just add your address and pick a date to confirm.'
+                : 'Tell us what you need. Pay after the service is done.'}
             </p>
           </div>
+
+          {prefill.status === 'ready' && prefill.payload?.total && (
+            <div
+              className="rounded-xl border p-4 flex items-center justify-between gap-4"
+              style={{
+                background: `${accentColor}15`,
+                borderColor: `${accentColor}50`,
+              }}
+            >
+              <div className="min-w-0">
+                <div className="text-xs uppercase tracking-wide" style={{ color: accentColor }}>
+                  Your quote from {businessName}
+                </div>
+                <div className="text-white/80 text-sm mt-0.5 truncate">
+                  {[
+                    prefill.payload.service,
+                    prefill.payload.bedrooms && `${prefill.payload.bedrooms} bed`,
+                    prefill.payload.bathrooms && `${prefill.payload.bathrooms} bath`,
+                  ].filter(Boolean).join(' \u00b7 ')}
+                </div>
+              </div>
+              <div className="text-2xl font-bold shrink-0" style={{ color: accentColor }}>
+                ${prefill.payload.total.toFixed(0)}
+              </div>
+            </div>
+          )}
           <Section title="1. Choose your service">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {opts.options.service.map((s) => (
