@@ -163,6 +163,19 @@ export default function QuoteConfirmPage(props: Props) {
     }
   }, [prefill.status, prefill.payload]);
 
+  // ---------- form state ----------
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [stateCode, setStateCode] = useState('');
+  const [zip, setZip] = useState('');
+  const [scheduledDate, setScheduledDate] = useState<string>('');
+  const [scheduledTime, setScheduledTime] = useState<string>('10:00');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
+
   // ---------- live quote recompute ----------
   const [liveQuote, setLiveQuote] = useState<QuoteResponse['quote'] | null>(null);
   const [recalculating, setRecalculating] = useState(false);
@@ -183,6 +196,11 @@ export default function QuoteConfirmPage(props: Props) {
             sqft,
             addons: Array.from(addons),
             frequency,
+            // Send schedule so the same-day surcharge ($25 within 24h)
+            // appears in the live quote total the moment the customer
+            // picks a date/time. Server is authoritative either way.
+            scheduledLocalDate: scheduledDate || undefined,
+            scheduledLocalTime: scheduledTime || undefined,
           }),
           signal: controller.signal,
         });
@@ -198,20 +216,7 @@ export default function QuoteConfirmPage(props: Props) {
       controller.abort();
       clearTimeout(t);
     };
-  }, [brandSlug, service, bedrooms, bathrooms, sqft, addons, frequency]);
-
-  // ---------- form state ----------
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [stateCode, setStateCode] = useState('');
-  const [zip, setZip] = useState('');
-  const [scheduledDate, setScheduledDate] = useState<string>('');
-  const [scheduledTime, setScheduledTime] = useState<string>('10:00');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
+  }, [brandSlug, service, bedrooms, bathrooms, sqft, addons, frequency, scheduledDate, scheduledTime]);
 
   // Hydrate name/email from prefill payload so the form doesn't re-prompt
   // for fields we already have from the lead.
