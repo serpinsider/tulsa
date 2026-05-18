@@ -8,6 +8,7 @@ import SuccessMessage from '@/components/shared/SuccessMessage';
 const FORM_BG = 'rgba(255, 255, 255, 0.05)';
 
 type AddonsType = {
+  sameDayService: boolean;
   insideFridge: boolean;
   insideOven: boolean;
   carpetCleaning: boolean;
@@ -61,6 +62,7 @@ export default function QuoteForm() {
     frequency: 'One Time',
     serviceType: '',
     addons: {
+      sameDayService: false,
       insideFridge: false,
       insideOven: false,
       carpetCleaning: false,
@@ -143,7 +145,8 @@ export default function QuoteForm() {
       frequency: type === 'moveout' ? 'One Time' : prev.frequency,
       addons: {
         ...resetAddons,
-        ...serviceTypeAddons
+        ...serviceTypeAddons,
+        sameDayService: prev.addons.sameDayService,
       }
     }));
 
@@ -227,6 +230,7 @@ export default function QuoteForm() {
         .map(([key]) => {
           // Make names more readable
           const readableNames: Record<string, string> = {
+            sameDayService: 'Same Day Service ($30 rush fee)',
             insideFridge: 'Inside Fridge',
             insideOven: 'Inside Oven',
             carpetCleaning: 'Carpet Cleaning',

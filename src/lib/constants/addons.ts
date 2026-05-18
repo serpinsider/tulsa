@@ -7,6 +7,15 @@ export interface AddOn {
 }
 
 export const ADDONS: AddOn[] = [
+  // First: same-day rush. Highest-margin one-toggle upsell when a customer
+  // is browsing. Auto-toggled on /q when scheduled within today's cutoff.
+  {
+    key: 'sameDayService',
+    label: 'Same Day Service',
+    description: 'Rush today',
+    icon: 'flash.png',
+    tooltip: 'We prioritize your job for today. Subject to cleaner availability before the same-day cutoff (around 2pm local).',
+  },
   // Top priority addons - in order requested
   { 
     key: 'insideFridge', 
