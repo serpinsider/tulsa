@@ -36,12 +36,13 @@
  *   separately as a tier upsell, not an addon pill.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
 import { CONTACT_INFO } from '@/lib/contact';
 import { ADDONS } from '@/lib/constants/addons';
+import InlineStripeCard, { type InlineStripeCardHandle } from '@/components/InlineStripeCard';
 
 interface Props {
   brandSlug: string;
@@ -152,7 +153,21 @@ export default function QuoteConfirmPage(props: Props) {
     if (p.bedrooms) setBedrooms(p.bedrooms);
     if (p.bathrooms) setBathrooms(p.bathrooms);
     if (p.sqft) setSqft(p.sqft);
-    if (Array.isArray(p.addons)) setAddons(new Set(p.addons));
+    if (Array.isArray(p.addons)) {
+      // Dedupe by canonical key (case-insensitive, strip spaces) so
+      // prefill quirks like ["insideFridge", "Inside Fridge"] don't
+      // render the same addon twice in the breakdown.
+      const seen = new Set<string>();
+      const unique: string[] = [];
+      for (const a of p.addons) {
+        if (typeof a !== 'string') continue;
+        const k = a.toLowerCase().replace(/\s+/g, '');
+        if (seen.has(k)) continue;
+        seen.add(k);
+        unique.push(a);
+      }
+      setAddons(new Set(unique));
+    }
     if (
       p.frequency === 'one-time' ||
       p.frequency === 'weekly' ||
@@ -175,6 +190,9 @@ export default function QuoteConfirmPage(props: Props) {
   const [scheduledDate, setScheduledDate] = useState<string>('');
   const [scheduledTime, setScheduledTime] = useState<string>('10:00');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
+  const [cardStatus, setCardStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [cardStatusErr, setCardStatusErr] = useState<string | null>(null);
+  const cardRef = useRef<InlineStripeCardHandle | null>(null);
 
   // ---------- live quote recompute ----------
   const [liveQuote, setLiveQuote] = useState<QuoteResponse['quote'] | null>(null);
@@ -196,9 +214,6 @@ export default function QuoteConfirmPage(props: Props) {
             sqft,
             addons: Array.from(addons),
             frequency,
-            // Send schedule so the same-day surcharge ($25 within 24h)
-            // appears in the live quote total the moment the customer
-            // picks a date/time. Server is authoritative either way.
             scheduledLocalDate: scheduledDate || undefined,
             scheduledLocalTime: scheduledTime || undefined,
           }),
@@ -229,10 +244,55 @@ export default function QuoteConfirmPage(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill.payload]);
 
+  // Auto-toggle sameDayService addon when the customer picks a date/time
+  // that falls inside the same-day cutoff window (today, before 14:00 local).
+  // We track manual de-toggle so we don't keep re-adding it after the
+  // customer explicitly removed it for the same date. Resets when they
+  // pick a different date.
+  const [sameDayManuallyRemovedFor, setSameDayManuallyRemovedFor] = useState<string | null>(null);
+  const [sameDayBanner, setSameDayBanner] = useState(false);
+  useEffect(() => {
+    if (!scheduledDate || !scheduledTime) {
+      setSameDayBanner(false);
+      return;
+    }
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayLocal = `${yyyy}-${mm}-${dd}`;
+    const isToday = scheduledDate === todayLocal;
+    const [hh] = scheduledTime.split(':');
+    const hour = Number(hh);
+    const beforeCutoff = isToday && hour >= 0 && hour < 14;
+    if (beforeCutoff) {
+      if (!addons.has('sameDayService') && sameDayManuallyRemovedFor !== scheduledDate) {
+        const next = new Set(addons);
+        next.add('sameDayService');
+        setAddons(next);
+        setSameDayBanner(true);
+        setTimeout(() => setSameDayBanner(false), 6000);
+      }
+    } else {
+      setSameDayBanner(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheduledDate, scheduledTime]);
+
   const [editingScope, setEditingScope] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  // Industry-standard: don't show field-level errors until the user
+  // actually tries to submit. Then surface them inline under each
+  // missing field and scroll to the first one. Cleared when the user
+  // starts editing again (handled per-field by checking submitAttempted).
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  // Map of fieldId -> ref so we can scroll/focus the first invalid one.
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const registerFieldRef = useCallback((id: string) => (el: HTMLElement | null) => {
+    fieldRefs.current[id] = el;
+  }, []);
 
   // ---------- page-view tracking ----------
   useEffect(() => {
@@ -383,6 +443,10 @@ export default function QuoteConfirmPage(props: Props) {
       if (next.has(key)) next.delete(key);
       else next.add(key);
       setAddons(next);
+      if (key === 'sameDayService' && !next.has(key) && scheduledDate) {
+        setSameDayManuallyRemovedFor(scheduledDate);
+        setSameDayBanner(false);
+      }
       void fetch(`${VA_OPS_URL}/api/public/quote-page-view`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -418,22 +482,42 @@ export default function QuoteConfirmPage(props: Props) {
   // ---------- submit ----------
   const effectiveFirst = (firstName || prefill.payload?.customer?.firstName || '').trim();
   const effectiveLast = (lastName || prefill.payload?.customer?.lastName || '').trim();
-  const canSubmit = !!(
-    effectiveFirst &&
-    effectiveLast &&
-    addressLine1.trim() &&
-    city.trim() &&
-    zip.trim() &&
-    scheduledDate &&
-    scheduledTime &&
-    paymentMethod &&
-    service
-  );
+  // Field-level errors: keyed by the same id the field is registered
+  // under so we can scroll to the first invalid one and render a red
+  // helper underneath. Order here determines scroll priority on submit.
+  const fieldErrors: Record<string, string> = {};
+  if (!effectiveFirst) fieldErrors.firstName = 'Required';
+  if (!effectiveLast) fieldErrors.lastName = 'Required';
+  if (!addressLine1.trim()) fieldErrors.addressLine1 = 'Enter your street address';
+  if (!city.trim()) fieldErrors.city = 'Required';
+  if (!zip.trim()) fieldErrors.zip = 'Required';
+  if (!scheduledDate) fieldErrors.scheduledDate = 'Pick a date';
+  if (!scheduledTime) fieldErrors.scheduledTime = 'Pick a time';
+  if (paymentMethod === 'card' && cardStatus !== 'ready') {
+    if (cardStatus === 'loading') fieldErrors.card = 'Card form still loading';
+    else if (cardStatus === 'error') fieldErrors.card = 'Card form had an error. Pick Zelle or refresh.';
+    else fieldErrors.card = 'Finish adding your card';
+  }
+  const firstInvalidId = Object.keys(fieldErrors)[0] || null;
 
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!canSubmit || !prefill.payload) return;
+      if (!prefill.payload) return;
+      setSubmitAttempted(true);
+      // If invalid, scroll to + focus the first bad field instead of
+      // silently doing nothing. This is the GOV.UK / Stripe / Shopify
+      // pattern.
+      if (firstInvalidId) {
+        const el = fieldRefs.current[firstInvalidId];
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (typeof (el as HTMLInputElement).focus === 'function') {
+            setTimeout(() => (el as HTMLInputElement).focus({ preventScroll: true }), 350);
+          }
+        }
+        return;
+      }
       setSubmitting(true);
       setSubmitErr(null);
       try {
@@ -444,6 +528,19 @@ export default function QuoteConfirmPage(props: Props) {
           phone: payload.customer?.phone || '',
           email: emailInput.trim() || payload.customer?.email || '',
         };
+
+        let confirmedSetupIntentId: string | null = null;
+        if (paymentMethod === 'card') {
+          if (!cardRef.current) {
+            throw new Error('Card form not ready yet. Wait a moment and try again.');
+          }
+          const result = await cardRef.current.confirm();
+          if (!result.ok || !result.setupIntentId) {
+            throw new Error(result.error || 'Card was declined. Try again or pick Zelle.');
+          }
+          confirmedSetupIntentId = result.setupIntentId;
+        }
+
         const res = await fetch(`${VA_OPS_URL}/api/public/bookings/create`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -467,6 +564,7 @@ export default function QuoteConfirmPage(props: Props) {
               zip: zip.trim(),
             },
             paymentMethodKind: paymentMethod,
+            setupIntentId: confirmedSetupIntentId || undefined,
             quotePrefillToken: token || undefined,
           }),
         });
@@ -480,17 +578,27 @@ export default function QuoteConfirmPage(props: Props) {
           throw new Error(data.error || 'Could not confirm booking');
         }
         sessionStorage.removeItem(`quote_draft_${token}`);
-        const next = `/customer?tab=bookings&booking=${data.booking.id}`;
-        window.location.href =
-          data.portalSsoUrl ||
-          `${VA_OPS_URL}/api/sso?next=${encodeURIComponent(next)}`;
+        // If the server provided a portalSsoUrl (token-bearing magic
+        // link), redirect there. If not, DO NOT fall back to a
+        // tokenless /api/sso request - that always 307s to
+        // /sign-in?error=missing_token because there's nothing to
+        // consume. Instead show a friendly inline message and let
+        // the customer use the SMS link we just texted them.
+        if (data.portalSsoUrl) {
+          window.location.href = data.portalSsoUrl;
+        } else {
+          setSubmitErr(
+            "Booking confirmed. Check your phone for a sign-in link to view it.",
+          );
+          setSubmitting(false);
+        }
       } catch (err) {
         setSubmitErr(err instanceof Error ? err.message : 'Something went wrong');
         setSubmitting(false);
       }
     },
     [
-      canSubmit,
+      firstInvalidId,
       prefill.payload,
       brandSlug,
       service,
@@ -563,10 +671,7 @@ export default function QuoteConfirmPage(props: Props) {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-5">
         {/* Greeting */}
         <div>
-          <h1
-            className="text-2xl sm:text-3xl font-semibold text-white leading-tight"
-            style={{ fontFamily: 'var(--font-playfair, serif)' }}
-          >
+          <h1 className="text-2xl sm:text-3xl font-semibold text-white leading-tight tracking-tight">
             {customerFirst ? `Hi ${customerFirst}, ` : ''}your quote is ready.
           </h1>
           <p className="text-white/70 text-sm sm:text-base mt-2 leading-relaxed">
@@ -575,19 +680,19 @@ export default function QuoteConfirmPage(props: Props) {
           </p>
         </div>
 
-        {/* Trust strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <TrustPill icon="shield" label="Insured" accentColor={accentColor} />
-          <TrustPill icon="cash" label="Pay after the clean" accentColor={accentColor} />
-          <TrustPill icon="card" label="Card or Zelle" accentColor={accentColor} />
-          <TrustPill icon="smile" label="Satisfaction guaranteed" accentColor={accentColor} />
+        {/* Trust strip - one liner. Pills shrink/wrap on tiny screens. */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-white/70">
+          <TrustChip icon="shield" label="Insured" accentColor={accentColor} />
+          <TrustChip icon="cash" label="Pay after" accentColor={accentColor} />
+          <TrustChip icon="card" label="Card or Zelle" accentColor={accentColor} />
+          <TrustChip icon="smile" label="Satisfaction guaranteed" accentColor={accentColor} />
         </div>
 
         {/* Quote card */}
         <section
           className="rounded-2xl border overflow-hidden"
           style={{
-            background: 'rgba(18, 45, 72, 0.65)',
+            background: 'rgba(0, 0, 0, 0.30)',
             borderColor: `${accentColor}40`,
             boxShadow: '0 10px 40px rgba(0,0,0,0.30)',
           }}
@@ -601,10 +706,7 @@ export default function QuoteConfirmPage(props: Props) {
                 >
                   Your quote
                 </div>
-                <div
-                  className="text-white text-xl sm:text-2xl leading-tight"
-                  style={{ fontFamily: 'var(--font-playfair, serif)' }}
-                >
+                <div className="text-white text-lg sm:text-xl font-semibold leading-snug tracking-tight">
                   {scopeText({ service, bedrooms, bathrooms, opts }) || 'Cleaning service'}
                 </div>
                 {frequency !== 'one-time' && (
@@ -795,45 +897,29 @@ export default function QuoteConfirmPage(props: Props) {
           </button>
         )}
 
-        {/* Recurring nudge (only one-time + only if recurring options exist) */}
-        {frequency === 'one-time' && (
-          <div
-            className="rounded-xl border p-3 flex items-center justify-between gap-3"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              borderColor: 'rgba(255,255,255,0.10)',
-            }}
-          >
-            <div className="text-[13px] text-white/75 leading-snug">
-              Save with recurring: <span style={{ color: accentColor }} className="font-semibold">10% weekly</span>, 5% bi-weekly, or $25 off monthly.
-            </div>
-            <button
-              type="button"
-              onClick={() => setFrequency('weekly')}
-              className="shrink-0 text-[12px] font-medium px-3 py-1.5 rounded-md transition-colors"
-              style={{ color: accentColor, border: `1px solid ${accentColor}55` }}
-            >
-              Switch
-            </button>
-          </div>
-        )}
+        {/* Frequency selector. Always visible so the customer can flip
+            back to one-time after switching, and can see the discount
+            attached to each option without opening the full scope editor. */}
+        <FrequencyStrip
+          frequency={frequency}
+          setFrequency={setFrequency}
+          accentColor={accentColor}
+          btnTextColor={btnTextColor}
+        />
 
         {/* Confirm form */}
         <form
           onSubmit={onSubmit}
           className="rounded-2xl border p-5 sm:p-6 space-y-5"
           style={{
-            background: 'rgba(18, 45, 72, 0.65)',
+            background: 'rgba(0, 0, 0, 0.30)',
             borderColor: 'rgba(255,255,255,0.10)',
             boxShadow: '0 10px 40px rgba(0,0,0,0.30)',
           }}
         >
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2
-                className="text-white text-lg sm:text-xl font-semibold"
-                style={{ fontFamily: 'var(--font-playfair, serif)' }}
-              >
+              <h2 className="text-white text-lg sm:text-xl font-semibold tracking-tight">
                 Confirm your booking
               </h2>
               <p className="text-white/55 text-xs mt-1">
@@ -851,18 +937,22 @@ export default function QuoteConfirmPage(props: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {!prefill.payload?.customer?.firstName && (
                   <Input
+                    ref={registerFieldRef('firstName')}
                     value={firstName}
                     onChange={setFirstName}
                     placeholder="First name"
                     accentColor={accentColor}
+                    error={submitAttempted ? fieldErrors.firstName : null}
                   />
                 )}
                 {!prefill.payload?.customer?.lastName && (
                   <Input
+                    ref={registerFieldRef('lastName')}
                     value={lastName}
                     onChange={setLastName}
                     placeholder="Last name"
                     accentColor={accentColor}
+                    error={submitAttempted ? fieldErrors.lastName : null}
                   />
                 )}
               </div>
@@ -882,6 +972,7 @@ export default function QuoteConfirmPage(props: Props) {
 
           <FieldGroup label="Service address">
             <AddressAutocomplete
+              ref={registerFieldRef('addressLine1')}
               value={addressLine1}
               onSelect={({ line1, city: c, state: s, zip: z }) => {
                 setAddressLine1(line1);
@@ -892,9 +983,17 @@ export default function QuoteConfirmPage(props: Props) {
               onTextChange={setAddressLine1}
               placeholder="Street address"
               accentColor={accentColor}
+              error={submitAttempted ? fieldErrors.addressLine1 : null}
             />
             <div className="grid grid-cols-3 gap-2 mt-2">
-              <Input value={city} onChange={setCity} placeholder="City" accentColor={accentColor} />
+              <Input
+                ref={registerFieldRef('city')}
+                value={city}
+                onChange={setCity}
+                placeholder="City"
+                accentColor={accentColor}
+                error={submitAttempted ? fieldErrors.city : null}
+              />
               <Input
                 value={stateCode}
                 onChange={(v) => setStateCode(v.toUpperCase().slice(0, 2))}
@@ -902,11 +1001,13 @@ export default function QuoteConfirmPage(props: Props) {
                 accentColor={accentColor}
               />
               <Input
+                ref={registerFieldRef('zip')}
                 value={zip}
                 onChange={(v) => setZip(v.replace(/\D/g, '').slice(0, 5))}
                 placeholder="ZIP"
                 accentColor={accentColor}
                 inputMode="numeric"
+                error={submitAttempted ? fieldErrors.zip : null}
               />
             </div>
             <Input
@@ -921,23 +1022,48 @@ export default function QuoteConfirmPage(props: Props) {
           <FieldGroup label="Date and time">
             <div className="grid grid-cols-2 gap-2">
               <Input
+                ref={registerFieldRef('scheduledDate')}
                 type="date"
                 value={scheduledDate}
                 onChange={setScheduledDate}
                 accentColor={accentColor}
                 min={dateMin}
                 max={dateMax}
+                error={submitAttempted ? fieldErrors.scheduledDate : null}
               />
               <Input
+                ref={registerFieldRef('scheduledTime')}
                 type="time"
                 value={scheduledTime}
                 onChange={setScheduledTime}
                 accentColor={accentColor}
+                error={submitAttempted ? fieldErrors.scheduledTime : null}
               />
             </div>
             <p className="text-white/45 text-[11px] mt-1.5">
               We&apos;ll confirm the exact arrival window after assigning a cleaner.
             </p>
+            {sameDayBanner && (
+              <div
+                className="mt-2 flex items-start gap-2 rounded-lg border px-3 py-2 text-[12px]"
+                style={{
+                  background: `${accentColor}14`,
+                  borderColor: `${accentColor}55`,
+                  color: 'white',
+                }}
+              >
+                <span
+                  className="mt-[2px] inline-flex w-4 h-4 items-center justify-center rounded-full text-[10px] font-bold"
+                  style={{ background: accentColor, color: btnTextColor }}
+                  aria-hidden="true"
+                >
+                  !
+                </span>
+                <span className="text-white/85">
+                  We added Same Day Service ($30) since you picked today. Subject to cleaner availability before 2pm.
+                </span>
+              </div>
+            )}
           </FieldGroup>
 
           <FieldGroup label="Payment method">
@@ -947,8 +1073,8 @@ export default function QuoteConfirmPage(props: Props) {
                 onClick={() => setPaymentMethod('card')}
                 accentColor={accentColor}
                 btnTextColor={btnTextColor}
-                title="Card on file"
-                sub="We text a secure link to add it. Charged after the clean."
+                title="Card"
+                sub="Charged after the clean."
               />
               <RadioCard
                 selected={paymentMethod === 'zelle'}
@@ -956,9 +1082,40 @@ export default function QuoteConfirmPage(props: Props) {
                 accentColor={accentColor}
                 btnTextColor={btnTextColor}
                 title="Zelle"
-                sub="We text the handle and reference after the clean."
+                sub="Instructions sent after booking."
               />
             </div>
+            {paymentMethod === 'card' && token && (
+              <div className="mt-3" ref={registerFieldRef('card')}>
+                <InlineStripeCard
+                  ref={cardRef}
+                  token={token}
+                  vaOpsUrl={VA_OPS_URL}
+                  accentColor={accentColor}
+                  customer={{
+                    email: emailInput || prefill.payload?.customer?.email,
+                    firstName: firstName || prefill.payload?.customer?.firstName,
+                    lastName: lastName || prefill.payload?.customer?.lastName,
+                    phone: prefill.payload?.customer?.phone,
+                  }}
+                  onStatusChange={(s, err) => {
+                    setCardStatus(s);
+                    setCardStatusErr(err || null);
+                  }}
+                />
+                {cardStatus === 'error' && cardStatusErr && (
+                  <p className="text-[11px] text-red-300 mt-1.5">{cardStatusErr}</p>
+                )}
+                {submitAttempted && fieldErrors.card && cardStatus !== 'error' && (
+                  <p className="text-[11px] text-red-300 mt-1.5">{fieldErrors.card}</p>
+                )}
+              </div>
+            )}
+            {paymentMethod === 'zelle' && (
+              <p className="text-[12px] text-white/55 mt-2">
+                You&apos;ll see Zelle instructions in your account and confirmation email after booking.
+              </p>
+            )}
           </FieldGroup>
 
           {submitErr && (
@@ -969,12 +1126,12 @@ export default function QuoteConfirmPage(props: Props) {
 
           <button
             type="submit"
-            disabled={!canSubmit || submitting}
-            className="w-full px-6 py-3.5 rounded-lg text-base font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            disabled={submitting}
+            className="w-full px-6 py-3.5 rounded-lg text-base font-semibold disabled:opacity-60 disabled:cursor-wait transition-all"
             style={{
               background: accentColor,
               color: btnTextColor,
-              boxShadow: canSubmit && !submitting ? `0 8px 24px ${accentColor}40` : 'none',
+              boxShadow: !submitting ? `0 8px 24px ${accentColor}40` : 'none',
             }}
           >
             {submitting ? 'Confirming...' : `Confirm booking · $${total.toFixed(0)}`}
@@ -1052,7 +1209,6 @@ export default function QuoteConfirmPage(props: Props) {
 
       {/* Mobile sticky CTA */}
       <MobileStickyCta
-        canSubmit={canSubmit}
         total={total}
         submitting={submitting}
         accentColor={accentColor}
@@ -1071,7 +1227,72 @@ export default function QuoteConfirmPage(props: Props) {
 
 // ===================== sub-components =====================
 
-function TrustPill({
+function FrequencyStrip({
+  frequency,
+  setFrequency,
+  accentColor,
+  btnTextColor,
+}: {
+  frequency: Frequency;
+  setFrequency: (f: Frequency) => void;
+  accentColor: string;
+  btnTextColor: string;
+}) {
+  const options: Array<{ id: Frequency; label: string; tag?: string }> = [
+    { id: 'one-time', label: 'One-time' },
+    { id: 'weekly', label: 'Weekly', tag: '-10%' },
+    { id: 'bi-weekly', label: 'Bi-weekly', tag: '-5%' },
+    { id: 'monthly', label: 'Monthly', tag: '-$25' },
+  ];
+  return (
+    <div className="space-y-1.5">
+      <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 font-semibold pl-0.5">
+        Frequency
+      </div>
+      <div className="grid grid-cols-4 gap-1.5">
+        {options.map((o) => {
+          const active = frequency === o.id;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => setFrequency(o.id)}
+              className="rounded-lg border px-2 py-2 text-[12px] font-medium leading-tight transition-colors"
+              style={
+                active
+                  ? {
+                      background: accentColor,
+                      borderColor: accentColor,
+                      color: btnTextColor,
+                    }
+                  : {
+                      background: 'rgba(255,255,255,0.03)',
+                      borderColor: 'rgba(255,255,255,0.12)',
+                      color: 'rgba(255,255,255,0.78)',
+                    }
+              }
+            >
+              <div>{o.label}</div>
+              {o.tag && (
+                <div
+                  className="text-[10px] mt-0.5 font-semibold"
+                  style={{
+                    color: active ? btnTextColor : accentColor,
+                    opacity: active ? 0.85 : 1,
+                  }}
+                >
+                  {o.tag}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TrustChip({
   icon,
   label,
   accentColor,
@@ -1081,18 +1302,12 @@ function TrustPill({
   accentColor: string;
 }) {
   return (
-    <div
-      className="flex items-center gap-2 px-3 py-2 rounded-lg border"
-      style={{
-        background: 'rgba(255,255,255,0.025)',
-        borderColor: 'rgba(255,255,255,0.10)',
-      }}
-    >
-      <div className="shrink-0" style={{ color: accentColor }}>
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <span className="shrink-0" style={{ color: accentColor }}>
         <TrustIcon name={icon} />
-      </div>
-      <div className="text-[12px] sm:text-[13px] text-white/85 leading-tight">{label}</div>
-    </div>
+      </span>
+      <span>{label}</span>
+    </span>
   );
 }
 
@@ -1175,15 +1390,9 @@ function DisclaimerBlock({
       }}
     >
       <p>
-        <span className="font-semibold text-white/75">Re-clean promise:</span> if
-        you&apos;re not happy with any area we cleaned, text us within 48 hours
-        and we&apos;ll come back and re-clean it at no charge.
-      </p>
-      <p>
-        {businessName} is insured. Our cleaners are trained for residential
-        cleaning. Confirming this booking does not charge your payment method;
-        you&apos;re only billed after the clean is complete. You can reschedule
-        or cancel free up to 24 hours before your appointment by texting us.
+        Satisfaction guaranteed. Insured. Confirming doesn&apos;t charge you,
+        billed after the clean. Free reschedule or cancel up to 24h ahead by
+        text.
       </p>
       <p className="flex flex-wrap gap-x-3 gap-y-1">
         <a href="/terms" className="hover:text-white" style={{ color: accentColor }}>
@@ -1221,14 +1430,12 @@ function SavedPill({ visible, accentColor }: { visible: boolean; accentColor: st
 }
 
 function MobileStickyCta({
-  canSubmit,
   total,
   submitting,
   accentColor,
   btnTextColor,
   onClick,
 }: {
-  canSubmit: boolean;
   total: number;
   submitting: boolean;
   accentColor: string;
@@ -1246,8 +1453,8 @@ function MobileStickyCta({
       <button
         type="button"
         onClick={onClick}
-        disabled={!canSubmit || submitting}
-        className="w-full px-6 py-3 rounded-lg text-base font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled={submitting}
+        className="w-full px-6 py-3 rounded-lg text-base font-semibold disabled:opacity-60 disabled:cursor-wait"
         style={{
           background: accentColor,
           color: btnTextColor,
@@ -1510,17 +1717,7 @@ function FieldGroup({ label, children }: { label: string; children: React.ReactN
   );
 }
 
-function Input({
-  value,
-  onChange,
-  placeholder,
-  type = 'text',
-  inputMode,
-  accentColor,
-  className,
-  min,
-  max,
-}: {
+const Input = forwardRef<HTMLInputElement, {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
@@ -1530,33 +1727,60 @@ function Input({
   className?: string;
   min?: string;
   max?: string;
-}) {
+  error?: string | null;
+}>(function Input(
+  { value, onChange, placeholder, type = 'text', inputMode, accentColor, className, min, max, error },
+  ref,
+) {
   // Force dark color-scheme for date/time so the native calendar/clock icon
   // renders light on dark instead of nearly-invisible black-on-dark.
   const needsDarkScheme = type === 'date' || type === 'time' || type === 'datetime-local';
+  const baseBorder = error ? 'rgba(252,165,165,0.55)' : 'rgba(255,255,255,0.15)';
   return (
-    <input
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      type={type}
-      inputMode={inputMode}
-      min={min}
-      max={max}
-      className={classNames(
-        'w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors',
-        className,
+    <div className={className}>
+      <input
+        ref={ref}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        type={type}
+        inputMode={inputMode}
+        min={min}
+        max={max}
+        aria-invalid={!!error}
+        className="w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors"
+        style={{
+          borderColor: baseBorder,
+          ...(needsDarkScheme ? { colorScheme: 'dark' as const } : {}),
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = accentColor;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = baseBorder;
+        }}
+        onClick={(e) => {
+          // Native date/time inputs only open the picker when you click
+          // the tiny calendar/clock icon by default. showPicker() makes
+          // the whole field clickable, which is the modern expectation.
+          // Safari < 16.4 and Firefox < 101 don't support showPicker;
+          // they'll just fall back to default behavior, no crash.
+          if (needsDarkScheme && typeof (e.currentTarget as HTMLInputElement).showPicker === 'function') {
+            try {
+              (e.currentTarget as HTMLInputElement).showPicker();
+            } catch {
+              // Some browsers throw if called from a non-user-trigger;
+              // safe to ignore, the native picker still works via icon.
+            }
+          }
+        }}
+      />
+      {error && (
+        <div className="text-[11px] text-red-300 mt-1 pl-0.5">{error}</div>
       )}
-      style={needsDarkScheme ? { colorScheme: 'dark' } : undefined}
-      onFocus={(e) => {
-        e.currentTarget.style.borderColor = accentColor;
-      }}
-      onBlur={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-      }}
-    />
+    </div>
   );
-}
+});
 
 function RadioCard({
   selected,
@@ -1621,10 +1845,7 @@ function SimpleMessage({
       style={{ background: 'linear-gradient(180deg, #0b1626 0%, #0a121e 100%)' }}
     >
       <div className="max-w-md w-full text-center">
-        <h1
-          className="text-2xl font-semibold text-white mb-3"
-          style={{ fontFamily: 'var(--font-playfair, serif)' }}
-        >
+        <h1 className="text-2xl font-semibold text-white mb-3 tracking-tight">
           {title}
         </h1>
         <p className="text-white/70 leading-relaxed">{body}</p>
@@ -1732,20 +1953,38 @@ interface ParsedAddress {
   zip: string;
 }
 
-function AddressAutocomplete({
-  value,
-  onSelect,
-  onTextChange,
-  placeholder,
-  accentColor,
-}: {
+const AddressAutocomplete = forwardRef<HTMLInputElement, {
   value: string;
   onSelect: (addr: ParsedAddress) => void;
   onTextChange: (v: string) => void;
   placeholder?: string;
   accentColor: string;
-}) {
+  error?: string | null;
+}>(function AddressAutocomplete(
+  { value, onSelect, onTextChange, placeholder, accentColor, error },
+  forwardedRef,
+) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  // Bridge our internal ref with whatever the parent forwarded (callback
+  // or object ref). We keep the internal ref so Google Autocomplete can
+  // still bind to the same element.
+  useEffect(() => {
+    if (!forwardedRef) return;
+    if (typeof forwardedRef === 'function') forwardedRef(inputRef.current);
+    else (forwardedRef as React.MutableRefObject<HTMLInputElement | null>).current = inputRef.current;
+  }, [forwardedRef]);
+  // Hold the latest onSelect in a ref so the autocomplete-attach effect
+  // only runs ONCE on mount (don't put onSelect in deps; parent passes
+  // a new closure on every render which would re-attach the listener
+  // on every keystroke and freeze typing).
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+  const valueRef = useRef(value);
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     let ac: {
@@ -1792,30 +2031,38 @@ function AddressAutocomplete({
         const stateShort = get('administrative_area_level_1')?.short_name || '';
         const zip = get('postal_code')?.long_name || '';
         const line1 = [num, route].filter(Boolean).join(' ').trim();
-        onSelect({
-          line1: line1 || (place?.address_components?.[0]?.long_name ?? value),
+        onSelectRef.current({
+          line1: line1 || (place?.address_components?.[0]?.long_name ?? valueRef.current),
           city,
           state: stateShort,
           zip,
         });
       });
     });
-  }, [onSelect, value]);
+    // Mount-only. Re-attaching on every keystroke was the freeze.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  const baseBorder = error ? 'rgba(252,165,165,0.55)' : 'rgba(255,255,255,0.15)';
   return (
-    <input
-      ref={inputRef}
-      value={value}
-      onChange={(e) => onTextChange(e.target.value)}
-      placeholder={placeholder}
-      autoComplete="off"
-      className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors"
-      onFocus={(e) => {
-        e.currentTarget.style.borderColor = accentColor;
-      }}
-      onBlur={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-      }}
-    />
+    <div>
+      <input
+        ref={inputRef}
+        value={value}
+        onChange={(e) => onTextChange(e.target.value)}
+        placeholder={placeholder}
+        autoComplete="off"
+        aria-invalid={!!error}
+        className="w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors"
+        style={{ borderColor: baseBorder }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = accentColor;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = baseBorder;
+        }}
+      />
+      {error && <div className="text-[11px] text-red-300 mt-1 pl-0.5">{error}</div>}
+    </div>
   );
-}
+});
