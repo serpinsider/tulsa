@@ -548,8 +548,8 @@ export default function QuoteForm() {
                   {[
                     { id: 'One Time', name: 'One Time', popular: false },
                     { id: 'Weekly', name: 'Weekly', popular: false },
-                    { id: 'Monthly', name: 'Monthly', popular: true },
-                    { id: 'Quarterly', name: 'Quarterly', popular: false }
+                    { id: 'Bi-Weekly', name: 'Bi-Weekly', popular: true },
+                    { id: 'Monthly', name: 'Monthly', popular: false }
                   ].map(({ id, name, popular }) => (
                     <button
                       key={id}
