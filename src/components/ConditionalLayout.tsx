@@ -13,13 +13,10 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
 
-  // Define paths that should have NO layout (auth pages + standalone
-  // quote-confirm page, which renders its own brand chrome).
+  // Define paths that should have NO layout (auth pages only).
   const isAppRoute = pathname && (
     pathname.startsWith('/login') ||
-    pathname.startsWith('/signup') ||
-    pathname === '/q' ||
-    pathname.startsWith('/q/')
+    pathname.startsWith('/signup')
   );
 
   // Define paths that should have SIMPLE header (booking/quote pages).
@@ -28,9 +25,30 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
     pathname.startsWith('/quote')
   );
 
+  // `/q` is the standalone quote-confirm page: simple header, NO Footer,
+  // logo NOT linked. Disclaimer copy lives inside the page.
+  const isStandaloneConfirmPage = pathname === '/q' || pathname?.startsWith('/q/');
+
   // For app routes (dashboards), render without any chrome
   if (isAppRoute) {
     return <>{children}</>;
+  }
+
+  // /q: simple header (logo not linked, always-solid), no announcement bar, no footer
+  if (isStandaloneConfirmPage) {
+    return (
+      <>
+        <HeaderSimple
+          linkLogo={false}
+          hideBookButton
+          hasAnnouncementAbove={false}
+          forceSolid
+        />
+        {/* Spacer for fixed header height (h-20 desktop, h-16 mobile) */}
+        <div className="h-16 lg:h-20" aria-hidden="true" />
+        {children}
+      </>
+    );
   }
 
   // For booking/quote pages, render with simple header and footer

@@ -33,13 +33,13 @@
   --tertiary-button-border: #dfbd69;
   --tertiary-button-hover-bg: rgba(223, 189, 105, 0.1);
   
-  --quaternary-button-bg: linear-gradient(135deg, #dfbd69 0%, #b8956d 100%);
+  --quaternary-button-bg: linear-gradient(135deg, #dfbd69 0%, #c9a84c 100%);
   --quaternary-button-text: #194169;
-  --quaternary-button-hover-bg: linear-gradient(135deg, #dfbd69 0%, #b8956d 100%);
+  --quaternary-button-hover-bg: linear-gradient(135deg, #dfbd69 0%, #c9a84c 100%);
 
   /* Accent colors */
   --brand-gold: #dfbd69;
-  --brand-gold-dark: #b8956d;
+  --brand-gold-dark: #c9a84c;
   --brand-white: #FFFFFF;
   --brand-ocean: #1a3755;
   --brand-coastal: #5b9aa8;
@@ -148,12 +148,12 @@ body {
 }
 
 .button-quaternary {
-  background: linear-gradient(135deg, #d4a574 0%, #b8956d 100%);
+  background: linear-gradient(135deg, #dfbd69 0%, #c9a84c 100%);
   color: var(--quaternary-button-text);
   border: 2px solid transparent;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
   border-radius: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -161,11 +161,13 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  box-shadow: 0 4px 12px rgba(223, 189, 105, 0.25);
 }
 
 .button-quaternary:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(223, 189, 105, 0.35);
 }
 
 /* Form expansion animations */
@@ -208,7 +210,7 @@ body {
   font-size: 1.5rem;
   line-height: 1.2;
   font-weight: 600;
-  background: linear-gradient(135deg, #d4a574 0%, #b8956d 100%);
+  background: linear-gradient(135deg, #d4a574 0%, #c9a84c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

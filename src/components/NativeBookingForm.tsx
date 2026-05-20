@@ -679,7 +679,7 @@ export default function NativeBookingForm({
                           } rounded-lg p-3 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                         >
                           <div className="flex flex-col gap-2">
-                            <div className="w-8 h-8 mx-auto">
+                            <div className="w-10 h-10 mx-auto rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-1">
                               <Image
                                 src={`/icons/addons/${a.icon}`}
                                 alt={a.label}

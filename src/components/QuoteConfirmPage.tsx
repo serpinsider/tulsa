@@ -1238,11 +1238,16 @@ function FrequencyStrip({
   accentColor: string;
   btnTextColor: string;
 }) {
+  // Canonical discounts from sites/va-ops/src/lib/quote.ts FREQ_DISCOUNTS:
+  //   weekly = $25 flat off
+  //   bi-weekly = 10%
+  //   monthly = 5%
+  // Tags here are display only; the server is authoritative on price.
   const options: Array<{ id: Frequency; label: string; tag?: string }> = [
     { id: 'one-time', label: 'One-time' },
-    { id: 'weekly', label: 'Weekly', tag: '-10%' },
-    { id: 'bi-weekly', label: 'Bi-weekly', tag: '-5%' },
-    { id: 'monthly', label: 'Monthly', tag: '-$25' },
+    { id: 'weekly', label: 'Weekly', tag: '-$25' },
+    { id: 'bi-weekly', label: 'Bi-weekly', tag: '-10%' },
+    { id: 'monthly', label: 'Monthly', tag: '-5%' },
   ];
   return (
     <div className="space-y-1.5">
