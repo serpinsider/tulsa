@@ -78,6 +78,9 @@ interface QuoteResponse {
     lineItems: QuoteLineItem[];
     subtotal: number;
     discount?: { label: string; amount: number } | null;
+    // Sales tax for taxable states. 0 for tax-exempt brands.
+    salesTax?: number;
+    salesTaxRate?: number;
     total: number;
   };
   error?: string;
@@ -382,6 +385,8 @@ export default function QuoteConfirmPage(props: Props) {
   const total = liveQuote?.total ?? prefill.payload?.total ?? 0;
   const subtotal = liveQuote?.subtotal ?? total;
   const discount = liveQuote?.discount ?? null;
+  const salesTax = liveQuote?.salesTax ?? 0;
+  const salesTaxRate = liveQuote?.salesTaxRate ?? 0;
 
   // Reserved: full line-item breakdown is intentionally hidden from the
   // customer view to keep the summary simple. The quote endpoint still
@@ -769,13 +774,24 @@ export default function QuoteConfirmPage(props: Props) {
               </div>
             )}
 
-            {/* Discount + subtotal row (only when there is a discount worth showing) */}
-            {(discount || (subtotal !== total)) && (
+            {/* Discount + sales tax + subtotal row (only when meaningful) */}
+            {(discount || salesTax > 0 || (subtotal !== total)) && (
               <div className="border-t border-white/10 pt-3 mt-4 space-y-1.5 text-[13px]">
                 {discount && (
                   <div className="flex justify-between" style={{ color: accentColor }}>
                     <span>{discount.label}</span>
                     <span className="tabular-nums">-${discount.amount.toFixed(2)}</span>
+                  </div>
+                )}
+                {salesTax > 0 && (
+                  <div className="flex justify-between text-white/55">
+                    <span>
+                      Sales tax
+                      {salesTaxRate
+                        ? ` (${(salesTaxRate * 100).toFixed((salesTaxRate * 100) % 1 === 0 ? 0 : 2)}%)`
+                        : ''}
+                    </span>
+                    <span className="tabular-nums">${salesTax.toFixed(2)}</span>
                   </div>
                 )}
                 {subtotal !== total && (

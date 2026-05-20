@@ -41,6 +41,8 @@ type QuoteSegment = {
   lineItems: Array<{ category: string; ruleKey: string; label: string; amount: number }>;
   subtotal: number;
   discount: { label: string; amount: number } | null;
+  salesTax?: number;
+  salesTaxRate?: number;
   total: number;
   formattedTotal: string;
 };
@@ -51,6 +53,10 @@ type QuoteResponse = {
     lineItems: Array<{ category: string; ruleKey: string; label: string; amount: number }>;
     subtotal: number;
     discount: { label: string; amount: number } | null;
+    // Sales tax for taxable states (SC, TN, OK). 0 for tax-exempt brands.
+    // Rate is the decimal (0.07 = 7%) so the UI can render "Sales tax (7%)".
+    salesTax?: number;
+    salesTaxRate?: number;
     total: number;
     includedFreeWithService: { service: string; addons: string[] } | null;
     splitQuote: {
@@ -373,6 +379,14 @@ export default function NativeBookingForm({
   if (city.trim().length <= 1) missingFields.push('city');
   if (usState.trim().length < 2) missingFields.push('state');
   if (!/^\d{5}$/.test(zip.trim())) missingFields.push('ZIP');
+  // Card-on-file is the default payment method. Stripe's SetupIntent
+  // needs an email to attach the PaymentMethod to a customer, so when
+  // they're paying by card and the email field is empty, treat email
+  // as missing here so the unified hint can call it out instead of a
+  // separate inline message in the payment section.
+  if (paymentMethod === 'card' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!missingFields.includes('email')) missingFields.push('email');
+  }
 
   const formValid = missingFields.length === 0;
 
@@ -910,28 +924,31 @@ export default function NativeBookingForm({
                       setCardStatusErr(err || null);
                     }}
                   />
-                ) : (
-                  <div className="text-xs text-white/60 bg-white/5 border border-white/15 rounded-lg p-3">
-                    Enter your email in section 6 above to add a card on file. No charge today.
-                  </div>
-                )}
+                ) : null}
                 {cardStatus === 'error' && cardStatusErr && (
                   <p className="text-[11px] text-red-300 mt-1.5">{cardStatusErr}</p>
                 )}
               </div>
             )}
-            <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
-              {paymentMethod === 'card' ? (
-                <>
-                  <strong>No charge today.</strong> Your card is verified and held on file. We only charge after the cleaner finishes the job.
-                </>
-              ) : (
-                <>
-                  <strong>Pay by Zelle.</strong> After service, we&apos;ll text you the Zelle
-                  details with a unique reference number to include in the memo.
-                </>
-              )}
-            </div>
+            {/* Reassurance / receipt-style note. Hidden when the user is
+                paying by card but hasn't entered an email yet — in that
+                state the unified "missing fields" hint above the Book
+                button calls out exactly what's left, so we don't need a
+                second message saying the same thing. */}
+            {(paymentMethod !== 'card' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && (
+              <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+                {paymentMethod === 'card' ? (
+                  <>
+                    <strong>No charge today.</strong> Your card is verified and held on file. We only charge after the cleaner finishes the job.
+                  </>
+                ) : (
+                  <>
+                    <strong>Pay by Zelle.</strong> After service, we&apos;ll text you the Zelle
+                    details with a unique reference number to include in the memo.
+                  </>
+                )}
+              </div>
+            )}
           </Section>
 
           {/* Bottom-of-form Book button — customers on mobile or anyone who
@@ -1104,6 +1121,15 @@ export default function NativeBookingForm({
                     <span>-${quote.discount.amount.toFixed(2)}</span>
                   </div>
                 )}
+                {quote.salesTax && quote.salesTax > 0 ? (
+                  <div className="flex justify-between text-white/80">
+                    <span>
+                      Sales tax
+                      {quote.salesTaxRate ? ` (${(quote.salesTaxRate * 100).toFixed(quote.salesTaxRate * 100 % 1 === 0 ? 0 : 2)}%)` : ''}
+                    </span>
+                    <span>${quote.salesTax.toFixed(2)}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between text-lg font-bold pt-2">
                   <span className="text-white">
                     {quote.splitQuote ? 'First clean' : 'Total'}
@@ -1133,20 +1159,10 @@ export default function NativeBookingForm({
               </div>
             )}
 
-            {missingHint && (
-              <div
-                className="text-[12px] rounded-lg px-3 py-2 border"
-                style={{
-                  color: accentColor,
-                  borderColor: `${accentColor}40`,
-                  background: `${accentColor}14`,
-                }}
-                role="status"
-                aria-live="polite"
-              >
-                {missingHint}
-              </div>
-            )}
+            {/* No missingHint here — single source of truth lives in the
+                bottom-of-form block. Two stacked hints (sidebar + bottom)
+                read as redundant and noisy when the user has many fields
+                left to fill. */}
             <button
               type="button"
               onClick={submit}
