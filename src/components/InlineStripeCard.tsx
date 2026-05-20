@@ -33,7 +33,10 @@ export interface InlineStripeCardHandle {
 }
 
 interface Props {
-  token: string;
+  // Either token (from /q?t=) or brandSlug (from bare /booking) is required.
+  // Both is fine too; the API prefers the token when present.
+  token?: string;
+  brandSlug?: string;
   vaOpsUrl: string;
   customer: {
     email?: string;
@@ -46,7 +49,7 @@ interface Props {
 }
 
 const InlineStripeCard = forwardRef<InlineStripeCardHandle, Props>(function InlineStripeCard(
-  { token, vaOpsUrl, customer, accentColor, onStatusChange },
+  { token, brandSlug, vaOpsUrl, customer, accentColor, onStatusChange },
   ref,
 ) {
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
@@ -60,6 +63,11 @@ const InlineStripeCard = forwardRef<InlineStripeCardHandle, Props>(function Inli
 
   useEffect(() => {
     if (ranRef.current) return;
+    // Wait until we have something to identify the customer by. On bare
+    // /booking the email field is the source of truth (no token), so we
+    // defer the SetupIntent until the user has typed an email + first
+    // name. On /q a token is present immediately so we mount right away.
+    if (!token && (!brandSlug || !customer.email)) return;
     ranRef.current = true;
     onStatusChange?.('loading');
     (async () => {
@@ -69,6 +77,7 @@ const InlineStripeCard = forwardRef<InlineStripeCardHandle, Props>(function Inli
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             token,
+            brandSlug,
             email: customer.email,
             firstName: customer.firstName,
             lastName: customer.lastName,
@@ -96,7 +105,7 @@ const InlineStripeCard = forwardRef<InlineStripeCardHandle, Props>(function Inli
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token, brandSlug, customer.email]);
 
   useImperativeHandle(
     ref,

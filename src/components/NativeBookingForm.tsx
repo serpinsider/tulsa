@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { ADDONS } from '@/lib/constants/addons';
 import { CONTACT_INFO } from '@/lib/contact';
 import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
+import InlineStripeCard, { type InlineStripeCardHandle } from '@/components/InlineStripeCard';
 
 const VA_OPS_URL =
   process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://maidcrm.com';
@@ -34,6 +35,16 @@ type BrandOptions = {
   inclusions: Record<string, string[]>;
 };
 
+type QuoteSegment = {
+  service: string;
+  frequency: string;
+  lineItems: Array<{ category: string; ruleKey: string; label: string; amount: number }>;
+  subtotal: number;
+  discount: { label: string; amount: number } | null;
+  total: number;
+  formattedTotal: string;
+};
+
 type QuoteResponse = {
   ok: boolean;
   quote: {
@@ -42,25 +53,32 @@ type QuoteResponse = {
     discount: { label: string; amount: number } | null;
     total: number;
     includedFreeWithService: { service: string; addons: string[] } | null;
+    splitQuote: {
+      initial: QuoteSegment;
+      recurring: QuoteSegment;
+      explanation: string;
+    } | null;
   };
   error?: string;
 };
 
 type Frequency = 'one-time' | 'weekly' | 'bi-weekly' | 'monthly';
 
-const FREQUENCIES: Array<{ id: Frequency; label: string; badge?: string; popular?: boolean }> = [
+// Canonical recurring-discount values (set in quote.ts FREQ_DISCOUNTS).
+// Weekly = -$25 flat, Bi-weekly = -10%, Monthly = -5%.
+const FREQUENCIES: Array<{ id: Frequency; label: string; badge?: string }> = [
   { id: 'one-time', label: 'One Time' },
-  { id: 'weekly', label: 'Weekly', badge: '10% OFF' },
-  { id: 'bi-weekly', label: 'Bi-Weekly', badge: '5% OFF' },
-  { id: 'monthly', label: 'Monthly', badge: '$25 OFF', popular: true },
+  { id: 'weekly', label: 'Weekly', badge: '-$25' },
+  { id: 'bi-weekly', label: 'Bi-Weekly', badge: '-10%' },
+  { id: 'monthly', label: 'Monthly', badge: '-5%' },
 ];
 
 const ENTRY_METHODS = [
   { id: 'home', label: "I'll be home" },
-  { id: 'lockbox', label: 'Lockbox / key code' },
+  { id: 'lockbox', label: 'Lockbox' },
   { id: 'hidden_key', label: 'Hidden key' },
-  { id: 'doorman', label: 'Doorman / concierge' },
-  { id: 'other', label: 'Other (note below)' },
+  { id: 'doorman', label: 'Doorman' },
+  { id: 'other', label: 'Other' },
 ];
 
 interface Props {
@@ -109,6 +127,9 @@ export default function NativeBookingForm({
   const [promoCode, setPromoCode] = useState('');
 
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
+  const cardRef = useRef<InlineStripeCardHandle | null>(null);
+  const [cardStatus, setCardStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [cardStatusErr, setCardStatusErr] = useState<string | null>(null);
 
   const [quote, setQuote] = useState<QuoteResponse['quote'] | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
@@ -290,7 +311,18 @@ export default function NativeBookingForm({
           frequency,
         }),
       });
-      const data = (await res.json()) as QuoteResponse;
+      if (ctl.signal.aborted) return;
+      const text = await res.text();
+      if (ctl.signal.aborted) return;
+      if (!text) {
+        return;
+      }
+      let data: QuoteResponse;
+      try {
+        data = JSON.parse(text) as QuoteResponse;
+      } catch {
+        return;
+      }
       if (ctl.signal.aborted) return;
       if (!res.ok || !data.ok) {
         setQuoteErr(data.error || 'Could not calculate a quote');
@@ -299,9 +331,9 @@ export default function NativeBookingForm({
         setQuote(data.quote);
       }
     } catch (e) {
-      if ((e as Error).name !== 'AbortError') {
-        setQuoteErr(e instanceof Error ? e.message : 'Network error');
-      }
+      const err = e as Error;
+      if (err.name === 'AbortError' || err.name === 'SyntaxError') return;
+      setQuoteErr(err.message || 'Network error');
     } finally {
       if (!ctl.signal.aborted) setQuoteLoading(false);
     }
@@ -311,6 +343,16 @@ export default function NativeBookingForm({
     const t = setTimeout(refreshQuote, 250);
     return () => clearTimeout(t);
   }, [refreshQuote]);
+
+  // Move Out is always a single one-time service. If a user lands on a
+  // recurring frequency (e.g. via prefill / form-back navigation) we
+  // silently snap them back to one-time so the booking sent to the CRM
+  // is internally consistent with what the backend pricing expects.
+  useEffect(() => {
+    if (service === 'Move Out' && frequency !== 'one-time') {
+      setFrequency('one-time');
+    }
+  }, [service, frequency]);
 
   // Build a humanized "what's missing" list. Order roughly matches the form
   // top-to-bottom so the hint reads natural ("Pick a service, add bedrooms,
@@ -347,13 +389,16 @@ export default function NativeBookingForm({
     setSubmitting(true);
     setSubmitErr(null);
     try {
-      // Send the picked date+time as brand-LOCAL naive parts. The server
-      // converts to UTC using the brand's service-area timezone. Earlier
-      // versions called `new Date(...).toISOString()` here which silently
-      // interpreted the picker as the customer's BROWSER timezone — wrong
-      // for any out-of-area customer (e.g. East Coast booking Pacific Maids
-      // got a 3-hour drift). The legacy field is kept for one release so a
-      // stale CDN cache doesn't break booking.
+      let setupIntentId: string | undefined;
+      if (paymentMethod === 'card' && cardRef.current && cardStatus === 'ready') {
+        const cardResult = await cardRef.current.confirm();
+        if (!cardResult.ok) {
+          setSubmitErr(cardResult.error || 'Card could not be verified. Please check the card details and try again.');
+          setSubmitting(false);
+          return;
+        }
+        setupIntentId = cardResult.setupIntentId;
+      }
       const scheduledLocalDate = scheduledDate;
       const scheduledLocalTime = scheduledTime;
       const scheduledStartAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
@@ -377,13 +422,8 @@ export default function NativeBookingForm({
           specialNotes,
           promoCode: promoCode.trim() || undefined,
           paymentMethodKind: paymentMethod,
-          // If the customer arrived via a `?t=<prefill-token>` URL, forward
-          // the token so the CRM can attribute the booking back to the lead
-          // / Quo conversation that minted it. Undefined when no token.
+          setupIntentId,
           quotePrefillToken: prefill.token || undefined,
-          // `?ref=<customer-referral-code>` from a friend's share link.
-          // Server attributes on first booking + grants $25 to both parties
-          // when status flips to completed.
           referralCode: referralCode || undefined,
           botField,
         }),
@@ -626,29 +666,34 @@ export default function NativeBookingForm({
 
           <Section title="3. How often do you need cleaning?">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {FREQUENCIES.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFrequency(f.id)}
-                  className={`relative ${
-                    frequency === f.id
-                      ? 'ring-2 ring-[#dfbd69] bg-white/40 border border-white'
-                      : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
-                  } rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
-                >
-                  {f.popular && (
-                    <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#dfbd69] text-[#283845] text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
-                      MOST POPULAR
-                    </span>
-                  )}
-                  <span className="text-sm font-semibold text-white block">{f.label}</span>
-                  {f.badge && (
-                    <span className="text-[10px] text-white/70 block mt-0.5">{f.badge}</span>
-                  )}
-                </button>
-              ))}
+              {FREQUENCIES.map((f) => {
+                const isMoveOut = service === 'Move Out';
+                const disabled = isMoveOut && f.id !== 'one-time';
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => !disabled && setFrequency(f.id)}
+                    disabled={disabled}
+                    className={`relative ${
+                      frequency === f.id
+                        ? 'ring-2 ring-[#dfbd69] bg-white/40 border border-white'
+                        : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
+                    } ${disabled ? 'opacity-30 cursor-not-allowed' : ''} rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
+                  >
+                    <span className="text-sm font-semibold text-white block">{f.label}</span>
+                    {f.badge && !disabled && (
+                      <span className="text-[10px] text-[#dfbd69] block mt-0.5 font-semibold">{f.badge}</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
+            {service === 'Move Out' && (
+              <p className="text-[11px] text-white/55 mt-2">
+                Move Out cleans are a single one-time service. To set up recurring cleaning, switch the service above.
+              </p>
+            )}
           </Section>
 
           {visibleAddons.length > 0 && (
@@ -679,7 +724,7 @@ export default function NativeBookingForm({
                           } rounded-lg p-3 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                         >
                           <div className="flex flex-col gap-2">
-                            <div className="w-10 h-10 mx-auto rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-1">
+                            <div className="w-8 h-8 mx-auto">
                               <Image
                                 src={`/icons/addons/${a.icon}`}
                                 alt={a.label}
@@ -708,7 +753,13 @@ export default function NativeBookingForm({
                   value={scheduledDate}
                   min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  className={inputClass}
+                  onClick={(e) => {
+                    const el = e.currentTarget as HTMLInputElement;
+                    if (typeof el.showPicker === 'function') {
+                      try { el.showPicker(); } catch { /* ignore */ }
+                    }
+                  }}
+                  className={`${inputClass} cursor-pointer`}
                   style={{ background: inputBg, colorScheme: 'dark' }}
                 />
               </div>
@@ -719,7 +770,13 @@ export default function NativeBookingForm({
                   value={scheduledTime}
                   step={1800}
                   onChange={(e) => setScheduledTime(e.target.value)}
-                  className={inputClass}
+                  onClick={(e) => {
+                    const el = e.currentTarget as HTMLInputElement;
+                    if (typeof el.showPicker === 'function') {
+                      try { el.showPicker(); } catch { /* ignore */ }
+                    }
+                  }}
+                  className={`${inputClass} cursor-pointer`}
                   style={{ background: inputBg, colorScheme: 'dark' }}
                 />
               </div>
@@ -763,19 +820,19 @@ export default function NativeBookingForm({
           </Section>
 
           <Section title="8. How do we get in?">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
               {ENTRY_METHODS.map((e) => (
                 <button
                   key={e.id}
                   type="button"
                   onClick={() => setEntryMethod(e.id)}
-                  className={`relative ${
+                  className={`relative min-h-[3rem] flex items-center justify-center ${
                     entryMethod === e.id
                       ? 'ring-2 ring-[#dfbd69] bg-white/40'
                       : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
-                  } rounded-lg p-3 text-xs text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
+                  } rounded-lg px-2 py-2 text-xs text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                 >
-                  <span className="text-white font-medium">{e.label}</span>
+                  <span className="text-white font-medium whitespace-nowrap">{e.label}</span>
                 </button>
               ))}
             </div>
@@ -833,11 +890,40 @@ export default function NativeBookingForm({
                 <span className="text-[10px] text-white/70">Send after service</span>
               </button>
             </div>
+            {paymentMethod === 'card' && (
+              <div className="mb-3">
+                {email.trim() ? (
+                  <InlineStripeCard
+                    ref={cardRef}
+                    token={prefill.token || undefined}
+                    brandSlug={brandSlug}
+                    vaOpsUrl={VA_OPS_URL}
+                    accentColor={accentColor}
+                    customer={{
+                      email: email || prefill.payload?.customer?.email,
+                      firstName: firstName || prefill.payload?.customer?.firstName,
+                      lastName: lastName || prefill.payload?.customer?.lastName,
+                      phone: phone || prefill.payload?.customer?.phone,
+                    }}
+                    onStatusChange={(s, err) => {
+                      setCardStatus(s);
+                      setCardStatusErr(err || null);
+                    }}
+                  />
+                ) : (
+                  <div className="text-xs text-white/60 bg-white/5 border border-white/15 rounded-lg p-3">
+                    Enter your email in section 6 above to add a card on file. No charge today.
+                  </div>
+                )}
+                {cardStatus === 'error' && cardStatusErr && (
+                  <p className="text-[11px] text-red-300 mt-1.5">{cardStatusErr}</p>
+                )}
+              </div>
+            )}
             <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
               {paymentMethod === 'card' ? (
                 <>
-                  <strong>No charge today.</strong> After you book, we&apos;ll text you a secure link
-                  to add a card on file. Your card is only charged after the cleaner finishes the job.
+                  <strong>No charge today.</strong> Your card is verified and held on file. We only charge after the cleaner finishes the job.
                 </>
               ) : (
                 <>
@@ -990,9 +1076,19 @@ export default function NativeBookingForm({
               <div className="text-red-300 text-sm pt-2 border-t border-white/10">{quoteErr}</div>
             )}
 
-            {quote && (
+            {quote && (() => {
+              const baseItems = quote.lineItems.filter((li) => li.category !== 'addon');
+              const addonItems = quote.lineItems.filter((li) => li.category === 'addon');
+              const baseTotal = baseItems.reduce((s, li) => s + li.amount, 0);
+              return (
               <div className="border-t border-white/10 pt-4 space-y-1 text-sm">
-                {quote.lineItems.map((li, idx) => (
+                {baseTotal > 0 && (
+                  <div className="flex justify-between text-white/80">
+                    <span className="truncate pr-2">Base price</span>
+                    <span>${baseTotal.toFixed(2)}</span>
+                  </div>
+                )}
+                {addonItems.map((li, idx) => (
                   <div key={idx} className="flex justify-between text-white/80">
                     <span className="truncate pr-2">{li.label}</span>
                     <span>${li.amount.toFixed(2)}</span>
@@ -1009,11 +1105,27 @@ export default function NativeBookingForm({
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold pt-2">
-                  <span className="text-white">Total</span>
+                  <span className="text-white">
+                    {quote.splitQuote ? 'First clean' : 'Total'}
+                  </span>
                   <span className="text-[#dfbd69]">${quote.total.toFixed(2)}</span>
                 </div>
+                {quote.splitQuote && (
+                  <div className="mt-3 rounded-lg border border-[#dfbd69]/30 bg-[#dfbd69]/10 p-3 text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-white/80">Then every {quote.splitQuote.recurring.frequency.replace('-', ' ')}</span>
+                      <span className="text-[#dfbd69] font-semibold">{quote.splitQuote.recurring.formattedTotal}</span>
+                    </div>
+                    {quote.splitQuote.recurring.discount && (
+                      <div className="text-[10px] text-white/55">
+                        Recurring price already reflects {quote.splitQuote.recurring.discount.label}.
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
+              );
+            })()}
 
             {submitErr && (
               <div className="bg-red-500/20 border border-red-400/30 text-red-200 text-sm rounded-lg p-3">

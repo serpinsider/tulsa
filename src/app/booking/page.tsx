@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import NativeBookingForm from "@/components/NativeBookingForm";
 import { STEP_WIZARD_CONFIG } from "@/lib/step-wizard-config";
+import { COLORS } from "@/styles/colors";
 
 // /booking can carry ?t=<prefill-token>; force-dynamic so useSearchParams
 // works without a build-time error and tokens resolve per request.
@@ -49,7 +50,7 @@ export default function BookingPage() {
     <main
       className="min-h-screen pt-20"
       style={{
-        background: `radial-gradient(1200px 600px at 50% -10%, ${accent}1f 0%, rgba(11, 17, 32, 0) 60%), linear-gradient(180deg, #0b1120 0%, #0a0f1a 100%)`,
+        background: `radial-gradient(1200px 600px at 50% -10%, ${accent}1f 0%, transparent 60%), linear-gradient(180deg, ${COLORS.brand.dark} 0%, ${COLORS.brand.dark} 100%)`,
       }}
     >
       <NativeBookingForm
@@ -57,7 +58,7 @@ export default function BookingPage() {
         businessName={STEP_WIZARD_CONFIG.businessName}
         accentColor={STEP_WIZARD_CONFIG.accentColor}
         btnTextColor={STEP_WIZARD_CONFIG.btnTextColor}
-        cardBg="rgba(22, 32, 52, 0.72)"
+        cardBg={COLORS.backgrounds.primary}
       />
     </main>
   );
