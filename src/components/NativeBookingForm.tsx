@@ -1019,7 +1019,7 @@ export default function NativeBookingForm({
           </div>
         </div>
 
-        <aside className="lg:sticky lg:top-4 self-start space-y-6">
+        <aside className="lg:sticky lg:top-4 self-start space-y-6 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
           {/* Booking summary card - mirrors QuoteForm's "Quote Summary" structure */}
           <div className="backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-xl border border-white/10 space-y-5" style={{ background: inputBg }}>
             <h3 className="text-xl font-serif font-semibold text-white">Booking summary</h3>
