@@ -131,7 +131,7 @@ const InlineStripeCard = forwardRef<InlineStripeCardHandle, Props>(function Inli
       // paymentMethodOrder belongs on Elements options, NOT on the
       // PaymentElement options. Putting it on PaymentElement throws
       // a synchronous error from stripe-js and crashes the React tree.
-      paymentMethodOrder: ['card', 'link', 'cashapp'],
+      paymentMethodOrder: ['card', 'link'],
       // Match the dark glass cards on /q. Background is a hair lighter
       // than the form panel so the Stripe inputs feel "inset" instead
       // of floating on top of nothing. accentColor drives focus ring,
