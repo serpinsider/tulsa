@@ -387,6 +387,9 @@ export default function NativeBookingForm({
   if (paymentMethod === 'card' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     if (!missingFields.includes('email')) missingFields.push('email');
   }
+  if (paymentMethod === 'card' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && cardStatus !== 'ready') {
+    missingFields.push('card details');
+  }
 
   const formValid = missingFields.length === 0;
 

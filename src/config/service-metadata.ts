@@ -30,7 +30,7 @@ export const generateServiceMetadata = (service: ServiceMetadata): Metadata => {
       siteName: BRANDING.businessName,
       images: [
         {
-          url: '/ogs-image.jpg',
+          url: '/ogs-image.png',
           width: 1200,
           height: 630,
           alt: `${service.serviceName} - ${BRANDING.businessName}`,
@@ -43,7 +43,7 @@ export const generateServiceMetadata = (service: ServiceMetadata): Metadata => {
       card: 'summary_large_image',
       title: fullTitle,
       description: service.description,
-      images: ['/ogs-image.jpg'],
+      images: ['/ogs-image.png'],
     },
     robots: {
       index: true,

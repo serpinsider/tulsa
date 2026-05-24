@@ -42,7 +42,7 @@ export const BRANDING = {
     logo: '/logo.png',
     favicon: '/favicon.ico',
     appleTouchIcon: '/apple-touch-icon.png',
-    ogImage: '/ogs-image.jpg',
+    ogImage: '/ogs-image.png',
     twitterImage: '/twitter-image.jpg',
     heroVideo: '/hero-vid.mp4',
   },

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: BRANDING.businessName,
     images: [
       {
-        url: '/ogs-image.jpg',
+        url: '/ogs-image.png',
         width: 1200,
         height: 630,
         alt: `${BRANDING.businessName} Service Areas`,
