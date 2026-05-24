@@ -9,7 +9,7 @@
 
 import { redirect } from 'next/navigation';
 
-const PORTAL_LOGIN_URL = 'https://maidcrm.com/sign-in/magic';
+const PORTAL_LOGIN_URL = 'https://account.tulsamaids.com/sign-in/magic';
 
 export default function LoginPage() {
   redirect(PORTAL_LOGIN_URL);
