@@ -712,8 +712,25 @@ export default function QuoteConfirmPage(props: Props) {
                   Your quote
                 </div>
                 <div className="text-white text-lg sm:text-xl font-semibold leading-snug tracking-tight">
-                  {scopeText({ service, bedrooms, bathrooms, opts }) || 'Cleaning service'}
+                  {serviceLabel({ service, opts }) || 'Cleaning service'}
                 </div>
+                {(bedrooms || bathrooms) && (
+                  <div className="flex items-center gap-2 mt-1.5 text-sm text-white/70">
+                    {bedrooms && (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="font-semibold text-white/90">{opts?.options.bedrooms.find((s) => s.ruleKey === bedrooms)?.label || bedrooms}</span>
+                        <span>bed</span>
+                      </span>
+                    )}
+                    {bedrooms && bathrooms && <span className="text-white/30">|</span>}
+                    {bathrooms && (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="font-semibold text-white/90">{opts?.options.bathrooms.find((s) => s.ruleKey === bathrooms)?.label || bathrooms}</span>
+                        <span>bath</span>
+                      </span>
+                    )}
+                  </div>
+                )}
                 {frequency !== 'one-time' && (
                   <div className="text-white/55 text-xs mt-1 capitalize">
                     {frequency.replace('-', ' ')} recurring
@@ -1911,6 +1928,16 @@ function LoadingShell({ accentColor }: { accentColor: string }) {
 
 // ===================== helpers =====================
 
+function serviceLabel(args: {
+  service?: string;
+  opts?: BrandOptions | null;
+}): string {
+  const { service, opts } = args;
+  if (!service) return '';
+  const svcLabel = opts?.options.service.find((s) => s.ruleKey === service)?.label;
+  return svcLabel || prettyService(service);
+}
+
 function scopeText(args: {
   service?: string;
   bedrooms?: string;
@@ -1920,8 +1947,7 @@ function scopeText(args: {
   const { service, bedrooms, bathrooms, opts } = args;
   const parts: string[] = [];
   if (service) {
-    const svcLabel = opts?.options.service.find((s) => s.ruleKey === service)?.label;
-    parts.push(svcLabel || prettyService(service));
+    parts.push(serviceLabel({ service, opts }));
   }
   const room: string[] = [];
   if (bedrooms) {
