@@ -78,10 +78,14 @@ interface QuoteResponse {
     lineItems: QuoteLineItem[];
     subtotal: number;
     discount?: { label: string; amount: number } | null;
-    // Sales tax for taxable states. 0 for tax-exempt brands.
     salesTax?: number;
     salesTaxRate?: number;
     total: number;
+    splitQuote?: {
+      initial: { total: number; formattedTotal: string; discount?: { label: string; amount: number } | null };
+      recurring: { total: number; formattedTotal: string; discount?: { label: string; amount: number } | null };
+      explanation: string;
+    } | null;
   };
   error?: string;
 }
@@ -157,19 +161,19 @@ export default function QuoteConfirmPage(props: Props) {
     if (p.bathrooms) setBathrooms(p.bathrooms);
     if (p.sqft) setSqft(p.sqft);
     if (Array.isArray(p.addons)) {
-      // Dedupe by canonical key (case-insensitive, strip spaces) so
-      // prefill quirks like ["insideFridge", "Inside Fridge"] don't
-      // render the same addon twice in the breakdown.
       const seen = new Set<string>();
-      const unique: string[] = [];
+      const resolved: string[] = [];
       for (const a of p.addons) {
         if (typeof a !== 'string') continue;
-        const k = a.toLowerCase().replace(/\s+/g, '');
-        if (seen.has(k)) continue;
-        seen.add(k);
-        unique.push(a);
+        const norm = a.toLowerCase().replace(/\s+/g, '');
+        if (seen.has(norm)) continue;
+        seen.add(norm);
+        const match = ADDONS.find(
+          (ad) => ad.key === a || ad.key.toLowerCase() === norm || ad.label.toLowerCase().replace(/\s+/g, '') === norm,
+        );
+        resolved.push(match ? match.key : a);
       }
-      setAddons(new Set(unique));
+      setAddons(new Set(resolved));
     }
     if (
       p.frequency === 'one-time' ||
@@ -745,8 +749,13 @@ export default function QuoteConfirmPage(props: Props) {
                   ${total.toFixed(0)}
                 </div>
                 <div className="text-[10px] uppercase tracking-wider text-white/55 mt-1">
-                  {recalculating ? 'updating' : 'total'}
+                  {recalculating ? 'updating' : liveQuote?.splitQuote ? 'first clean' : 'total'}
                 </div>
+                {liveQuote?.splitQuote && (
+                  <div className="mt-1.5 text-xs text-white/60">
+                    then <span style={{ color: accentColor }} className="font-semibold">${liveQuote.splitQuote.recurring.total.toFixed(0)}</span>/clean
+                  </div>
+                )}
               </div>
             </div>
 
