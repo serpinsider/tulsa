@@ -146,7 +146,7 @@ export default function JoinOurTeamClient(props: Props) {
   if (success) {
     return (
       <section
-        className="min-h-screen flex items-center justify-center pt-28 pb-16 px-4"
+        className="min-h-screen flex items-center justify-center pt-40 lg:pt-52 pb-16 px-4"
         style={{ background: COLORS.backgrounds.primary }}
       >
         <div
@@ -179,7 +179,7 @@ export default function JoinOurTeamClient(props: Props) {
   }
 
   return (
-    <section className="pt-28 sm:pt-32 pb-16 px-4" style={{ background: COLORS.backgrounds.primary }}>
+    <section className="pt-40 lg:pt-52 pb-16 px-4" style={{ background: COLORS.backgrounds.primary }}>
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
