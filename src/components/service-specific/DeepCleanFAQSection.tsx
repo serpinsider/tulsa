@@ -48,7 +48,7 @@ export default function DeepCleanFAQSection() {
     },
     {
       question: "What payment methods do you accept?",
-      answer: "You pay at the end of the clean using credit/debit card, Zelle, or cash. We offer a satisfaction guarantee - you only pay if you're happy with the service."
+      answer: "You pay at the end of the clean using credit/debit card or Zelle. We offer a satisfaction guarantee - you only pay if you're happy with the service."
     }
   ];
 
