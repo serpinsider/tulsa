@@ -63,6 +63,7 @@ interface BrandOptions {
   brand: { slug: string; name: string };
   options: Record<'bedrooms' | 'bathrooms' | 'sqft' | 'service' | 'addon', RuleOption[]>;
   inclusions: Record<string, string[]>;
+  recommendedAddons?: Array<{ ruleKey: string; label: string; cents: number; attachRatePct: number; source: 'brand' | 'global' }>;
 }
 
 interface QuoteLineItem {
@@ -108,9 +109,9 @@ const RECOMMENDED_ADDON_ORDER = [
 
 const FREQUENCIES: Array<{ id: Frequency; label: string; badge?: string }> = [
   { id: 'one-time', label: 'One time' },
-  { id: 'weekly', label: 'Weekly', badge: '10% off' },
-  { id: 'bi-weekly', label: 'Bi-weekly', badge: '5% off' },
-  { id: 'monthly', label: 'Monthly', badge: '$25 off' },
+  { id: 'weekly', label: 'Weekly', badge: '$25 off' },
+  { id: 'bi-weekly', label: 'Bi-weekly', badge: '10% off' },
+  { id: 'monthly', label: 'Monthly', badge: '5% off' },
 ];
 
 function classNames(...xs: Array<string | false | null | undefined>): string {
@@ -127,11 +128,24 @@ export default function QuoteConfirmPage(props: Props) {
   const token = searchParams?.get('t') ?? null;
   const prefill = usePrefillFromToken({ brandSlug });
 
+    // ---------- mutable scope ----------
+  const [service, setService] = useState('');
+  const [bedrooms, setBedrooms] = useState('');
+  const [bathrooms, setBathrooms] = useState('');
+  const [sqft, setSqft] = useState('');
+  const [addons, setAddons] = useState<Set<string>>(new Set());
+
   // ---------- brand options (services, addons, prices) ----------
+  // Re-fetched when service changes so the server can return service-specific
+  // data-driven addon recommendations (e.g. Deep Clean buyers add different
+  // things than Standard).
   const [opts, setOpts] = useState<BrandOptions | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch(`${VA_OPS_URL}/api/public/brands/${brandSlug}/options`, { cache: 'default' })
+    const url = service
+      ? `${VA_OPS_URL}/api/public/brands/${brandSlug}/options?service=${encodeURIComponent(service)}`
+      : `${VA_OPS_URL}/api/public/brands/${brandSlug}/options`;
+    fetch(url, { cache: 'default' })
       .then((r) => r.json())
       .then((d) => {
         if (!cancelled) setOpts(d);
@@ -140,14 +154,7 @@ export default function QuoteConfirmPage(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [brandSlug]);
-
-  // ---------- mutable scope ----------
-  const [service, setService] = useState('');
-  const [bedrooms, setBedrooms] = useState('');
-  const [bathrooms, setBathrooms] = useState('');
-  const [sqft, setSqft] = useState('');
-  const [addons, setAddons] = useState<Set<string>>(new Set());
+  }, [brandSlug, service]);
   const [frequency, setFrequency] = useState<Frequency>('one-time');
 
   // hydrate from prefill once
@@ -165,11 +172,11 @@ export default function QuoteConfirmPage(props: Props) {
       const resolved: string[] = [];
       for (const a of p.addons) {
         if (typeof a !== 'string') continue;
-        const norm = a.toLowerCase().replace(/\s+/g, '');
+        const norm = a.toLowerCase().replace(/[\s_-]+/g, '');
         if (seen.has(norm)) continue;
         seen.add(norm);
         const match = ADDONS.find(
-          (ad) => ad.key === a || ad.key.toLowerCase() === norm || ad.label.toLowerCase().replace(/\s+/g, '') === norm,
+          (ad) => ad.key === a || ad.key.toLowerCase() === norm || ad.label.toLowerCase().replace(/[\s_-]+/g, '') === norm,
         );
         resolved.push(match ? match.key : a);
       }
@@ -413,7 +420,16 @@ export default function QuoteConfirmPage(props: Props) {
     if (!opts) return [];
     const offered = new Map(opts.options.addon.map((a) => [a.ruleKey, a]));
     const result: Array<{ key: string; label: string; price: number; iconSrc: string | null }> = [];
-    for (const key of RECOMMENDED_ADDON_ORDER) {
+
+    // Prefer server-provided, data-driven recommendations (per brand + service)
+    // when available. Falls back to the static RECOMMENDED_ADDON_ORDER list
+    // if the server returned no recs (cold-start brand, materialized view
+    // missing, etc.).
+    const orderedKeys: string[] = opts.recommendedAddons && opts.recommendedAddons.length > 0
+      ? opts.recommendedAddons.map((r) => r.ruleKey)
+      : RECOMMENDED_ADDON_ORDER;
+
+    for (const key of orderedKeys) {
       if (addons.has(key)) continue;
       if (includedFreeKeys.has(key)) continue;
       const opt = offered.get(key);
