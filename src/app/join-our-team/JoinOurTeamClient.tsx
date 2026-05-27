@@ -76,6 +76,13 @@ export default function JoinOurTeamClient(props: Props) {
   const accent = COLORS.brand.gold;
   const accentMuted = COLORS.brand.goldMuted;
 
+  const inputCls = 'w-full px-3.5 py-2.5 rounded-lg text-sm text-white outline-none transition-colors focus:ring-1 placeholder:text-white/30';
+  const inputSt = {
+    background: 'rgba(0,0,0,0.2)',
+    border: `1px solid rgba(255,255,255,0.1)`,
+  } as const;
+  const inputFocusSt = { '--tw-ring-color': `${accent}88` } as React.CSSProperties;
+
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -139,7 +146,7 @@ export default function JoinOurTeamClient(props: Props) {
   if (success) {
     return (
       <section
-        className="min-h-screen flex items-center justify-center py-16 px-4"
+        className="min-h-screen flex items-center justify-center pt-28 pb-16 px-4"
         style={{ background: COLORS.backgrounds.primary }}
       >
         <div
@@ -156,8 +163,8 @@ export default function JoinOurTeamClient(props: Props) {
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Application received</h1>
           <p className="text-white/70 text-sm mb-6">
-            Thanks {form.firstName}. We'll review your application and reach out within a few days
-            with next steps. If you're a fit, we'll send you a link to set up your cleaner account.
+            Thanks {form.firstName}. We will review your application and reach out within a few days
+            with next steps. If you are a fit, we will send you a link to set up your cleaner account.
           </p>
           <Link
             href="/"
@@ -172,61 +179,53 @@ export default function JoinOurTeamClient(props: Props) {
   }
 
   return (
-    <section className="py-16 px-4" style={{ background: COLORS.backgrounds.primary }}>
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Join the {businessName} team</h1>
-          <p className="text-white/65 text-sm sm:text-base">
+    <section className="pt-28 sm:pt-32 pb-16 px-4" style={{ background: COLORS.backgrounds.primary }}>
+      <div className="max-w-xl mx-auto">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            Join Our Team
+          </h1>
+          <p className="text-white/60 text-sm sm:text-base max-w-md mx-auto">
             Competitive pay, flexible scheduling, weekly payouts. Apply in under 2 minutes.
-            We'll review and reach out within a few days.
           </p>
         </div>
 
         <form
           onSubmit={submit}
-          className="rounded-2xl p-6 sm:p-8 space-y-4 border"
+          className="rounded-2xl p-6 sm:p-8 space-y-5 border shadow-lg"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.1)',
+            background: 'rgba(255,255,255,0.05)',
+            borderColor: 'rgba(255,255,255,0.08)',
           }}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="First name" required>
               <input
                 value={form.firstName}
                 onChange={(e) => update('firstName', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-                style={{
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
+                className={inputCls}
+                style={{ ...inputSt, ...inputFocusSt }}
               />
             </Field>
             <Field label="Last name" required>
               <input
                 value={form.lastName}
                 onChange={(e) => update('lastName', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-                style={{
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
+                className={inputCls}
+                style={{ ...inputSt, ...inputFocusSt }}
               />
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Phone" required>
               <input
                 inputMode="tel"
                 value={form.phone}
                 onChange={(e) => update('phone', formatPhone(e.target.value))}
                 placeholder="(555) 555-5555"
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-                style={{
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
+                className={inputCls}
+                style={{ ...inputSt, ...inputFocusSt }}
               />
             </Field>
             <Field label="Email">
@@ -235,26 +234,20 @@ export default function JoinOurTeamClient(props: Props) {
                 value={form.email}
                 onChange={(e) => update('email', e.target.value)}
                 placeholder="optional"
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-                style={{
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
+                className={inputCls}
+                style={{ ...inputSt, ...inputFocusSt }}
               />
             </Field>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
               <Field label="City">
                 <input
                   value={form.city}
                   onChange={(e) => update('city', e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-                  style={{
-                    background: 'rgba(0,0,0,0.25)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                  }}
+                  className={inputCls}
+                  style={{ ...inputSt, ...inputFocusSt }}
                 />
               </Field>
             </div>
@@ -263,11 +256,8 @@ export default function JoinOurTeamClient(props: Props) {
                 value={form.state}
                 maxLength={2}
                 onChange={(e) => update('state', e.target.value.toUpperCase())}
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2 uppercase"
-                style={{
-                  background: 'rgba(0,0,0,0.25)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
+                className={`${inputCls} uppercase`}
+                style={{ ...inputSt, ...inputFocusSt }}
               />
             </Field>
           </div>
@@ -277,11 +267,8 @@ export default function JoinOurTeamClient(props: Props) {
               value={form.locations}
               onChange={(e) => update('locations', e.target.value)}
               rows={2}
-              className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-              style={{
-                background: 'rgba(0,0,0,0.25)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
+              className={inputCls}
+              style={{ ...inputSt, ...inputFocusSt, resize: 'vertical' }}
             />
           </Field>
 
@@ -328,11 +315,8 @@ export default function JoinOurTeamClient(props: Props) {
               value={form.note}
               onChange={(e) => update('note', e.target.value)}
               rows={3}
-              className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none focus:ring-2"
-              style={{
-                background: 'rgba(0,0,0,0.25)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
+              className={inputCls}
+              style={{ ...inputSt, ...inputFocusSt, resize: 'vertical' }}
             />
           </Field>
 
@@ -352,17 +336,18 @@ export default function JoinOurTeamClient(props: Props) {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 hover:brightness-110"
             style={{
-              background: `linear-gradient(135deg, ${accent}, ${accentMuted})`,
+              background: accent,
               color: '#111',
+              boxShadow: `0 4px 14px ${accent}33`,
             }}
           >
             {submitting ? 'Submitting...' : 'Submit application'}
           </button>
 
-          <p className="text-xs text-white/40 text-center pt-2">
-            No ID or paperwork needed to apply. We'll collect that after approval.
+          <p className="text-[11px] text-white/35 text-center pt-2">
+            No ID or paperwork needed to apply. We will collect that after approval.
           </p>
         </form>
       </div>
