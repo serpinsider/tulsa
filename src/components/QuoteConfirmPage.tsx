@@ -421,16 +421,17 @@ export default function QuoteConfirmPage(props: Props) {
     const offered = new Map(opts.options.addon.map((a) => [a.ruleKey, a]));
     const result: Array<{ key: string; label: string; price: number; iconSrc: string | null }> = [];
 
-    // Prefer server-provided, data-driven recommendations (per brand + service)
-    // when available. Falls back to the static RECOMMENDED_ADDON_ORDER list
-    // if the server returned no recs (cold-start brand, materialized view
-    // missing, etc.).
     const orderedKeys: string[] = opts.recommendedAddons && opts.recommendedAddons.length > 0
       ? opts.recommendedAddons.map((r) => r.ruleKey)
       : RECOMMENDED_ADDON_ORDER;
 
+    // Build a normalized set of selected addon keys so we catch mismatches
+    // between camelCase ruleKeys and display-label strings in the addons Set.
+    const selectedNorm = new Set(Array.from(addons).map((a) => a.toLowerCase().replace(/[^a-z0-9]/g, '')));
+
     for (const key of orderedKeys) {
       if (addons.has(key)) continue;
+      if (selectedNorm.has(key.toLowerCase().replace(/[^a-z0-9]/g, ''))) continue;
       if (includedFreeKeys.has(key)) continue;
       const opt = offered.get(key);
       if (!opt) continue;
