@@ -6,6 +6,7 @@ import StructuredData from "@/components/StructuredData";
 import { BRANDING } from "@/config/branding";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import ScrollRestoration from "@/components/ScrollRestoration";
+import AnalyticsBeacon from '@/components/AnalyticsBeacon';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -92,6 +93,7 @@ export default function RootLayout({
           data-site="QJHZPKBB"
           strategy="afterInteractive"
         />
+        <AnalyticsBeacon />
         <ScrollRestoration />
         <StructuredData type="local-business" />
         <StructuredData type="organization" />
