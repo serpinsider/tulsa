@@ -23,7 +23,6 @@ import Image from 'next/image';
 import { ADDONS } from '@/lib/constants/addons';
 import { CONTACT_INFO } from '@/lib/contact';
 import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
-import InlineStripeCard, { type InlineStripeCardHandle } from '@/components/InlineStripeCard';
 
 const VA_OPS_URL =
   process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://maidcrm.com';
@@ -132,10 +131,7 @@ export default function NativeBookingForm({
 
   const [promoCode, setPromoCode] = useState('');
 
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
-  const cardRef = useRef<InlineStripeCardHandle | null>(null);
-  const [cardStatus, setCardStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [cardStatusErr, setCardStatusErr] = useState<string | null>(null);
+  const paymentMethod: 'card' = 'card';
 
   const [quote, setQuote] = useState<QuoteResponse['quote'] | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
@@ -147,7 +143,6 @@ export default function NativeBookingForm({
     bookingId: string;
     scheduledStartAt: string;
     total: number;
-    paymentMethodKind: 'card' | 'zelle';
   } | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -379,17 +374,6 @@ export default function NativeBookingForm({
   if (city.trim().length <= 1) missingFields.push('city');
   if (usState.trim().length < 2) missingFields.push('state');
   if (!/^\d{5}$/.test(zip.trim())) missingFields.push('ZIP');
-  // Card-on-file is the default payment method. Stripe's SetupIntent
-  // needs an email to attach the PaymentMethod to a customer, so when
-  // they're paying by card and the email field is empty, treat email
-  // as missing here so the unified hint can call it out instead of a
-  // separate inline message in the payment section.
-  if (paymentMethod === 'card' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    if (!missingFields.includes('email')) missingFields.push('email');
-  }
-  if (paymentMethod === 'card' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && cardStatus !== 'ready') {
-    missingFields.push('card details');
-  }
 
   const formValid = missingFields.length === 0;
 
@@ -406,16 +390,6 @@ export default function NativeBookingForm({
     setSubmitting(true);
     setSubmitErr(null);
     try {
-      let setupIntentId: string | undefined;
-      if (paymentMethod === 'card' && cardRef.current && cardStatus === 'ready') {
-        const cardResult = await cardRef.current.confirm();
-        if (!cardResult.ok) {
-          setSubmitErr(cardResult.error || 'Card could not be verified. Please check the card details and try again.');
-          setSubmitting(false);
-          return;
-        }
-        setupIntentId = cardResult.setupIntentId;
-      }
       const scheduledLocalDate = scheduledDate;
       const scheduledLocalTime = scheduledTime;
       const scheduledStartAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
@@ -439,7 +413,6 @@ export default function NativeBookingForm({
           specialNotes,
           promoCode: promoCode.trim() || undefined,
           paymentMethodKind: paymentMethod,
-          setupIntentId,
           quotePrefillToken: prefill.token || undefined,
           referralCode: referralCode || undefined,
           botField,
@@ -453,7 +426,6 @@ export default function NativeBookingForm({
         bookingId: data.booking.id,
         scheduledStartAt: data.booking.scheduledStartAt,
         total: data.booking.finalAmount,
-        paymentMethodKind: paymentMethod,
       });
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -466,13 +438,7 @@ export default function NativeBookingForm({
   };
 
   if (successData) {
-    // Compact, scannable confirmation. The previous version was a tall
-    // wall of receipt + nested next-step explanations. New layout:
-    //   - hero check + headline + 1-line confirmation
-    //   - 4 receipt facts
-    //   - one Next-step card (changes based on Zelle vs card)
-    //   - contact strip (call/text + back to home) - addresses the
-    //     user complaint that contact details weren't on the page
+    // Compact, scannable confirmation.
     const phoneTel = (CONTACT_INFO?.phone?.href || '').toString();
     const phoneDisplay = (CONTACT_INFO?.phone?.display || '').toString();
     const startDate = new Date(successData.scheduledStartAt);
@@ -521,11 +487,7 @@ export default function NativeBookingForm({
             </div>
             <div className="rounded-md bg-black/25 border border-white/10 px-3 py-2 col-span-2">
               <div className="text-white/40 uppercase tracking-wide text-[10px]">Payment</div>
-              <div className="text-white mt-0.5">
-                {successData.paymentMethodKind === 'zelle'
-                  ? 'Zelle — paid after service'
-                  : 'Card on file — charged after service'}
-              </div>
+              <div className="text-white mt-0.5">Card on file - charged after service</div>
             </div>
           </div>
 
@@ -542,9 +504,7 @@ export default function NativeBookingForm({
             }}
           >
             <strong>Next:</strong>{' '}
-            {successData.paymentMethodKind === 'zelle'
-              ? 'we\u2019ll text you our Zelle handle + a unique reference once the cleaner finishes.'
-              : 'we\u2019ll text you a secure link to add a card on file. We only charge after the cleaning is done.'}
+            we&apos;ll text you a secure link to add a card on file. We only charge after the cleaning is done.
           </div>
 
           {/* Contact strip — call/text us + back home. */}
@@ -880,78 +840,11 @@ export default function NativeBookingForm({
             )}
           </Section>
 
-          <Section title="10. Payment method">
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('card')}
-                className={`relative ${
-                  paymentMethod === 'card'
-                    ? 'ring-2 ring-[#dfbd69] bg-white/40'
-                    : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
-                } rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
-              >
-                <span className="text-sm font-semibold text-white block">Credit / Debit Card</span>
-                <span className="text-[10px] text-white/70">Charged after service</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('zelle')}
-                className={`relative ${
-                  paymentMethod === 'zelle'
-                    ? 'ring-2 ring-[#dfbd69] bg-white/40'
-                    : 'ring-1 ring-white/30 hover:ring-2 hover:ring-[#dfbd69]/50 bg-white/10'
-                } rounded-lg p-4 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
-              >
-                <span className="text-sm font-semibold text-white block">Zelle</span>
-                <span className="text-[10px] text-white/70">Send after service</span>
-              </button>
+          <Section title="10. Payment">
+            <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
+              <strong>No charge today.</strong> After you book, we&apos;ll text you a secure link
+              to add a card on file. Your card is only charged after the cleaner finishes the job.
             </div>
-            {paymentMethod === 'card' && (
-              <div className="mb-3">
-                {email.trim() ? (
-                  <InlineStripeCard
-                    ref={cardRef}
-                    token={prefill.token || undefined}
-                    brandSlug={brandSlug}
-                    vaOpsUrl={VA_OPS_URL}
-                    accentColor={accentColor}
-                    customer={{
-                      email: email || prefill.payload?.customer?.email,
-                      firstName: firstName || prefill.payload?.customer?.firstName,
-                      lastName: lastName || prefill.payload?.customer?.lastName,
-                      phone: phone || prefill.payload?.customer?.phone,
-                    }}
-                    onStatusChange={(s, err) => {
-                      setCardStatus(s);
-                      setCardStatusErr(err || null);
-                    }}
-                  />
-                ) : null}
-                {cardStatus === 'error' && cardStatusErr && (
-                  <p className="text-[11px] text-red-300 mt-1.5">{cardStatusErr}</p>
-                )}
-              </div>
-            )}
-            {/* Reassurance / receipt-style note. Hidden when the user is
-                paying by card but hasn't entered an email yet — in that
-                state the unified "missing fields" hint above the Book
-                button calls out exactly what's left, so we don't need a
-                second message saying the same thing. */}
-            {(paymentMethod !== 'card' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && (
-              <div className="text-xs text-[#dfbd69] bg-[#dfbd69]/10 border border-[#dfbd69]/30 rounded-lg p-3">
-                {paymentMethod === 'card' ? (
-                  <>
-                    <strong>No charge today.</strong> Your card is verified and held on file. We only charge after the cleaner finishes the job.
-                  </>
-                ) : (
-                  <>
-                    <strong>Pay by Zelle.</strong> After service, we&apos;ll text you the Zelle
-                    details with a unique reference number to include in the memo.
-                  </>
-                )}
-              </div>
-            )}
           </Section>
 
           {/* Bottom-of-form Book button — customers on mobile or anyone who
