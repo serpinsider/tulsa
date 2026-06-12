@@ -228,11 +228,6 @@ body {
   }
 }
 
-/* Form styling */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
-
 /* Animation classes */
 @keyframes glow {
   0%, 100% { box-shadow: 0 0 20px rgba(74, 155, 142, 0.3); }
@@ -265,4 +260,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .fadeInUp {
   animation: fadeInUp 0.4s ease-out;
+}
+
+/* All date/time inputs on this site sit on dark surfaces. color-scheme: dark
+   makes the native picker indicator render light. Do not add filter: invert()
+   on the indicator pseudo-element: newer Chromium ignores it, and where it
+   still applies it double-flips the dark-scheme icon back to black. */
+input[type='date'],
+input[type='time'] {
+  color-scheme: dark;
+}
+
+/* Booking and quote-confirm date/time fields overlay their own gold SVG
+   indicator; the native one paints near-black on the dark inputs in
+   Chromium regardless of color-scheme, so hide it for these fields only. */
+input.dt-native-hidden::-webkit-calendar-picker-indicator {
+  display: none;
 }

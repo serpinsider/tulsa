@@ -27,6 +27,11 @@ import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
 const VA_OPS_URL =
   process.env.NEXT_PUBLIC_VA_OPS_URL || 'https://maidcrm.com';
 
+/** Recolors the multicolor addon PNGs into the brand gold family so they
+ *  read cleanly on the dark card without a light tile behind them. */
+const GOLD_ICON_FILTER =
+  'grayscale(1) sepia(1) saturate(2.4) hue-rotate(5deg) brightness(1.25) contrast(0.95)';
+
 type RuleOption = { ruleKey: string; label: string; cents: number };
 type BrandOptions = {
   brand: { slug: string; name: string; phone: string | null };
@@ -701,16 +706,17 @@ export default function NativeBookingForm({
                           } rounded-lg p-3 text-center transition-all duration-300 ease-in-out backdrop-blur-sm`}
                         >
                           <div className="flex flex-col gap-2">
-                            <div className="w-10 h-10 mx-auto rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-1">
+                            <div className="w-9 h-9 mx-auto flex items-center justify-center">
                               <Image
                                 src={`/icons/addons/${a.icon}`}
                                 alt={a.label}
                                 width={32}
                                 height={32}
                                 className="w-full h-full object-contain"
+                                style={{ filter: GOLD_ICON_FILTER }}
                               />
                             </div>
-                            <div className="text-xs font-medium text-white">{a.label}</div>
+                            <div className="text-xs font-medium text-white capitalize">{a.label}</div>
                             <div className="text-[10px] text-white/70">{a.description}</div>
                           </div>
                         </button>
@@ -725,37 +731,55 @@ export default function NativeBookingForm({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">Date*</label>
-                <input
-                  type="date"
-                  value={scheduledDate}
-                  min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
-                  onChange={(e) => setScheduledDate(e.target.value)}
-                  onClick={(e) => {
-                    const el = e.currentTarget as HTMLInputElement;
-                    if (typeof el.showPicker === 'function') {
-                      try { el.showPicker(); } catch { /* ignore */ }
-                    }
-                  }}
-                  className={`${inputClass} cursor-pointer`}
-                  style={{ background: inputBg, colorScheme: 'dark' }}
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    onClick={(e) => {
+                      const el = e.currentTarget as HTMLInputElement;
+                      if (typeof el.showPicker === 'function') {
+                        try { el.showPicker(); } catch { /* ignore */ }
+                      }
+                    }}
+                    className={`${inputClass} cursor-pointer dt-native-hidden pr-9`}
+                    style={{ background: inputBg, colorScheme: 'dark' }}
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-[#dfbd69]/80" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </span>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">Time*</label>
-                <input
-                  type="time"
-                  value={scheduledTime}
-                  step={1800}
-                  onChange={(e) => setScheduledTime(e.target.value)}
-                  onClick={(e) => {
-                    const el = e.currentTarget as HTMLInputElement;
-                    if (typeof el.showPicker === 'function') {
-                      try { el.showPicker(); } catch { /* ignore */ }
-                    }
-                  }}
-                  className={`${inputClass} cursor-pointer`}
-                  style={{ background: inputBg, colorScheme: 'dark' }}
-                />
+                <div className="relative">
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    step={1800}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    onClick={(e) => {
+                      const el = e.currentTarget as HTMLInputElement;
+                      if (typeof el.showPicker === 'function') {
+                        try { el.showPicker(); } catch { /* ignore */ }
+                      }
+                    }}
+                    className={`${inputClass} cursor-pointer dt-native-hidden pr-9`}
+                    style={{ background: inputBg, colorScheme: 'dark' }}
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-[#dfbd69]/80" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </span>
+                </div>
               </div>
             </div>
             <p className="text-xs text-white/60 mt-2">

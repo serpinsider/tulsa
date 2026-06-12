@@ -10,7 +10,7 @@
  * Layout (top -> bottom):
  *   1. HeaderSimple chrome (logo not linked, no Book button) — from layout
  *   2. Hero greeting: "Hi {first}, your quote is ready."
- *   3. Trust strip: 4 truthful pills (Insured / Pay after / Card or Zelle / Satisfaction)
+ *   3. Trust strip: 4 truthful pills (Insured / Pay after / Card on file / Satisfaction)
  *   4. Quote card: always-visible breakdown, smart addon pills addable
  *      inline (no edit click), and a "Show full options" toggle that opens
  *      a scope editor for service tier / beds / baths / sqft / freq / all
@@ -42,7 +42,11 @@ import { useSearchParams } from 'next/navigation';
 import { usePrefillFromToken } from '@/lib/usePrefillFromToken';
 import { CONTACT_INFO } from '@/lib/contact';
 import { ADDONS } from '@/lib/constants/addons';
-import InlineStripeCard, { type InlineStripeCardHandle } from '@/components/InlineStripeCard';
+
+/** Recolors the multicolor addon PNGs into the brand gold family so they
+ *  read cleanly on the dark card without a light tile behind them. */
+const GOLD_ICON_FILTER =
+  'grayscale(1) sepia(1) saturate(2.4) hue-rotate(5deg) brightness(1.25) contrast(0.95)';
 
 interface Props {
   brandSlug: string;
@@ -203,10 +207,10 @@ export default function QuoteConfirmPage(props: Props) {
   const [zip, setZip] = useState('');
   const [scheduledDate, setScheduledDate] = useState<string>('');
   const [scheduledTime, setScheduledTime] = useState<string>('10:00');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'zelle'>('card');
-  const [cardStatus, setCardStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [cardStatusErr, setCardStatusErr] = useState<string | null>(null);
-  const cardRef = useRef<InlineStripeCardHandle | null>(null);
+  // Card is the only payment option for new customers (Zelle is enabled
+  // manually per customer on the backend). Card collection happens
+  // post-booking via the secure link we text, same as NativeBookingForm.
+  const paymentMethod = 'card' as const;
 
   // ---------- live quote recompute ----------
   const [liveQuote, setLiveQuote] = useState<QuoteResponse['quote'] | null>(null);
@@ -337,9 +341,6 @@ export default function QuoteConfirmPage(props: Props) {
         if (d.zip) setZip(d.zip);
         if (d.scheduledDate) setScheduledDate(d.scheduledDate);
         if (d.scheduledTime) setScheduledTime(d.scheduledTime);
-        if (d.paymentMethod === 'card' || d.paymentMethod === 'zelle') {
-          setPaymentMethod(d.paymentMethod);
-        }
       } catch {}
     }
     persistRef.current = true;
@@ -357,7 +358,6 @@ export default function QuoteConfirmPage(props: Props) {
         zip,
         scheduledDate,
         scheduledTime,
-        paymentMethod,
       }),
     );
     setSavedFlash(true);
@@ -372,7 +372,6 @@ export default function QuoteConfirmPage(props: Props) {
     zip,
     scheduledDate,
     scheduledTime,
-    paymentMethod,
   ]);
 
   // ---------- derived ----------
@@ -519,11 +518,6 @@ export default function QuoteConfirmPage(props: Props) {
   if (!zip.trim()) fieldErrors.zip = 'Required';
   if (!scheduledDate) fieldErrors.scheduledDate = 'Pick a date';
   if (!scheduledTime) fieldErrors.scheduledTime = 'Pick a time';
-  if (paymentMethod === 'card' && cardStatus !== 'ready') {
-    if (cardStatus === 'loading') fieldErrors.card = 'Card form still loading';
-    else if (cardStatus === 'error') fieldErrors.card = 'Card form had an error. Pick Zelle or refresh.';
-    else fieldErrors.card = 'Finish adding your card';
-  }
   const firstInvalidId = Object.keys(fieldErrors)[0] || null;
 
   const onSubmit = useCallback(
@@ -555,18 +549,6 @@ export default function QuoteConfirmPage(props: Props) {
           email: emailInput.trim() || payload.customer?.email || '',
         };
 
-        let confirmedSetupIntentId: string | null = null;
-        if (paymentMethod === 'card') {
-          if (!cardRef.current) {
-            throw new Error('Card form not ready yet. Wait a moment and try again.');
-          }
-          const result = await cardRef.current.confirm();
-          if (!result.ok || !result.setupIntentId) {
-            throw new Error(result.error || 'Card was declined. Try again or pick Zelle.');
-          }
-          confirmedSetupIntentId = result.setupIntentId;
-        }
-
         const res = await fetch(`${VA_OPS_URL}/api/public/bookings/create`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -590,7 +572,6 @@ export default function QuoteConfirmPage(props: Props) {
               zip: zip.trim(),
             },
             paymentMethodKind: paymentMethod,
-            setupIntentId: confirmedSetupIntentId || undefined,
             quotePrefillToken: token || undefined,
           }),
         });
@@ -643,7 +624,6 @@ export default function QuoteConfirmPage(props: Props) {
       city,
       stateCode,
       zip,
-      paymentMethod,
       token,
     ],
   );
@@ -710,7 +690,7 @@ export default function QuoteConfirmPage(props: Props) {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-white/70">
           <TrustChip icon="shield" label="Insured" accentColor={accentColor} />
           <TrustChip icon="cash" label="Pay after" accentColor={accentColor} />
-          <TrustChip icon="card" label="Card or Zelle" accentColor={accentColor} />
+          <TrustChip icon="card" label="Card on file" accentColor={accentColor} />
           <TrustChip icon="smile" label="Satisfaction guaranteed" accentColor={accentColor} />
         </div>
 
@@ -753,7 +733,7 @@ export default function QuoteConfirmPage(props: Props) {
                   </div>
                 )}
                 {frequency !== 'one-time' && (
-                  <div className="text-white/55 text-xs mt-1 capitalize">
+                  <div className="text-white/70 text-xs mt-1 capitalize">
                     {frequency.replace('-', ' ')} recurring
                   </div>
                 )}
@@ -765,7 +745,7 @@ export default function QuoteConfirmPage(props: Props) {
                 >
                   ${total.toFixed(0)}
                 </div>
-                <div className="text-[10px] uppercase tracking-wider text-white/55 mt-1">
+                <div className="text-[10px] uppercase tracking-wider text-white/70 mt-1">
                   {recalculating ? 'updating' : liveQuote?.splitQuote ? 'first clean' : 'total'}
                 </div>
                 {liveQuote?.splitQuote && (
@@ -779,7 +759,7 @@ export default function QuoteConfirmPage(props: Props) {
             {/* Selected add-ons as bullet list (no redundant breakdown rows) */}
             {addons.size > 0 && (
               <div className="border-t border-white/10 pt-4">
-                <div className="text-[10px] uppercase tracking-wider text-white/45 mb-2">
+                <div className="text-[10px] uppercase tracking-wider text-white/60 mb-2">
                   Your add-ons
                 </div>
                 <ul className="space-y-1.5 text-[13px]">
@@ -795,7 +775,7 @@ export default function QuoteConfirmPage(props: Props) {
                             style={{ background: accentColor }}
                             aria-hidden="true"
                           />
-                          <span className="truncate">{meta?.label || k}</span>
+                          <span className="truncate capitalize">{meta?.label || k}</span>
                         </span>
                         <span className="flex items-center gap-3 shrink-0">
                           {price ? (
@@ -804,7 +784,7 @@ export default function QuoteConfirmPage(props: Props) {
                           <button
                             type="button"
                             onClick={() => toggleAddon(k)}
-                            className="text-white/45 hover:text-white text-xs"
+                            className="text-white/60 hover:text-white text-xs"
                             aria-label={`Remove ${meta?.label || k}`}
                           >
                             remove
@@ -827,7 +807,7 @@ export default function QuoteConfirmPage(props: Props) {
                   </div>
                 )}
                 {salesTax > 0 && (
-                  <div className="flex justify-between text-white/55">
+                  <div className="flex justify-between text-white/70">
                     <span>
                       Sales tax
                       {salesTaxRate
@@ -838,7 +818,7 @@ export default function QuoteConfirmPage(props: Props) {
                   </div>
                 )}
                 {subtotal !== total && (
-                  <div className="flex justify-between text-white/55">
+                  <div className="flex justify-between text-white/70">
                     <span>Subtotal</span>
                     <span className="tabular-nums">${subtotal.toFixed(2)}</span>
                   </div>
@@ -849,7 +829,7 @@ export default function QuoteConfirmPage(props: Props) {
             {/* Recommended addon pills — addable WITHOUT clicking edit */}
             {recommendedAddons.length > 0 && (
               <div className="mt-4 pt-3 border-t border-white/10">
-                <div className="text-[10px] uppercase tracking-wider text-white/45 mb-2">
+                <div className="text-[10px] uppercase tracking-wider text-white/60 mb-2">
                   Most-added by customers like you
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -866,17 +846,16 @@ export default function QuoteConfirmPage(props: Props) {
                       }}
                     >
                       {a.iconSrc && (
-                        <span className="w-7 h-7 rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-0.5 shrink-0">
-                          <Image
-                            src={a.iconSrc}
-                            alt=""
-                            width={20}
-                            height={20}
-                            className="w-full h-full object-contain"
-                          />
-                        </span>
+                        <Image
+                          src={a.iconSrc}
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="shrink-0"
+                          style={{ filter: GOLD_ICON_FILTER }}
+                        />
                       )}
-                      <span>+ {a.label}</span>
+                      <span className="capitalize">+ {a.label}</span>
                       <span className="tabular-nums" style={{ color: accentColor }}>
                         ${a.price.toFixed(0)}
                       </span>
@@ -983,7 +962,7 @@ export default function QuoteConfirmPage(props: Props) {
               <h2 className="text-white text-lg sm:text-xl font-semibold tracking-tight">
                 Confirm your booking
               </h2>
-              <p className="text-white/55 text-xs mt-1">
+              <p className="text-white/70 text-xs mt-1">
                 Address, date, and how you&apos;d like to pay.
               </p>
             </div>
@@ -1101,7 +1080,7 @@ export default function QuoteConfirmPage(props: Props) {
                 error={submitAttempted ? fieldErrors.scheduledTime : null}
               />
             </div>
-            <p className="text-white/45 text-[11px] mt-1.5">
+            <p className="text-white/60 text-[11px] mt-1.5">
               We&apos;ll confirm the exact arrival window after assigning a cleaner.
             </p>
             {sameDayBanner && (
@@ -1127,56 +1106,18 @@ export default function QuoteConfirmPage(props: Props) {
             )}
           </FieldGroup>
 
-          <FieldGroup label="Payment method">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <RadioCard
-                selected={paymentMethod === 'card'}
-                onClick={() => setPaymentMethod('card')}
-                accentColor={accentColor}
-                btnTextColor={btnTextColor}
-                title="Card"
-                sub="Charged after the clean."
-              />
-              <RadioCard
-                selected={paymentMethod === 'zelle'}
-                onClick={() => setPaymentMethod('zelle')}
-                accentColor={accentColor}
-                btnTextColor={btnTextColor}
-                title="Zelle"
-                sub="Instructions sent after booking."
-              />
+          <FieldGroup label="Payment">
+            <div
+              className="text-xs rounded-lg p-3 border leading-relaxed"
+              style={{
+                color: accentColor,
+                background: `${accentColor}1a`,
+                borderColor: `${accentColor}4d`,
+              }}
+            >
+              <strong>No charge today.</strong> After you confirm, we&apos;ll text you a secure
+              link to add a card on file. Your card is only charged after the clean is complete.
             </div>
-            {paymentMethod === 'card' && token && (
-              <div className="mt-3" ref={registerFieldRef('card')}>
-                <InlineStripeCard
-                  ref={cardRef}
-                  token={token}
-                  vaOpsUrl={VA_OPS_URL}
-                  accentColor={accentColor}
-                  customer={{
-                    email: emailInput || prefill.payload?.customer?.email,
-                    firstName: firstName || prefill.payload?.customer?.firstName,
-                    lastName: lastName || prefill.payload?.customer?.lastName,
-                    phone: prefill.payload?.customer?.phone,
-                  }}
-                  onStatusChange={(s, err) => {
-                    setCardStatus(s);
-                    setCardStatusErr(err || null);
-                  }}
-                />
-                {cardStatus === 'error' && cardStatusErr && (
-                  <p className="text-[11px] text-red-300 mt-1.5">{cardStatusErr}</p>
-                )}
-                {submitAttempted && fieldErrors.card && cardStatus !== 'error' && (
-                  <p className="text-[11px] text-red-300 mt-1.5">{fieldErrors.card}</p>
-                )}
-              </div>
-            )}
-            {paymentMethod === 'zelle' && (
-              <p className="text-[12px] text-white/55 mt-2">
-                You&apos;ll see Zelle instructions in your account and confirmation email after booking.
-              </p>
-            )}
           </FieldGroup>
 
           {submitErr && (
@@ -1198,7 +1139,7 @@ export default function QuoteConfirmPage(props: Props) {
             {submitting ? 'Confirming...' : `Confirm booking · $${total.toFixed(0)}`}
           </button>
 
-          <div className="flex items-center justify-center gap-2 text-white/50 text-[11px]">
+          <div className="flex items-center justify-center gap-2 text-white/65 text-[11px]">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -1215,7 +1156,7 @@ export default function QuoteConfirmPage(props: Props) {
             borderColor: 'rgba(255,255,255,0.08)',
           }}
         >
-          <div className="text-[10px] uppercase tracking-[0.18em] text-white/40 mb-3 font-semibold">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-white/55 mb-3 font-semibold">
             What happens next
           </div>
           <ol className="space-y-3">
@@ -1234,7 +1175,7 @@ export default function QuoteConfirmPage(props: Props) {
             <NextStep
               num={3}
               title="Pay after the clean is done"
-              body="Card on file or Zelle. We email an itemized receipt."
+              body="Card on file. We email an itemized receipt."
               accentColor={accentColor}
             />
           </ol>
@@ -1312,7 +1253,7 @@ function FrequencyStrip({
   ];
   return (
     <div className="space-y-1.5">
-      <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 font-semibold pl-0.5">
+      <div className="text-[10px] uppercase tracking-[0.18em] text-white/60 font-semibold pl-0.5">
         Frequency
       </div>
       <div className="grid grid-cols-4 gap-1.5">
@@ -1434,7 +1375,7 @@ function NextStep({
       </div>
       <div className="min-w-0">
         <div className="text-white text-sm font-medium leading-tight">{title}</div>
-        <div className="text-white/55 text-xs mt-0.5 leading-relaxed">{body}</div>
+        <div className="text-white/70 text-xs mt-0.5 leading-relaxed">{body}</div>
       </div>
     </li>
   );
@@ -1449,7 +1390,7 @@ function DisclaimerBlock({
 }) {
   return (
     <footer
-      className="rounded-xl border p-4 text-[11px] text-white/55 leading-relaxed space-y-3"
+      className="rounded-xl border p-4 text-[11px] text-white/70 leading-relaxed space-y-3"
       style={{
         background: 'rgba(255,255,255,0.015)',
         borderColor: 'rgba(255,255,255,0.06)',
@@ -1467,7 +1408,7 @@ function DisclaimerBlock({
         <a href="/privacy" className="hover:text-white" style={{ color: accentColor }}>
           Privacy
         </a>
-        <span className="text-white/35">© {new Date().getFullYear()} {businessName}</span>
+        <span className="text-white/50">© {new Date().getFullYear()} {businessName}</span>
       </p>
     </footer>
   );
@@ -1570,7 +1511,7 @@ function ScopeEditor(props: {
   if (!opts) {
     return (
       <div className="px-5 pb-5 sm:px-6 sm:pb-6 border-t border-white/10 pt-4">
-        <div className="text-white/55 text-sm">Loading options...</div>
+        <div className="text-white/70 text-sm">Loading options...</div>
       </div>
     );
   }
@@ -1659,24 +1600,23 @@ function ScopeEditor(props: {
                   }}
                 >
                   {iconSrc ? (
-                    <span className="w-7 h-7 rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-0.5 shrink-0 mt-0.5">
-                      <Image
-                        src={iconSrc}
-                        alt=""
-                        width={22}
-                        height={22}
-                        className="w-full h-full object-contain"
-                      />
-                    </span>
+                    <Image
+                      src={iconSrc}
+                      alt=""
+                      width={22}
+                      height={22}
+                      className="shrink-0 mt-0.5"
+                      style={{ filter: GOLD_ICON_FILTER }}
+                    />
                   ) : (
-                    <span className="w-7 shrink-0" aria-hidden="true" />
+                    <span className="w-[22px] shrink-0" aria-hidden="true" />
                   )}
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[13px] font-medium text-white leading-tight">
+                    <span className="block text-[13px] font-medium text-white leading-tight capitalize">
                       {meta?.label || a.label}
                     </span>
                     {a.cents ? (
-                      <span className="block text-[11px] mt-0.5 tabular-nums" style={{ color: selected ? accentColor : 'rgba(255,255,255,0.5)' }}>
+                      <span className="block text-[11px] mt-0.5 tabular-nums" style={{ color: selected ? accentColor : 'rgba(255,255,255,0.65)' }}>
                         +${(a.cents / 100).toFixed(0)}
                       </span>
                     ) : null}
@@ -1693,7 +1633,7 @@ function ScopeEditor(props: {
 
 function EditorLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="text-[10px] uppercase tracking-[0.15em] text-white/50 mb-2 font-semibold">
+    <div className="text-[10px] uppercase tracking-[0.15em] text-white/65 mb-2 font-semibold">
       {children}
     </div>
   );
@@ -1719,6 +1659,7 @@ function SelectField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm outline-none cursor-pointer"
+        style={{ colorScheme: 'dark' }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = accentColor;
         }}
@@ -1800,12 +1741,15 @@ const Input = forwardRef<HTMLInputElement, {
   { value, onChange, placeholder, type = 'text', inputMode, accentColor, className, min, max, error },
   ref,
 ) {
-  // Force dark color-scheme for date/time so the native calendar/clock icon
-  // renders light on dark instead of nearly-invisible black-on-dark.
+  // Date/time inputs: dark color-scheme themes the native picker popup, and
+  // the native calendar/clock indicator is hidden (it paints near-black on
+  // the dark input regardless of color-scheme) in favor of our own gold SVG
+  // overlaid on the right. The whole field opens the picker via showPicker().
   const needsDarkScheme = type === 'date' || type === 'time' || type === 'datetime-local';
   const baseBorder = error ? 'rgba(252,165,165,0.55)' : 'rgba(255,255,255,0.15)';
   return (
     <div className={className}>
+      <div className="relative">
       <input
         ref={ref}
         value={value}
@@ -1816,7 +1760,7 @@ const Input = forwardRef<HTMLInputElement, {
         min={min}
         max={max}
         aria-invalid={!!error}
-        className="w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors"
+        className={`w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/50 text-sm outline-none transition-colors${needsDarkScheme ? ' dt-native-hidden pr-9' : ''}`}
         style={{
           borderColor: baseBorder,
           ...(needsDarkScheme ? { colorScheme: 'dark' as const } : {}),
@@ -1843,54 +1787,34 @@ const Input = forwardRef<HTMLInputElement, {
           }
         }}
       />
+      {needsDarkScheme && (
+        <span
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex"
+          style={{ color: `${accentColor}cc` }}
+          aria-hidden="true"
+        >
+          {type === 'time' ? (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          ) : (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          )}
+        </span>
+      )}
+      </div>
       {error && (
         <div className="text-[11px] text-red-300 mt-1 pl-0.5">{error}</div>
       )}
     </div>
   );
 });
-
-function RadioCard({
-  selected,
-  onClick,
-  accentColor,
-  btnTextColor,
-  title,
-  sub,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  accentColor: string;
-  btnTextColor: string;
-  title: string;
-  sub: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="text-left rounded-lg px-3 py-3 border transition-all"
-      style={{
-        background: selected ? `${accentColor}22` : 'rgba(255,255,255,0.03)',
-        borderColor: selected ? accentColor : 'rgba(255,255,255,0.15)',
-      }}
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <div
-          className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0"
-          style={{
-            borderColor: selected ? accentColor : 'rgba(255,255,255,0.45)',
-            background: selected ? accentColor : 'transparent',
-          }}
-        >
-          {selected && <div className="w-1.5 h-1.5 rounded-full" style={{ background: btnTextColor }} />}
-        </div>
-        <span className="text-white font-medium text-sm">{title}</span>
-      </div>
-      <div className="text-white/60 text-xs pl-6">{sub}</div>
-    </button>
-  );
-}
 
 // ===================== loading/error shells =====================
 
@@ -2130,7 +2054,7 @@ const AddressAutocomplete = forwardRef<HTMLInputElement, {
         placeholder={placeholder}
         autoComplete="off"
         aria-invalid={!!error}
-        className="w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/35 text-sm outline-none transition-colors"
+        className="w-full bg-white/5 border rounded-lg px-3 py-2.5 text-white placeholder-white/50 text-sm outline-none transition-colors"
         style={{ borderColor: baseBorder }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = accentColor;
