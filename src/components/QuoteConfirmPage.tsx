@@ -866,13 +866,15 @@ export default function QuoteConfirmPage(props: Props) {
                       }}
                     >
                       {a.iconSrc && (
-                        <Image
-                          src={a.iconSrc}
-                          alt=""
-                          width={20}
-                          height={20}
-                          className="opacity-90"
-                        />
+                        <span className="w-7 h-7 rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-0.5 shrink-0">
+                          <Image
+                            src={a.iconSrc}
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="w-full h-full object-contain"
+                          />
+                        </span>
                       )}
                       <span>+ {a.label}</span>
                       <span className="tabular-nums" style={{ color: accentColor }}>
@@ -1657,15 +1659,17 @@ function ScopeEditor(props: {
                   }}
                 >
                   {iconSrc ? (
-                    <Image
-                      src={iconSrc}
-                      alt=""
-                      width={22}
-                      height={22}
-                      className="opacity-90 shrink-0 mt-0.5"
-                    />
+                    <span className="w-7 h-7 rounded-md bg-white/90 ring-1 ring-white/30 flex items-center justify-center p-0.5 shrink-0 mt-0.5">
+                      <Image
+                        src={iconSrc}
+                        alt=""
+                        width={22}
+                        height={22}
+                        className="w-full h-full object-contain"
+                      />
+                    </span>
                   ) : (
-                    <span className="w-[22px]" aria-hidden="true" />
+                    <span className="w-7 shrink-0" aria-hidden="true" />
                   )}
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13px] font-medium text-white leading-tight">

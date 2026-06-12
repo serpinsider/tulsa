@@ -5,7 +5,21 @@ import { useState, useEffect } from 'react';
 import { BRANDING } from '@/config/branding';
 import Logo from './Logo';
 
-export default function HeaderSimple() {
+interface HeaderSimpleProps {
+  linkLogo?: boolean;
+  hideBookButton?: boolean;
+  /** If false, sits flush at top:0 (no AnnouncementBar above). Default true keeps legacy 48px offset. */
+  hasAnnouncementAbove?: boolean;
+  /** If true, header is always solid navy (no transparent-until-scroll behavior). */
+  forceSolid?: boolean;
+}
+
+export default function HeaderSimple({
+  linkLogo = true,
+  hideBookButton = false,
+  hasAnnouncementAbove = true,
+  forceSolid = false,
+}: HeaderSimpleProps = {}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -30,15 +44,15 @@ export default function HeaderSimple() {
   }, [isMenuOpen]);
 
   return (
-    <header className="fixed w-full z-50" style={{ top: '48px' }}>
+    <header className="fixed w-full z-50" style={{ top: hasAnnouncementAbove ? '48px' : '0' }}>
       {/* Main Header */}
       <div 
         className={`transition-all duration-300 ${
-          isScrolled 
+          isScrolled || forceSolid
             ? 'backdrop-blur-md border-b border-white/10' 
             : 'bg-transparent'
         }`}
-        style={isScrolled ? { background: 'rgba(26, 55, 85, 0.95)' } : {}}
+        style={(isScrolled || forceSolid) ? { background: 'rgba(26, 55, 85, 0.95)' } : {}}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Desktop Layout */}
@@ -59,24 +73,28 @@ export default function HeaderSimple() {
 
             {/* Center - Logo (absolutely centered) */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Logo size="md" />
+              <Logo size="md" linkToHome={linkLogo} />
             </div>
 
             {/* Right - Book Button */}
             <div className="flex items-center ml-auto">
-              <Link
-                href="/booking"
-                className="button-tertiary px-6 py-2"
-              >
-                Book Online
-              </Link>
+              {hideBookButton ? (
+                <span className="w-[120px]" aria-hidden="true" />
+              ) : (
+                <Link
+                  href="/booking"
+                  className="button-tertiary px-6 py-2"
+                >
+                  Book Online
+                </Link>
+              )}
             </div>
           </div>
 
           {/* Mobile Layout */}
           <div className="lg:hidden flex items-center justify-between h-16">
             {/* Mobile Logo */}
-            <Logo size="sm" />
+            <Logo size="sm" linkToHome={linkLogo} />
 
             {/* Mobile Menu Button */}
             <button
